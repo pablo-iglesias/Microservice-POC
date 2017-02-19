@@ -6,23 +6,26 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Map.Entry;
 
-public class TemplateParserDefault extends TemplateParser {
+public class TemplateParserDefault extends TemplateEngine {
 	
 	public String parseTemplate(String view, Map<String, String> params){
 		
-		InputStream file = TemplateParserDefault.class.getClassLoader().getResourceAsStream(view);
-		Scanner scanner = new Scanner(file);
-		scanner.useDelimiter("\\A");
-		String template = scanner.hasNext() ? scanner.next() : "";
-		scanner.close();
+		String template = loadResourceAsString(view);
 		
-		Iterator<Entry<String, String>> it = params.entrySet().iterator();
-	    while (it.hasNext()) {
-	        Map.Entry<String, String> pair = (Map.Entry<String, String>)it.next();
-	        template = template.replaceAll("\\{\\{"+pair.getKey()+"\\}\\}", pair.getValue());
-	        it.remove();
-	    }
-	    
-	    return template;
+		if(template != null){
+			if(params != null){
+				Iterator<Entry<String, String>> it = params.entrySet().iterator();
+			    while (it.hasNext()) {
+			        Map.Entry<String, String> pair = (Map.Entry<String, String>)it.next();
+			        template = template.replaceAll("\\{\\{"+pair.getKey()+"\\}\\}", pair.getValue());
+			        it.remove();
+			    }
+			}
+			
+			return template;
+		}
+		else{
+			return "";
+		}
 	}
 }

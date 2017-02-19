@@ -37,12 +37,16 @@ jar {
   manifest {
     attributes(
       'Main-Class': 'App',
-      'Class-Path': 'libs/sqlite-jdbc-3.7.2.jar'
+      'Class-Path': 'libs/sqlite-jdbc-3.7.2.jar libs/guava-20.0.jar'
     )
   }
   from('templates') {
       include  '**/*.html'
       into 'templates'
+  }
+  from('sql') {
+      include  '**/*.sql'
+      into 'sql'
   }
 }
 

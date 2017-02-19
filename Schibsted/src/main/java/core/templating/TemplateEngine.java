@@ -2,7 +2,9 @@ package core.templating;
 
 import java.util.Map;
 
-public abstract class TemplateParser {
+import core.ResourceLoader;
+
+public abstract class TemplateEngine extends ResourceLoader {
 
 	public static final int TYPE_DEFAULT = 1;
 	

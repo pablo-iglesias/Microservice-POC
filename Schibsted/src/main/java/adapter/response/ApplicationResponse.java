@@ -2,36 +2,49 @@ package adapter.response;
 
 import java.util.Map;
 
+import core.entity.Session;
+
+/**
+ * This class is a value object for the standard response of a Controller to the underlying architecture
+ * 
+ * @author Peibol
+ */
 public class ApplicationResponse {
 	
-	private int status;
+	public static final int RESPONSE_ILEGAL = -1;
+	public static final int RESPONSE_OK = 0;
+	public static final int RESPONSE_REDIRECT = 1;
+	
+	private int response;
+	private Session session = null;
+	private String location;
 	private String view;
 	private Map<String, String> data;
 	
-	public ApplicationResponse(int statusCode){
-		setStatusCode(statusCode);
+	public ApplicationResponse(int response){
+		setResponseCode(response);
 	}
 	
-	public ApplicationResponse(int status, String view, Map<String, String> data){
-		setStatusCode(status);
+	public ApplicationResponse(int response, String view, Map<String, String> data){
+		setResponseCode(response);
 		setView(view);
 		setData(data);
 	}
-	
-	public void setStatusCode(int statusCode){
-		this.status = statusCode;
+		
+	public int getResponseCode(){
+		return response;
 	}
 	
-	public int getStatusCode(){
-		return status;
-	}
-	
-	public void setView(String view){
-		this.view = view;
+	public void setResponseCode(int responseCode){
+		this.response = responseCode;
 	}
 	
 	public String getView(){
 		return view;
+	}
+	
+	public void setView(String view){
+		this.view = view;
 	}
 	
 	public Map<String, String> getData(){
@@ -40,5 +53,21 @@ public class ApplicationResponse {
 	
 	public void setData(Map<String, String> data){
 		this.data = data;
+	}
+	
+	public String getLocation(){
+		return location;
+	}
+	
+	public void setLocation(String location){
+		this.location = location;
+	}
+
+	public Session getSession() {
+		return session;
+	}
+
+	public void setSession(Session session) {
+		this.session = session;
 	}
 }
