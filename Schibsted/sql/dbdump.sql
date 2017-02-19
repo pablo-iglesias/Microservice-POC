@@ -20,18 +20,18 @@ INSERT INTO roles(role_name) VALUES('PAGE_1');
 INSERT INTO roles(role_name) VALUES('PAGE_2');
 INSERT INTO roles(role_name) VALUES('PAGE_3');
 
-CREATE TABLE user_has_roles (
-	user_id integer,
-	role_id integer
+CREATE TABLE user_has_role (
+	fk_user_id integer,
+	fk_role_id integer
 );
 
-INSERT INTO user_has_roles(user_id, role_id) VALUES(1, 1);
-INSERT INTO user_has_roles(user_id, role_id) VALUES(1, 2);
-INSERT INTO user_has_roles(user_id, role_id) VALUES(1, 3);
-INSERT INTO user_has_roles(user_id, role_id) VALUES(1, 4);
-INSERT INTO user_has_roles(user_id, role_id) VALUES(2, 2);
-INSERT INTO user_has_roles(user_id, role_id) VALUES(3, 3);
-INSERT INTO user_has_roles(user_id, role_id) VALUES(4, 4);
-INSERT INTO user_has_roles(user_id, role_id) VALUES(5, 2);
-INSERT INTO user_has_roles(user_id, role_id) VALUES(5, 3);
-INSERT INTO user_has_roles(user_id, role_id) VALUES(5, 4);
+INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(1, 1);
+INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(1, 2);
+INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(1, 3);
+INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(1, 4);
+INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(2, 2);
+INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(3, 3);
+INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(4, 4);
+INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(5, 2);
+INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(5, 3);
+INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(5, 4);

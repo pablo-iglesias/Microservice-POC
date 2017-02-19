@@ -21,6 +21,19 @@ public class UserModelRelational extends Model implements UserModelInterface{
 		db = (DatabaseRelational) Server.getDatabase();
 	}
 	
+	public String getUsernameByUserId(int uid) throws SQLException{
+		
+		db.prepare("SELECT user_name FROM users WHERE user_id = ?");
+		db.add(uid);
+				
+		if(db.selectOne()){
+			return db.getString("user_name");
+		}
+		else{
+			return null;
+		}
+	}
+	
 	public Integer getUserIdByUseranameAndPassword(String username, String password) throws SQLException{
 					
 		db.prepare("SELECT user_id FROM users WHERE user_name = ? AND user_password = ?");
@@ -29,19 +42,6 @@ public class UserModelRelational extends Model implements UserModelInterface{
 		
 		if(db.selectOne()){
 			return new Integer(db.getInt("user_id"));
-		}
-		else{
-			return null;
-		}
-	}
-	
-	public String getUsernameByUserId(int uid) throws SQLException{
-		
-		db.prepare("SELECT user_name FROM users WHERE user_id = ?");
-		db.add(uid);
-				
-		if(db.selectOne()){
-			return db.getString("user_name");
 		}
 		else{
 			return null;

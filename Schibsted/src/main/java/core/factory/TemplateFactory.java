@@ -3,6 +3,7 @@ package core.factory;
 import core.ResourceLoader;
 import core.templating.TemplateEngine;
 import core.templating.TemplateParserDefault;
+import core.templating.TemplateParserTwig;
 
 public class TemplateFactory extends ResourceLoader {
 
@@ -10,10 +11,11 @@ public class TemplateFactory extends ResourceLoader {
 		try{
 			switch(type){
 				case TemplateEngine.TYPE_DEFAULT:
-					TemplateEngine parser = new TemplateParserDefault();
-					return parser;
+					return new TemplateParserDefault();
+				case TemplateEngine.TYPE_TWIG:
+					return new TemplateParserTwig();
 				default:
-					throw new Exception("TemplateParserFactory: Specified templating engine is not available");
+					throw new Exception("TemplateFactory: Specified templating engine is not available");
 			}
 		}
 		catch(Exception e){

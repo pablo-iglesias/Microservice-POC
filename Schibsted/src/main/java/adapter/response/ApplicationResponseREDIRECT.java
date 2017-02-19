@@ -2,14 +2,14 @@ package adapter.response;
 
 import core.entity.Session;
 
-public class ResponseREDIRECT extends ApplicationResponse{
+public class ApplicationResponseREDIRECT extends ApplicationResponse{
 
-	public ResponseREDIRECT(String location) {
+	public ApplicationResponseREDIRECT(String location) {
 		super(RESPONSE_REDIRECT);
 		setLocation(location);
 	}
 	
-	public ResponseREDIRECT(String location, Session session) {
+	public ApplicationResponseREDIRECT(String location, Session session) {
 		super(RESPONSE_REDIRECT);
 		setLocation(location);
 		setSession(session);

@@ -161,4 +161,19 @@ public class DatabaseSQLite extends DatabaseRelational {
 		
 		return true;
 	}
+	
+	public int count() throws SQLException{
+		int current = rs.getRow();
+		if (rs.last()) {
+		    int rows = rs.getRow();
+		    rs.absolute(current);
+		    return rows;
+		}
+		
+		return 0;
+	}
+	
+	public int pointer(){
+		return pointer;
+	}
 }

@@ -1,7 +1,7 @@
 package core.entity;
 
 
-public class HttpResponse {
+public class HttpResponse{
 	
 	private int code;
 	private String body;

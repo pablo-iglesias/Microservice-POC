@@ -13,4 +13,6 @@ public abstract class DatabaseRelational extends Database {
 	public abstract String getString(String paramName) throws SQLException;
 	public abstract int getInt(String paramName) throws SQLException;
 	public abstract boolean next() throws SQLException;
+	public abstract int count() throws SQLException;
+	public abstract int pointer();
 }

@@ -11,6 +11,7 @@ import core.entity.Session;
  */
 public class ApplicationResponse {
 	
+	public static final int RESPONSE_DENIED = -2;
 	public static final int RESPONSE_ILEGAL = -1;
 	public static final int RESPONSE_OK = 0;
 	public static final int RESPONSE_REDIRECT = 1;
@@ -19,13 +20,13 @@ public class ApplicationResponse {
 	private Session session = null;
 	private String location;
 	private String view;
-	private Map<String, String> data;
+	private Map<String, Object> data;
 	
 	public ApplicationResponse(int response){
 		setResponseCode(response);
 	}
 	
-	public ApplicationResponse(int response, String view, Map<String, String> data){
+	public ApplicationResponse(int response, String view, Map<String, Object> data){
 		setResponseCode(response);
 		setView(view);
 		setData(data);
@@ -47,11 +48,11 @@ public class ApplicationResponse {
 		this.view = view;
 	}
 	
-	public Map<String, String> getData(){
+	public Map<String, Object> getData(){
 		return data;
 	}
 	
-	public void setData(Map<String, String> data){
+	public void setData(Map<String, Object> data){
 		this.data = data;
 	}
 	

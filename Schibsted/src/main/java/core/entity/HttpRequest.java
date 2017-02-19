@@ -2,7 +2,7 @@ package core.entity;
 
 import com.sun.net.httpserver.Headers;
 
-public class HttpRequest {
+public class HttpRequest extends DataContainer{
 	
 	private String method;
 	private Headers headers;

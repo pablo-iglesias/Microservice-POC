@@ -23,7 +23,7 @@ public class Server {
 	private static final int PORT = 8000;
 	
 	public static final int DATABASE_ENGINE = Database.TYPE_SQLITE_MEMORY;
-	public static final int TEMPLATE_ENGINE = TemplateEngine.TYPE_DEFAULT;
+	public static final int TEMPLATE_ENGINE = TemplateEngine.TYPE_TWIG;
 	
 	private static Map<String, Session> sessions = new HashMap<String, Session>();
 		
@@ -47,7 +47,7 @@ public class Server {
 			HttpServer server = HttpServer.create(socket, 0);
     		server.createContext("/", handler);
     		server.start();
-    		System.out.println("Running in port " + PORT + "...");
+    		System.out.println("Running in port " + PORT + "... \r\n");
     	}
     	catch(Exception e){
     		System.out.println("Initialization failed, aborting");

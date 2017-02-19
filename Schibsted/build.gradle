@@ -28,7 +28,17 @@ dependencies {
     
     // Use Sqlite
     compile 'org.xerial:sqlite-jdbc:3.7.2'
+    
+    // Use Jtwig
+    compile "org.jtwig:jtwig-core:5.75"
+    
+    // Additional dependence for preventing a little problem
+    compile "org.slf4j:slf4j-jdk14:1.7.12"
+    
+    // Library for working with named regular expression groups
+    compile "com.github.tony19:named-regexp:0.2.4"
 }
+
 
 // Define the main class for the application
 mainClassName = 'App'
@@ -37,7 +47,7 @@ jar {
   manifest {
     attributes(
       'Main-Class': 'App',
-      'Class-Path': 'libs/sqlite-jdbc-3.7.2.jar libs/guava-20.0.jar'
+      'Class-Path': 'libs/asm-5.0.3.jar libs/asm-analysis-5.0.3.jar libs/asm-tree-5.0.3.jar libs/asm-util-5.0.3.jar libs/commons-lang3-3.1.jar libs/concurrentlinkedhashmap-lru-1.4.2.jar libs/guava-20.0.jar libs/jtwig-core-5.75.jar libs/jtwig-reflection-1.21.jar libs/parboiled-core-1.1.7.jar libs/parboiled-java-1.1.7.jar libs/slf4j-api-1.7.12.jar libs/sqlite-jdbc-3.7.2.jar libs/slf4j-jdk14-1.7.12.jar libs/named-regexp-0.2.4.jar'
     )
   }
   from('templates') {

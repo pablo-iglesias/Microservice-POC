@@ -11,6 +11,10 @@ public class DataContainer {
 		data = new HashMap<String, String>();
 	}
 	
+	public void set(HashMap<String, String> data){
+		this.data = data;
+	}
+	
 	public void setData(String key, String value){
 		data.put(key, value);
 	}

@@ -4,7 +4,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.google.code.regexp.Pattern;
+import com.google.code.regexp.Matcher;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -35,13 +42,11 @@ public class RequestHandler implements HttpHandler {
 	
 	// Path, controller, method
 	private static final String[][] routes = {
-		{"/", 			"Application",	"index"},
-		{"/login",		"Application",	"login"},
-		{"/logout",		"Application",	"logout"},
-		{"/welcome",	"Application",	"welcome"},
-		{"/page1", 		"Application",	"page1"},
-		{"/page2", 		"Application",	"page2"},
-		{"/page3", 		"Application",	"page3"}
+		{"/", 						"Application",	"index"},
+		{"/login",					"Application",	"login"},
+		{"/logout",					"Application",	"logout"},
+		{"/welcome",				"Application",	"welcome"},
+		{"/page_(?<page>[0-9]+)",	"Application",	"page"}
 	};
 	
 	/**
@@ -58,6 +63,7 @@ public class RequestHandler implements HttpHandler {
 				{
 					if(path.matches(route[PATH]))
 					{
+						Map<String,String> uriSegments = parseURI(path, route[PATH]);
 						String controllerName = route[CONTROLLER];
 						String methodName = route[METHOD];
 						
@@ -66,7 +72,7 @@ public class RequestHandler implements HttpHandler {
 							case "Application":
 								
 								// Parse HTTP request
-								HttpRequest request = createHttpRequest(exchange);
+								HttpRequest request = createHttpRequest(exchange, uriSegments);
 								Cookie cookie = retrieveHttpCookie(exchange);
 								Session session = retrieveHttpSession(cookie);
 								
@@ -84,6 +90,7 @@ public class RequestHandler implements HttpHandler {
 								// Send HTTM response
 								propagateSession(exchange, appResponse, session);
 								HttpResponse response = createHttpResponse(exchange, appResponse, session);
+								
 								dispatchHttpResponse(exchange, response);
 								
 							return;
@@ -109,6 +116,25 @@ public class RequestHandler implements HttpHandler {
 			return;
 		}
     }
+	
+	/**
+	 * Returns a number of variables from the URI based in the routing regex 
+	 * 
+	 * @param uri
+	 * @param regex
+	 * @return
+	 */
+	private Map<String,String> parseURI(String uri, String regex){
+		
+		Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(uri);
+        if(matcher.find()){
+        	return matcher.namedGroups();
+        }
+        else{
+        	return null;
+        }
+	}
 	
 	/**
 	 * Retrieve session data using session token if found in the cookie  
@@ -140,11 +166,13 @@ public class RequestHandler implements HttpHandler {
 	 * Create an HTTP request object with data taken from the request and properly formatted
 	 * 
 	 * @param exchange
+	 * @param uriSegments
 	 * @return
 	 */
-	private HttpRequest createHttpRequest(HttpExchange exchange){
+	private HttpRequest createHttpRequest(HttpExchange exchange, Map<String,String> uriSegments){
 		RequestFactory factory = new RequestFactory();
 		HttpRequest request = factory.create(exchange);
+		request.set((HashMap<String,String>)uriSegments);
 		return request;
 	}
 	
@@ -185,9 +213,11 @@ public class RequestHandler implements HttpHandler {
 	 * 
 	 * @param exchange
 	 * @param appResponse
+	 * @param session
 	 * @return
+	 * @throws Exception
 	 */
-	private HttpResponse createHttpResponse(HttpExchange exchange, ApplicationResponse appResponse, Session session){
+	private HttpResponse createHttpResponse(HttpExchange exchange, ApplicationResponse appResponse, Session session) throws Exception{
 		
 		ResponseFactory factory = new ResponseFactory();
 		
@@ -205,6 +235,9 @@ public class RequestHandler implements HttpHandler {
 			case ApplicationResponse.RESPONSE_REDIRECT:
 				exchange.getResponseHeaders().set("Location", appResponse.getLocation());
 				return factory.create(HttpURLConnection.HTTP_SEE_OTHER, body);
+				
+			case ApplicationResponse.RESPONSE_DENIED:
+				return factory.create(HttpURLConnection.HTTP_FORBIDDEN, "<h1>403 Forbidden (~_^)</h1>");
 				
 			case ApplicationResponse.RESPONSE_ILEGAL:
 			default:
@@ -237,7 +270,7 @@ public class RequestHandler implements HttpHandler {
 	 */
 	private void respondResourceNotFound(HttpExchange exchange) throws IOException{
 		ResponseFactory factory = new ResponseFactory();
-		HttpResponse response = factory.create(HttpURLConnection.HTTP_NOT_FOUND, "<h1>404 Not Found</h1>");
+		HttpResponse response = factory.create(HttpURLConnection.HTTP_NOT_FOUND, "<h1>404 Not Found (¬_¬)</h1>");
 		dispatchHttpResponse(exchange, response);
 	}
 	
@@ -249,7 +282,7 @@ public class RequestHandler implements HttpHandler {
 	 */
 	private void respondInternalServerError(HttpExchange exchange) throws IOException{
 		ResponseFactory factory = new ResponseFactory();
-		HttpResponse response = factory.create(HttpURLConnection.HTTP_INTERNAL_ERROR, "<h1>500 Internal</h1>");
+		HttpResponse response = factory.create(HttpURLConnection.HTTP_INTERNAL_ERROR, "<h1>500 Internal (ò_ó)</h1>");
 		dispatchHttpResponse(exchange, response);
 	}
 	

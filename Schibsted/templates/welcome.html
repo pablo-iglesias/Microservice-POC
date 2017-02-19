@@ -1,4 +1,23 @@
 <html>
+<style type="text/css">
+li{
+	margin-left: 50px;
+}
+</style>
 <h1>Welcome {{user_name}}</h1>
+<ul>
+{% if roles|length > 0 %}
+	<h3>This is the list of your roles</h3>
+	<p>
+    {% for key, value in roles %}
+    	{% if value|length > 0 %}
+        	<li>{{ key }}: This role enables you to go to <a href="/{{ value }}">{{ key }}</a></li>
+        {% else %}
+        	<li>{{ key }}: This role enables you to manage user accounts through the API</a></li>
+        {% endif %}
+    {% endfor %}
+    </p>
+{% endif %}
+</ul>
 <form action="/logout" method="POST"><input type="submit" value="Logout"/></form>
 </html>
