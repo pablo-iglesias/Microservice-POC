@@ -2,11 +2,24 @@
 <h1>Login page</h1>
 <p>
 	<form action="login" method="post">
-		<label for="username">User name</label>
-		<input type="text" name="username" id="username">
-		<label for="password">Password</label>
-		<input type="password" name="password" id="password">
-		<input type="Submit"/>
+		<table>
+			<tr>
+				<td><label for="username">User name</label></td>
+				<td><input type="text" name="username" id="username"></td>
+			</tr>
+			<tr>
+				<td><label for="password">Password</label></td>
+				<td><input type="password" name="password" id="password"></td>
+			</tr>
+			<tr>
+				<td colspan="2" align="right">
+					<input type="Submit"/>
+				</td>
+			</tr>
+		</table>
+	{% if page %}
+		<input type="hidden" name="page" value="{{ page }}"/>
+	{% endif %}
 	</form>
 </p>
 </html>

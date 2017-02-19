@@ -1,17 +1,17 @@
 package adapter.controller;
 
+import java.util.Map;
+import java.util.HashMap;
+
 import core.Helper;
 import core.Server;
 import core.entity.HttpRequest;
 import core.entity.Session;
 
-import domain.application.usecase.UsecaseAuthenticateUser;
-import domain.application.usecase.UsecasePage;
-import domain.application.usecase.UsecaseWelcome;
 import domain.factory.UserFactory;
-
-import java.util.Map;
-import java.util.HashMap;
+import domain.usecase.application.UsecaseAuthenticateUser;
+import domain.usecase.application.UsecasePage;
+import domain.usecase.application.UsecaseWelcome;
 
 import adapter.response.*;
 
@@ -46,12 +46,25 @@ public class ApplicationController {
 			
 			Map<String, String> params = Helper.parseRequestBody(request.getBody());
 	        
-			UsecaseAuthenticateUser usecase = new UsecaseAuthenticateUser(new UserFactory());
+			UsecaseAuthenticateUser usecase = new UsecaseAuthenticateUser();
 			usecase.username = params.get("username");
 			usecase.password = params.get("password");
+			usecase.factory = new UserFactory();
 			
 			if(usecase.execute()){
 				session = Server.createSession(usecase.uid);
+				
+				if(params.containsKey("page")){
+					UsecasePage usecasePage = new UsecasePage();
+					usecasePage.uid = session.getUserId();
+					usecasePage.page = params.get("page");
+					usecasePage.factory = new UserFactory();
+					
+					if(usecasePage.execute() && usecasePage.allowed){
+						return new ApplicationResponseREDIRECT("/page_" + params.get("page"), session);
+					}
+				}
+				
 				return new ApplicationResponseREDIRECT("/welcome", session);
 			}
 			else{
@@ -81,7 +94,7 @@ public class ApplicationController {
 	}
 	
 	/**
-	 * Welcome page, displays user name
+	 * Welcome page, displays user name and logout button
 	 * 
 	 * @param request
 	 * @param session
@@ -92,8 +105,9 @@ public class ApplicationController {
 		
 		if(session != null){
 			
-			UsecaseWelcome usecase = new UsecaseWelcome(new UserFactory());
+			UsecaseWelcome usecase = new UsecaseWelcome();
 			usecase.uid = session.getUserId();
+			usecase.factory = new UserFactory();
 			
 			if(usecase.execute()){
 				
@@ -117,6 +131,7 @@ public class ApplicationController {
 	}
 	
 	/**
+	 * Standard page, displays user name and logout button
 	 * 
 	 * @param request
 	 * @param session
@@ -126,19 +141,21 @@ public class ApplicationController {
 		
 		if(session != null && request.contains("page")){
 			
-			UsecasePage usecase = new UsecasePage(new UserFactory());
+			UsecasePage usecase = new UsecasePage();
 			usecase.uid = session.getUserId();
 			usecase.page = request.getData("page");
+			usecase.factory = new UserFactory();
 			
 			if(usecase.execute() && usecase.allowed){
 				Map<String, Object> data = new HashMap<String, Object>();
 				data.put("page", request.getData("page"));
+				data.put("user_name", usecase.username);
 				return new ApplicationResponseOK("templates/page.html", data);
 			}
 			
 			return new ApplicationResponseDENIED();
 		}
 		
-		return new ApplicationResponseILEGAL();
+		return new ApplicationResponseILEGAL(request.getData("page"));
 	}
 }

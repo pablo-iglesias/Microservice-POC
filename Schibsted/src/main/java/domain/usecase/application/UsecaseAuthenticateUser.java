@@ -1,12 +1,13 @@
-package domain.application.usecase;
+package domain.usecase.application;
 
 import domain.entity.User;
 import domain.factory.UserFactory;
+import domain.usecase.Usecase;
 
 public class UsecaseAuthenticateUser extends Usecase {
 
 	// Factory
-	private UserFactory factory;
+	public UserFactory factory;
 		
 	// Input data
 	public String username = "";
@@ -14,11 +15,7 @@ public class UsecaseAuthenticateUser extends Usecase {
 	
 	// Output data
 	public int uid = 0;
-	
-	public UsecaseAuthenticateUser(UserFactory factory){
-		this.factory = factory;
-	}
-	
+		
 	public boolean execute() throws Exception{
 		
 		User user = factory.create(username, password);

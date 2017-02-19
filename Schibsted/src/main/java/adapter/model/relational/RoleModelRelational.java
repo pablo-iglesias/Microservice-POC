@@ -8,7 +8,7 @@ import core.Server;
 import core.database.DatabaseRelational;
 
 import adapter.model.Model;
-import adapter.model.interfaces.RoleModelInterface;
+import adapter.model.RoleModelInterface;
 
 /**
  * Role model that expects the database to be relational and SQL driven

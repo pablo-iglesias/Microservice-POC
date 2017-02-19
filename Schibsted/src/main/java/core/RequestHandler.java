@@ -58,7 +58,7 @@ public class RequestHandler implements HttpHandler {
 			try{
 				
 				String path = exchange.getRequestURI().getPath();
-				
+												
 				for(String[] route : routes)
 				{
 					if(path.matches(route[PATH]))
@@ -221,6 +221,20 @@ public class RequestHandler implements HttpHandler {
 		
 		ResponseFactory factory = new ResponseFactory();
 		
+		// If the application has a page name in the querystring, it will be sent to the template system
+		String query = exchange.getRequestURI().getQuery();
+		
+		if(query != null && query != ""){
+			Map<String, String> segments = Helper.parseRequestBody(query);
+			if(segments.containsKey("page")){
+				if(appResponse.getData() == null){
+					Map<String, Object> data = new HashMap<String, Object>();
+					appResponse.setData(data);
+				}
+				appResponse.getData().put("page", segments.get("page"));
+			}
+		}
+		
 		// If the application specified a view and context data, use the template parser to generate response body
 		String body = "";
 		if(appResponse.getView() != null){
@@ -241,8 +255,14 @@ public class RequestHandler implements HttpHandler {
 				
 			case ApplicationResponse.RESPONSE_ILEGAL:
 			default:
-				exchange.getResponseHeaders().set("Location", "/");
-				return factory.create(HttpURLConnection.HTTP_SEE_OTHER, body);
+				if(appResponse.getStart() != null){
+					exchange.getResponseHeaders().set("Location", "/?page=" + appResponse.getStart());
+					return factory.create(HttpURLConnection.HTTP_SEE_OTHER, body);
+				}
+				else{
+					exchange.getResponseHeaders().set("Location", "/");
+					return factory.create(HttpURLConnection.HTTP_SEE_OTHER, body);
+				}
 		}
 	}
 	

@@ -1,8 +1,8 @@
 package adapter.model.generic;
 
-import adapter.factory.ModelFactory;
 import adapter.model.Model;
-import adapter.model.interfaces.UserModelInterface;
+import adapter.model.UserModelInterface;
+import adapter.model.factory.ModelFactory;
 
 /**
  * Standard User model, abstracted from data source

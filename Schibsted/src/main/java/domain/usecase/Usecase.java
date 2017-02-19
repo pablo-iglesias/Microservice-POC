@@ -1,4 +1,4 @@
-package domain.application.usecase;
+package domain.usecase;
 
 public abstract class Usecase {
 

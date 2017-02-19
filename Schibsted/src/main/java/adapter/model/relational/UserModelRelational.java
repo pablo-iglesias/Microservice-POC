@@ -6,7 +6,7 @@ import core.Server;
 import core.database.DatabaseRelational;
 
 import adapter.model.Model;
-import adapter.model.interfaces.UserModelInterface;
+import adapter.model.UserModelInterface;
 
 /**
  * User model that expects the database to be relational and SQL driven

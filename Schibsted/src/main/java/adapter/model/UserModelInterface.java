@@ -1,4 +1,4 @@
-package adapter.model.interfaces;
+package adapter.model;
 
 /**
  * All models of the type User must implement this

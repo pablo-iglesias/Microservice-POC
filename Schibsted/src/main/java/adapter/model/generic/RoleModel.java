@@ -2,9 +2,9 @@ package adapter.model.generic;
 
 import java.sql.SQLException;
 
-import adapter.factory.ModelFactory;
 import adapter.model.Model;
-import adapter.model.interfaces.RoleModelInterface;
+import adapter.model.RoleModelInterface;
+import adapter.model.factory.ModelFactory;
 
 /**
  * Standard Role model, abstracted from data source

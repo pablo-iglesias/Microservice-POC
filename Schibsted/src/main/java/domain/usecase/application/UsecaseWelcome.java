@@ -1,14 +1,15 @@
-package domain.application.usecase;
+package domain.usecase.application;
 
 import domain.entity.User;
 import domain.entity.Role;
 
 import domain.factory.UserFactory;
+import domain.usecase.Usecase;
 
 public class UsecaseWelcome extends Usecase {
 
 	// Factory
-	private UserFactory factory;
+	public UserFactory factory;
 	
 	// Input data
 	public int uid = 0;
@@ -16,10 +17,6 @@ public class UsecaseWelcome extends Usecase {
 	// Output data
 	public String username = "";
 	public String[][] roles = null;
-	
-	public UsecaseWelcome(UserFactory factory){
-		this.factory = factory;
-	}
 	
 	public boolean execute() throws Exception{
 		

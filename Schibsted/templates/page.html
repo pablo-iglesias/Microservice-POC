@@ -1,7 +1,10 @@
 <html>
 <h1>Page {{ page }}</h1>
-<form action="/logout" method="POST">
-	<input type="submit" value="Logout"/>
-	<button onclick="javascript:window.history.back()">Go Back</button>
+<strong>Hello {{user_name}}</strong>
+<form action="/logout" name="logout" method="POST">
+	<ul>
+		<li><a href="javascript:document.forms['logout'].submit()">Logout</a></li>
+		<li><a href="/welcome">Go back</a></li>
+	</ul>
 </form>
 </html>

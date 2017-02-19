@@ -5,7 +5,7 @@ import java.util.Map;
 import core.entity.Session;
 
 /**
- * This class is a value object for the standard response of a Controller to the underlying architecture
+ * This class is a value object for the standard response of a Controller to the request handler
  * 
  * @author Peibol
  */
@@ -16,11 +16,12 @@ public class ApplicationResponse {
 	public static final int RESPONSE_OK = 0;
 	public static final int RESPONSE_REDIRECT = 1;
 	
-	private int response;
-	private Session session = null;
-	private String location;
-	private String view;
-	private Map<String, Object> data;
+	private int response;						// Response code
+	private Session session = null;				// New session created by the Application
+	private String location = null;				// Redirect to this location
+	private String start = null;				// Page to get redirected after login
+	private String view = null;					// Template the get rendered
+	private Map<String, Object> data = null;	// Data to populate the template
 	
 	public ApplicationResponse(int response){
 		setResponseCode(response);
@@ -70,5 +71,13 @@ public class ApplicationResponse {
 
 	public void setSession(Session session) {
 		this.session = session;
+	}
+
+	public String getStart() {
+		return start;
+	}
+
+	public void setStart(String start) {
+		this.start = start;
 	}
 }

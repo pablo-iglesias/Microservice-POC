@@ -1,4 +1,4 @@
-package adapter.factory;
+package adapter.model.factory;
 
 import core.Server;
 import core.database.Database;
