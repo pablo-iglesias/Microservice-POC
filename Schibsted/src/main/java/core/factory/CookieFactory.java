@@ -15,7 +15,8 @@ public class CookieFactory {
 	 */
 	public Cookie create(HttpExchange exchange){
 		if(exchange.getRequestHeaders().containsKey("Cookie")){
-			return new Cookie(Helper.parseCookie(exchange.getRequestHeaders().getFirst("Cookie")));
+			String cookie = exchange.getRequestHeaders().getFirst("Cookie");
+			return new Cookie(Helper.map(cookie, ";*([^=]*)=([^;]*)"));
 		}
 		else{
 			return null;

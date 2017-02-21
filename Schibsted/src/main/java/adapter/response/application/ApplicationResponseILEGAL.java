@@ -1,4 +1,4 @@
-package adapter.response;
+package adapter.response.application;
 
 public class ApplicationResponseILEGAL extends ApplicationResponse{
 

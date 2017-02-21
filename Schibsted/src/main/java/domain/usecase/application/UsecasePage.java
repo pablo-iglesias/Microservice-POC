@@ -8,7 +8,7 @@ import domain.usecase.Usecase;
 public class UsecasePage extends Usecase{
 
 	// Factory
-	public UserFactory factory;
+	private UserFactory factory;
 		
 	// Input data
 	public int uid = 0;
@@ -17,6 +17,14 @@ public class UsecasePage extends Usecase{
 	// Output data
 	public String username = "";
 	public boolean allowed = false;
+	
+	public UsecasePage() throws Exception{
+		factory = new UserFactory();
+	}
+	
+	public UsecasePage(UserFactory factory){
+		this.factory = factory;
+	}
 	
 	public boolean execute() throws Exception{
 		

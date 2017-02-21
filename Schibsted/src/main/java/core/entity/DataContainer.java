@@ -15,16 +15,16 @@ public class DataContainer {
 		this.data = data;
 	}
 	
-	public void setData(String key, String value){
+	public void set(String key, String value){
 		data.put(key, value);
 	}
 	
-	public String getData(String key){
+	public String get(String key){
 		return data.get(key);
 	}
 	
-	public void removeData(String key){
-		data.remove(getData(key));
+	public void remove(String key){
+		data.remove(get(key));
 	}
 	
 	public boolean contains(String key){

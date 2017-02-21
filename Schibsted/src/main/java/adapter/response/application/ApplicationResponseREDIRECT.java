@@ -1,4 +1,4 @@
-package adapter.response;
+package adapter.response.application;
 
 import core.entity.Session;
 

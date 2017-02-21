@@ -1,6 +1,6 @@
 package adapter.model.generic;
 
-import java.sql.SQLException;
+import java.util.Vector;
 
 import adapter.model.Model;
 import adapter.model.RoleModelInterface;
@@ -21,11 +21,7 @@ public class RoleModel extends Model implements RoleModelInterface {
 		model = (RoleModelInterface) factory.create("Role");
 	}
 	
-	public String getRoleNameByRoleId(int rid) throws SQLException{
-		return model.getRoleNameByRoleId(rid);
-	}
-	
-	public Integer[] getRolesIdsByUserId(int uid) throws Exception{
-		return model.getRolesIdsByUserId(uid);
+	public Vector<Object[]> getRolesByUserId(int uid) throws Exception{
+		return model.getRolesByUserId(uid);
 	}
 }

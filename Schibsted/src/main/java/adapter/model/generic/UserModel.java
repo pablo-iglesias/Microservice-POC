@@ -1,5 +1,7 @@
 package adapter.model.generic;
 
+import java.util.Vector;
+
 import adapter.model.Model;
 import adapter.model.UserModelInterface;
 import adapter.model.factory.ModelFactory;
@@ -19,6 +21,10 @@ public class UserModel extends Model implements UserModelInterface {
 		model = (UserModelInterface) factory.create("User");
 	}
 	
+	public Vector<Object[]> getUsers() throws Exception{
+		return model.getUsers();
+	}
+		
 	public Integer getUserIdByUseranameAndPassword(String username, String password) throws Exception{
 		return model.getUserIdByUseranameAndPassword(username, password);
 	}

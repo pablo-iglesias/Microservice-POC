@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.code.regexp.Pattern;
 import com.google.code.regexp.Matcher;
@@ -16,17 +16,16 @@ import com.google.code.regexp.Matcher;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
-import adapter.controller.ApplicationController;
-import adapter.response.ApplicationResponse;
+import adapter.controller.api.ApiController;
+import adapter.controller.application.ApplicationController;
+import adapter.response.application.ApplicationResponse;
 
 import core.entity.Cookie;
 import core.entity.HttpRequest;
 import core.entity.HttpResponse;
 import core.entity.Session;
-import core.exception.SessionLossException;
 import core.factory.CookieFactory;
 import core.factory.RequestFactory;
-import core.factory.ResponseFactory;
 
 /**
  * Request handler
@@ -42,11 +41,12 @@ public class RequestHandler implements HttpHandler {
 	
 	// Path, controller, method
 	private static final String[][] routes = {
-		{"/", 						"Application",	"index"},
-		{"/login",					"Application",	"login"},
-		{"/logout",					"Application",	"logout"},
-		{"/welcome",				"Application",	"welcome"},
-		{"/page_(?<page>[0-9]+)",	"Application",	"page"}
+		{"/", 							"Application",	"index"},
+		{"/login",						"Application",	"login"},
+		{"/logout",						"Application",	"logout"},
+		{"/welcome",					"Application",	"welcome"},
+		{"/page_(?<page>[0-9]+)$",		"Application",	"page"},
+		{"/api/users/?(?<uid>[0-9]*)$",	"Api",			"handler"}
 	};
 	
 	/**
@@ -54,6 +54,8 @@ public class RequestHandler implements HttpHandler {
 	 */
 	public void handle(HttpExchange exchange) {
        
+		String controllerName = null;
+		
 		try{
 			try{
 				
@@ -63,35 +65,52 @@ public class RequestHandler implements HttpHandler {
 				{
 					if(path.matches(route[PATH]))
 					{
-						Map<String,String> uriSegments = parseURI(path, route[PATH]);
-						String controllerName = route[CONTROLLER];
+						controllerName = route[CONTROLLER];
 						String methodName = route[METHOD];
+						Class<?> controller;
+						Method method;
+						
+						// Parse URI and HTTP request
+						Map<String,String> uriSegments = Helper.group(path, route[PATH]);
+						HttpRequest request = createHttpRequest(exchange, uriSegments);
 						
 						switch(controllerName)
 						{
 							case "Application":
 								
-								// Parse HTTP request
-								HttpRequest request = createHttpRequest(exchange, uriSegments);
+								// Parse Cookie and identify Session
 								Cookie cookie = retrieveHttpCookie(exchange);
 								Session session = retrieveHttpSession(cookie);
 								
 								// Session loss check
 								if(session != null && session.isExpired()){
 									Server.removeSession(session.getSessionToken());
-									throw new SessionLossException();
 								}
-									
-								// Run application through the appropriate controller and method
-								Class<?> controller = ApplicationController.class;
-								Method method = controller.getMethod(methodName, new Class[]{HttpRequest.class, Session.class});
+								
+								// Identify appropriate controller and method
+								controller = ApplicationController.class;
+								method = controller.getMethod(methodName, new Class[]{HttpRequest.class, Session.class});
+						
+								// Run controller
 								ApplicationResponse appResponse = (ApplicationResponse) method.invoke(null, request, session);
 								
-								// Send HTTM response
+								// Send HTTP response
 								propagateSession(exchange, appResponse, session);
-								HttpResponse response = createHttpResponse(exchange, appResponse, session);
+								dispatchHttpResponse(exchange, createHttpResponse(exchange, appResponse, session));
 								
-								dispatchHttpResponse(exchange, response);
+							return;
+							
+							case "Api":					
+								
+								// Identify appropriate controller and method
+								controller = ApiController.class;
+								method = controller.getMethod(methodName, new Class[]{HttpRequest.class});
+								
+								HttpResponse apiResponse = (HttpResponse) method.invoke(null, request);
+								apiResponse.setHeader("Content-Type", "application/vnd.api+json");
+								
+								// Run controller and send HTTP response
+								dispatchHttpResponse(exchange, apiResponse);
 								
 							return;
 							default: 
@@ -101,13 +120,16 @@ public class RequestHandler implements HttpHandler {
 				}
 				respondResourceNotFound(exchange);
 			}
-			catch(SessionLossException e){
-				respondSessionLost(exchange);
-				return;
-			}
 			catch(Exception e){
 				e.printStackTrace(System.out);
-				respondInternalServerError(exchange);
+				switch(controllerName){
+					case "Application":
+						respondInternalServerError(exchange, true);
+					break;
+					case "Api":
+					default:
+						respondInternalServerError(exchange, false);
+				}
 				return;
 			}
 		}
@@ -118,25 +140,6 @@ public class RequestHandler implements HttpHandler {
     }
 	
 	/**
-	 * Returns a number of variables from the URI based in the routing regex 
-	 * 
-	 * @param uri
-	 * @param regex
-	 * @return
-	 */
-	private Map<String,String> parseURI(String uri, String regex){
-		
-		Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(uri);
-        if(matcher.find()){
-        	return matcher.namedGroups();
-        }
-        else{
-        	return null;
-        }
-	}
-	
-	/**
 	 * Retrieve session data using session token if found in the cookie  
 	 * 
 	 * @param exchange
@@ -144,7 +147,7 @@ public class RequestHandler implements HttpHandler {
 	 */
 	private Session retrieveHttpSession(Cookie cookie){
 		if(cookie != null && cookie.contains("sessionToken")){
-			String sessionToken = cookie.getData("sessionToken");
+			String sessionToken = cookie.get("sessionToken");
 			return Server.getSession(sessionToken);
 		}
 		return null;
@@ -172,7 +175,7 @@ public class RequestHandler implements HttpHandler {
 	private HttpRequest createHttpRequest(HttpExchange exchange, Map<String,String> uriSegments){
 		RequestFactory factory = new RequestFactory();
 		HttpRequest request = factory.create(exchange);
-		request.set((HashMap<String,String>)uriSegments);
+		request.set((HashMap<String,String>) uriSegments);
 		return request;
 	}
 	
@@ -218,50 +221,51 @@ public class RequestHandler implements HttpHandler {
 	 * @throws Exception
 	 */
 	private HttpResponse createHttpResponse(HttpExchange exchange, ApplicationResponse appResponse, Session session) throws Exception{
-		
-		ResponseFactory factory = new ResponseFactory();
-		
-		// If the application has a page name in the querystring, it will be sent to the template system
-		String query = exchange.getRequestURI().getQuery();
-		
-		if(query != null && query != ""){
-			Map<String, String> segments = Helper.parseRequestBody(query);
-			if(segments.containsKey("page")){
-				if(appResponse.getData() == null){
-					Map<String, Object> data = new HashMap<String, Object>();
-					appResponse.setData(data);
-				}
-				appResponse.getData().put("page", segments.get("page"));
-			}
-		}
-		
+				
 		// If the application specified a view and context data, use the template parser to generate response body
 		String body = "";
 		if(appResponse.getView() != null){
+			
+			// If the application has a page number in the query string, it will be sent to the template system
+			// This has something to do with the feature of redirecting user to last attempted page on login
+			String query = exchange.getRequestURI().getQuery();
+			
+			if(query != null && query != ""){
+				Map<String, String> segments = Helper.map(query, "&*([^=]+)=([^&]+)"); // Parse request query string
+				if(segments.containsKey("page")){
+					if(appResponse.getData() == null){
+						Map<String, Object> data = new HashMap<String, Object>();
+						appResponse.setData(data);
+					}
+					appResponse.getData().put("page", segments.get("page"));
+				}
+			}
+			
+			// Render view
 			body = Server.getTemplateParser().parseTemplate(appResponse.getView(), appResponse.getData());
 		}	
 		
 		switch(appResponse.getResponseCode()){
 			
 			case ApplicationResponse.RESPONSE_OK:
-				return factory.create(HttpURLConnection.HTTP_OK, body);
+				return new HttpResponse(HttpURLConnection.HTTP_OK, body);
 				
 			case ApplicationResponse.RESPONSE_REDIRECT:
 				exchange.getResponseHeaders().set("Location", appResponse.getLocation());
-				return factory.create(HttpURLConnection.HTTP_SEE_OTHER, body);
+				return new HttpResponse(HttpURLConnection.HTTP_SEE_OTHER, body);
 				
 			case ApplicationResponse.RESPONSE_DENIED:
-				return factory.create(HttpURLConnection.HTTP_FORBIDDEN, "<h1>403 Forbidden (~_^)</h1>");
+				return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN, "<h1>403 Forbidden (~_^)</h1>");
 				
 			case ApplicationResponse.RESPONSE_ILEGAL:
 			default:
 				if(appResponse.getStart() != null){
 					exchange.getResponseHeaders().set("Location", "/?page=" + appResponse.getStart());
-					return factory.create(HttpURLConnection.HTTP_SEE_OTHER, body);
+					return new HttpResponse(HttpURLConnection.HTTP_SEE_OTHER, body);
 				}
 				else{
 					exchange.getResponseHeaders().set("Location", "/");
-					return factory.create(HttpURLConnection.HTTP_SEE_OTHER, body);
+					return new HttpResponse(HttpURLConnection.HTTP_SEE_OTHER, body);
 				}
 		}
 	}
@@ -275,7 +279,18 @@ public class RequestHandler implements HttpHandler {
 	 */
 	private void dispatchHttpResponse(HttpExchange exchange, HttpResponse response) throws IOException{
 		
-		exchange.sendResponseHeaders(response.getCode(), response.getBody().length());
+		Map<String, String> headers = response.getHeaders();
+		
+		if(headers.size() > 0){
+			Iterator<Entry<String, String>> it = headers.entrySet().iterator();
+		    while (it.hasNext()) {
+		        Map.Entry<String, String> pair = (Map.Entry<String, String>)it.next();
+		        exchange.getResponseHeaders().set(pair.getKey(), pair.getValue());
+		        it.remove();
+		    }
+		}
+		
+		exchange.sendResponseHeaders(response.getCode(), response.getBody().getBytes().length);
 		
 		OutputStream stream = exchange.getResponseBody();
 		stream.write(response.getBody().getBytes());
@@ -289,8 +304,7 @@ public class RequestHandler implements HttpHandler {
 	 * @throws IOException
 	 */
 	private void respondResourceNotFound(HttpExchange exchange) throws IOException{
-		ResponseFactory factory = new ResponseFactory();
-		HttpResponse response = factory.create(HttpURLConnection.HTTP_NOT_FOUND, "<h1>404 Not Found (¬_¬)</h1>");
+		HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND, "<h1>404 Not Found (¬_¬)</h1>");
 		dispatchHttpResponse(exchange, response);
 	}
 	
@@ -300,20 +314,8 @@ public class RequestHandler implements HttpHandler {
 	 * @param exchange
 	 * @throws IOException
 	 */
-	private void respondInternalServerError(HttpExchange exchange) throws IOException{
-		ResponseFactory factory = new ResponseFactory();
-		HttpResponse response = factory.create(HttpURLConnection.HTTP_INTERNAL_ERROR, "<h1>500 Internal (ò_ó)</h1>");
+	private void respondInternalServerError(HttpExchange exchange, boolean html) throws IOException{
+		HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, html?"<h1>500 Internal (ò_ó)</h1>":"");
 		dispatchHttpResponse(exchange, response);
-	}
-	
-	/**
-	 * Send HTTP 303 and redirect to index
-	 * 
-	 * @param exchange
-	 * @throws IOException
-	 */
-	private void respondSessionLost(HttpExchange exchange) throws IOException{
-		exchange.getResponseHeaders().set("Location", "/");
-		exchange.sendResponseHeaders(HttpURLConnection.HTTP_SEE_OTHER, -1);
 	}
 }

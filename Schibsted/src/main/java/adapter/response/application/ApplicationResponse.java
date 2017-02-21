@@ -1,26 +1,27 @@
-package adapter.response;
+package adapter.response.application;
 
 import java.util.Map;
 
 import core.entity.Session;
 
 /**
- * This class is a value object for the standard response of a Controller to the request handler
+ * This class is a value object for the standard response of the application controller to the request handler
  * 
  * @author Peibol
  */
 public class ApplicationResponse {
 	
+	// Response codes
 	public static final int RESPONSE_DENIED = -2;
 	public static final int RESPONSE_ILEGAL = -1;
 	public static final int RESPONSE_OK = 0;
 	public static final int RESPONSE_REDIRECT = 1;
 	
-	private int response;						// Response code
+	private int response;						// Application response code
 	private Session session = null;				// New session created by the Application
 	private String location = null;				// Redirect to this location
-	private String start = null;				// Page to get redirected after login
-	private String view = null;					// Template the get rendered
+	private String startPage = null;			// Page to get redirected after login
+	private String view = null;					// Template to render
 	private Map<String, Object> data = null;	// Data to populate the template
 	
 	public ApplicationResponse(int response){
@@ -74,10 +75,10 @@ public class ApplicationResponse {
 	}
 
 	public String getStart() {
-		return start;
+		return startPage;
 	}
 
 	public void setStart(String start) {
-		this.start = start;
+		this.startPage = start;
 	}
 }

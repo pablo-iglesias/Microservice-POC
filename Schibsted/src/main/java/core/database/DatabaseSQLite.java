@@ -50,7 +50,10 @@ public class DatabaseSQLite extends DatabaseRelational {
 		
         try {
         	Statement stmt = conn.createStatement();
-        	Vector<String> vector = Helper.parseSQLDump(dump);
+        	
+        	// Get all the statements of the SQL dump line by line
+        	Vector<String> vector = Helper.vector(dump, "([^;]+;)");
+        	
         	for (String sql : vector) {
         		stmt.execute(sql);
         	}

@@ -1,6 +1,6 @@
 package adapter.model;
 
-import java.sql.SQLException;
+import java.util.Vector;
 
 /**
  * All models of the type Role must implement this
@@ -9,6 +9,5 @@ import java.sql.SQLException;
  */
 public interface RoleModelInterface{
 
-	public abstract String getRoleNameByRoleId(int rid) throws SQLException;
-	public abstract Integer[] getRolesIdsByUserId(int uid) throws Exception;
+	public abstract Vector<Object[]> getRolesByUserId(int uid) throws Exception;
 }

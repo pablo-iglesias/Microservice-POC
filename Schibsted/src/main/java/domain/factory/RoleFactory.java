@@ -1,38 +1,36 @@
 package domain.factory;
 
+import java.util.Vector;
+
 import adapter.model.generic.RoleModel;
 import domain.entity.Role;
 
 public class RoleFactory {
 
-	RoleModel model;
+	private RoleModel model;
+	
+	public RoleFactory(RoleModel model) throws Exception{
+		this.model = model;
+	}
 	
 	public RoleFactory() throws Exception{
 		model = new RoleModel();
 	}
 	
-	public Role create(int rid) throws Exception{
-		
-		String name = model.getRoleNameByRoleId(rid);
-		if(name != null){
-			return new Role(rid, name);
-		}
-		return null;
-	}
-	
 	public Role[] createByUser(int uid) throws Exception{
+				
+		Vector<Object[]> roles = model.getRolesByUserId(uid);
 		
-		Integer[] rids = model.getRolesIdsByUserId(uid);
-		
-		if(rids != null){
-			Role[] roles = new Role[rids.length];
-			for(int i = 0; i < rids.length; i++){
-				int rid = rids[i].intValue();
-				String name = model.getRoleNameByRoleId(rid);
-				roles[i] = new Role(rid, name);
+		if(roles != null){
+			Role[] roleObjects = new Role[roles.size()];
+			for(int i = 0; i < roleObjects.length; i++){
+				Integer rid = (Integer)roles.get(i)[0];
+				String name = (String)roles.get(i)[1];
+				roleObjects[i] = new Role(rid, name);
 			}
-			return roles;
+			return roleObjects;
 		}
+		
 		return null;
 	}
 }

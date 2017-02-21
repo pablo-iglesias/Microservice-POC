@@ -9,7 +9,7 @@ import domain.usecase.Usecase;
 public class UsecaseWelcome extends Usecase {
 
 	// Factory
-	public UserFactory factory;
+	private UserFactory factory;
 	
 	// Input data
 	public int uid = 0;
@@ -17,6 +17,14 @@ public class UsecaseWelcome extends Usecase {
 	// Output data
 	public String username = "";
 	public String[][] roles = null;
+	
+	public UsecaseWelcome() throws Exception{
+		factory = new UserFactory();
+	}
+	
+	public UsecaseWelcome(UserFactory factory){
+		this.factory = factory;
+	}
 	
 	public boolean execute() throws Exception{
 		

@@ -23,22 +23,24 @@ dependencies {
     // The production code uses Guava
     compile 'com.google.guava:guava:20.0'
 
-    // Use JUnit test framework
+    // Use JUnit for test framework
     testCompile 'junit:junit:4.12'
     
-    // Use Sqlite
+    // Use Sqlite for embedded database
     compile 'org.xerial:sqlite-jdbc:3.7.2'
     
-    // Use Jtwig
+    // Use Jtwig for template engine
     compile "org.jtwig:jtwig-core:5.75"
     
-    // Additional dependence for preventing a little problem
+    // Use gson for JSON parser
+    compile "com.google.code.gson:gson:2.8.0"
+    
+    // Additional dependence for preventing a little problem with Jtwig
     compile "org.slf4j:slf4j-jdk14:1.7.12"
     
     // Library for working with named regular expression groups
     compile "com.github.tony19:named-regexp:0.2.4"
 }
-
 
 // Define the main class for the application
 mainClassName = 'App'
@@ -47,7 +49,7 @@ jar {
   manifest {
     attributes(
       'Main-Class': 'App',
-      'Class-Path': 'libs/asm-5.0.3.jar libs/asm-analysis-5.0.3.jar libs/asm-tree-5.0.3.jar libs/asm-util-5.0.3.jar libs/commons-lang3-3.1.jar libs/concurrentlinkedhashmap-lru-1.4.2.jar libs/guava-20.0.jar libs/jtwig-core-5.75.jar libs/jtwig-reflection-1.21.jar libs/parboiled-core-1.1.7.jar libs/parboiled-java-1.1.7.jar libs/slf4j-api-1.7.12.jar libs/sqlite-jdbc-3.7.2.jar libs/slf4j-jdk14-1.7.12.jar libs/named-regexp-0.2.4.jar'
+      'Class-Path': 'libs/' + configurations.runtime.files.collect { it.name }.join(' libs/')
     )
   }
   from('templates') {
@@ -60,7 +62,17 @@ jar {
   }
 }
 
-// Copy jar file to the jar folder and all runtime dependencies to the libs subfolder
+// Copy templates and sqls to bin directory for debugging the app with those resources available
+task copyTemplates(type: Copy) {
+	into "$projectDir/bin/templates"
+    from "$projectDir/templates"
+}
+task copySqls(type: Copy) {
+	into "$projectDir/bin/sql"
+    from "$projectDir/sql"
+}
+
+// Copy jar file to the jar folder and all runtime dependencies to the jar/libs subfolder
 task deployJar(type: Copy) {
 	into "$buildDir/jar"
     from jar.archivePath
@@ -70,6 +82,5 @@ task deployDependencies(type: Copy) {
     from configurations.runtime
 }
 
-
-jar.finalizedBy([deployJar, deployDependencies])
+jar.finalizedBy([copyTemplates, copySqls, deployJar, deployDependencies])
 

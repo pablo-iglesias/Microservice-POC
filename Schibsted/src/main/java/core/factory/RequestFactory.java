@@ -9,7 +9,12 @@ import core.entity.HttpRequest;
 public class RequestFactory extends ResourceLoader {
 
 	public HttpRequest create(HttpExchange exchange){
-		String body = Helper.convertInputStreamToString(exchange.getRequestBody());	
-		return new HttpRequest(exchange.getRequestMethod(), exchange.getRequestHeaders(), body);
+		String body = Helper.convertInputStreamToString(exchange.getRequestBody());
+		String requestedURL = "http://" + exchange.getRequestHeaders().getFirst("Host") + exchange.getRequestURI();
+		return new HttpRequest(
+				requestedURL, 
+				exchange.getRequestMethod(), 
+				exchange.getRequestHeaders(), 
+				body);
 	}
 }
