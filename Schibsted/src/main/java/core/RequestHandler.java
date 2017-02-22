@@ -250,23 +250,13 @@ public class RequestHandler implements HttpHandler {
 			case ApplicationResponse.RESPONSE_OK:
 				return new HttpResponse(HttpURLConnection.HTTP_OK, body);
 				
-			case ApplicationResponse.RESPONSE_REDIRECT:
-				exchange.getResponseHeaders().set("Location", appResponse.getLocation());
-				return new HttpResponse(HttpURLConnection.HTTP_SEE_OTHER, body);
-				
 			case ApplicationResponse.RESPONSE_DENIED:
 				return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN, "<h1>403 Forbidden (~_^)</h1>");
 				
-			case ApplicationResponse.RESPONSE_ILEGAL:
+			case ApplicationResponse.RESPONSE_REDIRECT:
 			default:
-				if(appResponse.getStart() != null){
-					exchange.getResponseHeaders().set("Location", "/?page=" + appResponse.getStart());
-					return new HttpResponse(HttpURLConnection.HTTP_SEE_OTHER, body);
-				}
-				else{
-					exchange.getResponseHeaders().set("Location", "/");
-					return new HttpResponse(HttpURLConnection.HTTP_SEE_OTHER, body);
-				}
+				exchange.getResponseHeaders().set("Location", appResponse.getLocation());
+				return new HttpResponse(HttpURLConnection.HTTP_SEE_OTHER, body);
 		}
 	}
 	

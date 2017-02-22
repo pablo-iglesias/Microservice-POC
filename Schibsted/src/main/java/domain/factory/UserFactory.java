@@ -1,40 +1,50 @@
 package domain.factory;
 
+import java.util.Arrays;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 
+import adapter.model.generic.RoleModel;
 import adapter.model.generic.UserModel;
 import domain.entity.User;
 
 public class UserFactory {
 
-	private UserModel model;
-	RoleFactory roleFactory;
+	private static final int USER_ID = 0;
+	private static final int USER_NAME = 1;
 	
-	public UserFactory(UserModel model, RoleFactory roleFactory) throws Exception{
-		this.model = model;
-		this.roleFactory = roleFactory;
+	private UserModel userModel;
+	private RoleModel roleModel;
+	
+	public UserFactory(UserModel userModel, RoleModel roleModel) throws Exception{
+		this.userModel = userModel;
+		this.roleModel = roleModel;
 	}
 	
 	public UserFactory() throws Exception{
-		model = new UserModel();
-		roleFactory = new RoleFactory();
+		userModel = new UserModel();
+		roleModel = new RoleModel();
+	}
+	
+	private User buildUser(int uid, String name) throws Exception{
+		return new User(uid, name, roleModel.getRoleIdsByUserId(uid));
 	}
 	
 	public User[] create() throws Exception{
 		
-		Vector<Object[]> users = model.getUsers();
+		Vector<Object[]> records = userModel.getUsers();
 		
-		if(users != null){
-			User[] userObjects = new User[users.size()];
-			for(int i = 0; i < userObjects.length; i++){
-				Integer uid = (Integer)users.get(i)[0];
-				String name = (String)users.get(i)[1];
-				userObjects[i] = new User(uid, name,  roleFactory.createByUser(uid));
+		if(records != null){
+			User[] users = new User[records.size()];
+			for(int i = 0; i < users.length; i++){
+				Integer uid  = (Integer)records.get(i)[USER_ID];
+				String  name =  (String)records.get(i)[USER_NAME];
+				users[i] = buildUser(uid, name);
 			}
-			return userObjects;
+			return users;
 		}
 		
 		return null;
@@ -42,20 +52,20 @@ public class UserFactory {
 	
 	public User create(int uid) throws Exception{
 		
-		String username = model.getUsernameByUserId(uid);
-		if(username != null){
-			return new User(uid, username, roleFactory.createByUser(uid));
+		String name = userModel.getUsernameByUserId(uid);
+		if(name != null){
+			return buildUser(uid, name);
 		}
 		return null;
 	}
 	
-	public User create(String username, String password) throws Exception{
+	public User create(String name, String password) throws Exception{
 		
-		if(username != null && password != null){
+		if(name != null && password != null){
 			String hash = Hashing.sha1().hashString(password, Charsets.UTF_8 ).toString();
-			Integer uid = model.getUserIdByUseranameAndPassword(username, hash);
+			Integer uid = userModel.getUserIdByUseranameAndPassword(name, hash);
 			if(uid != null){
-				return new User(uid, username, roleFactory.createByUser(uid));
+				return buildUser(uid, name);
 			}
 		}
 		return null;

@@ -4,9 +4,9 @@ public class User {
 
 	private int id;
 	private String username;
-	private Role[] roles;
+	private int[] roles;
 	
-	public User(int id, String username, Role[] roles){
+	public User(int id, String username, int[] roles){
 		this.id = id;
 		this.username = username;
 		this.roles = roles;
@@ -20,7 +20,7 @@ public class User {
 		return username;
 	}
 
-	public Role[] getRoles() {
+	public int[] getRoles() {
 		return roles;
 	}
 }

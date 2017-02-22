@@ -70,7 +70,6 @@ public class ApiController extends Controller {
 				
 				switch(request.getMethod()){
 					case "GET": return GET(refUserId.intValue());
-						
 				}
 			}
 			// Request that refer the entire collection of users
@@ -96,10 +95,7 @@ public class ApiController extends Controller {
 		UsecaseGetUsers usecase = new UsecaseGetUsers();
 		
 		if(usecase.execute()){
-		    return new HttpResponse(
-		    		HttpURLConnection.HTTP_OK, 
-		    		new Gson().toJson(usecase.users) 
-		    		);
+		    return new HttpResponse(HttpURLConnection.HTTP_OK, new Gson().toJson(usecase.users));
 		}
 		else{
 			return new HttpResponse(HttpURLConnection.HTTP_OK, "[]");
@@ -119,10 +115,7 @@ public class ApiController extends Controller {
 		usecase.uid = refdUserId;
 		
 		if(usecase.execute()){
-			return new HttpResponse(
-					HttpURLConnection.HTTP_OK, 
-					new Gson().toJson(usecase.user)
-					);
+			return new HttpResponse(HttpURLConnection.HTTP_OK, new Gson().toJson(usecase.user));
 		}
 		else{
 			return new HttpResponse(HttpURLConnection.HTTP_OK, "{}");

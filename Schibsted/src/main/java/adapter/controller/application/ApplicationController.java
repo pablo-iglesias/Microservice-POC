@@ -7,11 +7,13 @@ import core.Helper;
 import core.Server;
 import core.entity.HttpRequest;
 import core.entity.Session;
-import domain.usecase.UsecaseAuthenticateUser;
+
+import adapter.controller.Controller;
+import adapter.response.application.ApplicationResponse;
+
+import domain.entity.Role;
 import domain.usecase.application.UsecasePage;
 import domain.usecase.application.UsecaseWelcome;
-import adapter.controller.Controller;
-import adapter.response.application.*;
 
 public class ApplicationController extends Controller{
 	
@@ -24,10 +26,15 @@ public class ApplicationController extends Controller{
 	 */
 	public static ApplicationResponse index(HttpRequest request, Session session){
 		if(session != null){
-			return new ApplicationResponseREDIRECT("/welcome", session);
+			return new ApplicationResponse()
+					.setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+					.setLocation("/welcome")
+					.setSession(session);
 		}
 		
-		return new ApplicationResponseOK("templates/login.html", null);
+		return new ApplicationResponse()
+				.setResponseCode(ApplicationResponse.RESPONSE_OK)
+				.setView("templates/login.html");
 	}
 	
 	/**
@@ -57,16 +64,25 @@ public class ApplicationController extends Controller{
 						usecasePage.page = params.get("page");
 						
 						if(usecasePage.execute() && usecasePage.allowed){
-							return new ApplicationResponseREDIRECT("/page_" + params.get("page"), session);
+							return new ApplicationResponse()
+									.setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+									.setLocation("/page_" + params.get("page"))
+									.setSession(session);
+									
 						}
 					}
 					
-					return new ApplicationResponseREDIRECT("/welcome", session);
+					return new ApplicationResponse()
+							.setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+							.setLocation("/welcome")
+							.setSession(session);
 				}
 			}
 		}
 		
-		return new ApplicationResponseILEGAL();
+		return new ApplicationResponse()
+				.setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+				.setLocation("/");
 	}
 	
 	/**
@@ -81,10 +97,14 @@ public class ApplicationController extends Controller{
 		
 		if(session != null){
 			Server.removeSession(session.getSessionToken());			
-			return new ApplicationResponseREDIRECT("/");
+			return new ApplicationResponse()
+					.setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+					.setLocation("/");
 		}
 		
-		return new ApplicationResponseILEGAL();
+		return new ApplicationResponse()
+				.setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+				.setLocation("/");
 	}
 	
 	/**
@@ -109,18 +129,23 @@ public class ApplicationController extends Controller{
 				
 				if(usecase.roles != null){
 					Map<String, String> roles = new HashMap<String, String>();
-					for(String[] role : usecase.roles){
-						roles.put(role[0], role[1]);
+					for(Role role : usecase.roles){
+						roles.put(role.getName(), role.getPage());
 					}
 					
 					data.put("roles", roles);
 				}
 				
-				return new ApplicationResponseOK("templates/welcome.html", data);
+				return new ApplicationResponse()
+						.setResponseCode(ApplicationResponse.RESPONSE_OK)
+						.setView("templates/welcome.html")
+						.setData(data);
 			}
 		}
 		
-		return new ApplicationResponseILEGAL();
+		return new ApplicationResponse()
+				.setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+				.setLocation("/");
 	}
 	
 	/**
@@ -142,12 +167,18 @@ public class ApplicationController extends Controller{
 				Map<String, Object> data = new HashMap<String, Object>();
 				data.put("page", request.get("page"));
 				data.put("user_name", usecase.username);
-				return new ApplicationResponseOK("templates/page.html", data);
+				return new ApplicationResponse()
+						.setResponseCode(ApplicationResponse.RESPONSE_OK)
+						.setView("templates/page.html")
+						.setData(data);
 			}
 			
-			return new ApplicationResponseDENIED();
+			return new ApplicationResponse()
+					.setResponseCode(ApplicationResponse.RESPONSE_DENIED);
 		}
 		
-		return new ApplicationResponseILEGAL(request.get("page"));
+		return new ApplicationResponse()
+				.setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+				.setLocation("/?page=" + request.get("page"));
 	}
 }

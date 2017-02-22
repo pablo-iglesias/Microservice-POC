@@ -7,6 +7,10 @@ import domain.entity.Role;
 
 public class RoleFactory {
 
+	private static final int ROLE_ID = 0;
+	private static final int ROLE_NAME = 1;
+	private static final int ROLE_PAGE = 2;
+	
 	private RoleModel model;
 	
 	public RoleFactory(RoleModel model) throws Exception{
@@ -17,16 +21,17 @@ public class RoleFactory {
 		model = new RoleModel();
 	}
 	
-	public Role[] createByUser(int uid) throws Exception{
+	public Role[] createByIds(int rids[]) throws Exception{
 				
-		Vector<Object[]> roles = model.getRolesByUserId(uid);
+		Vector<Object[]> roles = model.getRolesByIds(rids);
 		
 		if(roles != null){
 			Role[] roleObjects = new Role[roles.size()];
 			for(int i = 0; i < roleObjects.length; i++){
-				Integer rid = (Integer)roles.get(i)[0];
-				String name = (String)roles.get(i)[1];
-				roleObjects[i] = new Role(rid, name);
+				Integer rid  = (Integer)roles.get(i)[ROLE_ID];
+				String  name =  (String)roles.get(i)[ROLE_NAME];
+				String  page =  (String)roles.get(i)[ROLE_PAGE];
+				roleObjects[i] = new Role(rid, name, page);
 			}
 			return roleObjects;
 		}

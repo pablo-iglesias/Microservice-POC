@@ -2,13 +2,15 @@ package domain.usecase.application;
 
 import domain.entity.Role;
 import domain.entity.User;
+import domain.factory.RoleFactory;
 import domain.factory.UserFactory;
 import domain.usecase.Usecase;
 
 public class UsecasePage extends Usecase{
 
 	// Factory
-	private UserFactory factory;
+	private UserFactory userFactory;
+	private RoleFactory roleFactory;
 		
 	// Input data
 	public int uid = 0;
@@ -19,20 +21,25 @@ public class UsecasePage extends Usecase{
 	public boolean allowed = false;
 	
 	public UsecasePage() throws Exception{
-		factory = new UserFactory();
+		userFactory = new UserFactory();
+		roleFactory = new RoleFactory();
 	}
 	
-	public UsecasePage(UserFactory factory){
-		this.factory = factory;
+	public UsecasePage(UserFactory userFactory, RoleFactory roleFactory){
+		this.userFactory = userFactory;
+		this.roleFactory = roleFactory;
 	}
 	
 	public boolean execute() throws Exception{
 		
-		User user = factory.create(uid);
+		User user = userFactory.create(uid);
 		username = user.getUsername();
 		
 		if(user != null){
-			for(Role role : user.getRoles()){
+			
+			Role[] roles = roleFactory.createByIds(user.getRoles());
+			
+			for(Role role : roles){
 				if(role.getName().matches("PAGE_" + page)){
 					allowed = true;
 				}

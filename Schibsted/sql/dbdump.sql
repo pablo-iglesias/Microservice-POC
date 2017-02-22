@@ -12,13 +12,14 @@ INSERT INTO users(user_name, user_password) VALUES('user4', '2db4c1811f424582a90
 
 CREATE TABLE roles (
 	role_id integer PRIMARY KEY,
-	role_name text DEFAULT ''
+	role_name text DEFAULT '',
+	role_page text DEFAULT ''
 );
 
 INSERT INTO roles(role_name) VALUES('ADMIN');
-INSERT INTO roles(role_name) VALUES('PAGE_1');
-INSERT INTO roles(role_name) VALUES('PAGE_2');
-INSERT INTO roles(role_name) VALUES('PAGE_3');
+INSERT INTO roles(role_name, role_page) VALUES('PAGE_1', 'page_1');
+INSERT INTO roles(role_name, role_page) VALUES('PAGE_2', 'page_2');
+INSERT INTO roles(role_name, role_page) VALUES('PAGE_3', 'page_3');
 
 CREATE TABLE user_has_role (
 	fk_user_id integer,

@@ -2,48 +2,43 @@ package domain.usecase.application;
 
 import domain.entity.User;
 import domain.entity.Role;
-
+import domain.factory.RoleFactory;
 import domain.factory.UserFactory;
 import domain.usecase.Usecase;
 
 public class UsecaseWelcome extends Usecase {
 
+	public static final int ROLE_ID = 0;
+	public static final int ROLE_NAME = 1;
+	
 	// Factory
-	private UserFactory factory;
+	private UserFactory userFactory;
+	private RoleFactory roleFactory;
 	
 	// Input data
 	public int uid = 0;
 	
 	// Output data
 	public String username = "";
-	public String[][] roles = null;
+	public Role[] roles = null;
 	
 	public UsecaseWelcome() throws Exception{
-		factory = new UserFactory();
+		userFactory = new UserFactory();
+		roleFactory = new RoleFactory();
 	}
 	
-	public UsecaseWelcome(UserFactory factory){
-		this.factory = factory;
+	public UsecaseWelcome(UserFactory userFactory, RoleFactory roleFactory){
+		this.userFactory = userFactory;
+		this.roleFactory = roleFactory;
 	}
 	
 	public boolean execute() throws Exception{
 		
-		User user = factory.create(uid);
+		User user = userFactory.create(uid);
 		
 		if(user != null){
 			username = user.getUsername();
-			Role[] roles = user.getRoles();
-			if(roles != null && roles.length > 0){
-				this.roles = new String[roles.length][];
-				for(int i = 0; i < roles.length; i++){
-					this.roles[i] = new String[2];
-					this.roles[i][0] = roles[i].getName();
-					this.roles[i][1] = "";
-					if(!roles[i].getName().matches("ADMIN")){
-						this.roles[i][1] = roles[i].getName().toLowerCase();
-					}
-				}
-			}
+			roles = roleFactory.createByIds(user.getRoles());
 			
 			return true;
 		}

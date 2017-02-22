@@ -21,7 +21,11 @@ public class RoleModel extends Model implements RoleModelInterface {
 		model = (RoleModelInterface) factory.create("Role");
 	}
 	
-	public Vector<Object[]> getRolesByUserId(int uid) throws Exception{
-		return model.getRolesByUserId(uid);
+	public Vector<Object[]> getRolesByIds(int rids[]) throws Exception{
+		return model.getRolesByIds(rids);
+	}
+	
+	public int[] getRoleIdsByUserId(int uid) throws Exception{
+		return model.getRoleIdsByUserId(uid);
 	}
 }

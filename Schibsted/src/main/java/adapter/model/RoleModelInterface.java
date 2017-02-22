@@ -9,5 +9,6 @@ import java.util.Vector;
  */
 public interface RoleModelInterface{
 
-	public abstract Vector<Object[]> getRolesByUserId(int uid) throws Exception;
+	public abstract Vector<Object[]> getRolesByIds(int rids[]) throws Exception;
+	public abstract int[] getRoleIdsByUserId(int uid) throws Exception;
 }
