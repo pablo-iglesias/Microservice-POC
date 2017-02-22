@@ -32,6 +32,20 @@ public class ApplicationController extends Controller{
 					.setSession(session);
 		}
 		
+		// If the application has a page number in the query string, it will be sent to the template system
+		// This has something to do with the feature of redirecting user to last attempted page on login
+		if(request.get("query") != null && request.get("query") != ""){
+			Map<String, String> segments = Helper.map(request.get("query"), "&*([^=]+)=([^&]+)"); // Parse request query string
+			if(segments.containsKey("page")){
+				Map<String, Object> data = new HashMap<String, Object>();
+				data.put("page", segments.get("page"));
+				return new ApplicationResponse()
+						.setResponseCode(ApplicationResponse.RESPONSE_OK)
+						.setView("templates/login.html")
+						.setData(data);
+			}
+		}
+		
 		return new ApplicationResponse()
 				.setResponseCode(ApplicationResponse.RESPONSE_OK)
 				.setView("templates/login.html");

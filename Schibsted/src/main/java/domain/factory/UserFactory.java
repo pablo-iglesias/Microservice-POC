@@ -29,10 +29,6 @@ public class UserFactory {
 		roleModel = new RoleModel();
 	}
 	
-	private User buildUser(int uid, String name) throws Exception{
-		return new User(uid, name, roleModel.getRoleIdsByUserId(uid));
-	}
-	
 	public User[] create() throws Exception{
 		
 		Vector<Object[]> records = userModel.getUsers();
@@ -42,7 +38,7 @@ public class UserFactory {
 			for(int i = 0; i < users.length; i++){
 				Integer uid  = (Integer)records.get(i)[USER_ID];
 				String  name =  (String)records.get(i)[USER_NAME];
-				users[i] = buildUser(uid, name);
+				users[i] = new User(uid, name, roleModel.getRoleIdsByUserId(uid));
 			}
 			return users;
 		}
@@ -54,7 +50,7 @@ public class UserFactory {
 		
 		String name = userModel.getUsernameByUserId(uid);
 		if(name != null){
-			return buildUser(uid, name);
+			return new User(uid, name, roleModel.getRoleIdsByUserId(uid));
 		}
 		return null;
 	}
@@ -65,7 +61,7 @@ public class UserFactory {
 			String hash = Hashing.sha1().hashString(password, Charsets.UTF_8 ).toString();
 			Integer uid = userModel.getUserIdByUseranameAndPassword(name, hash);
 			if(uid != null){
-				return buildUser(uid, name);
+				return new User(uid, name, roleModel.getRoleIdsByUserId(uid));
 			}
 		}
 		return null;

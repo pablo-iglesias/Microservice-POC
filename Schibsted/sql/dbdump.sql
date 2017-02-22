@@ -9,6 +9,7 @@ INSERT INTO users(user_name, user_password) VALUES('user1', 'f0578f1e7174b1a41c4
 INSERT INTO users(user_name, user_password) VALUES('user2', '8be52126a6fde450a7162a3651d589bb51e9579d');
 INSERT INTO users(user_name, user_password) VALUES('user3', 'de2a4d5751ab06dc4f987142db57c26d50925c8a');
 INSERT INTO users(user_name, user_password) VALUES('user4', '2db4c1811f424582a90f8d7ee77995cf018d9443');
+INSERT INTO users(user_name, user_password) VALUES('user5', '9e5ca6b0ffb417997ffb844c76f9c24bbc20fe88');
 
 CREATE TABLE roles (
 	role_id integer PRIMARY KEY,

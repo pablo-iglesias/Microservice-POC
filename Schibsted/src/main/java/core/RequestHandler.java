@@ -107,7 +107,7 @@ public class RequestHandler implements HttpHandler {
 								method = controller.getMethod(methodName, new Class[]{HttpRequest.class});
 								
 								HttpResponse apiResponse = (HttpResponse) method.invoke(null, request);
-								apiResponse.setHeader("Content-Type", "application/vnd.api+json");
+								apiResponse.setHeader("Content-Type", "application/json");
 								
 								// Run controller and send HTTP response
 								dispatchHttpResponse(exchange, apiResponse);
@@ -176,6 +176,7 @@ public class RequestHandler implements HttpHandler {
 		RequestFactory factory = new RequestFactory();
 		HttpRequest request = factory.create(exchange);
 		request.set((HashMap<String,String>) uriSegments);
+		request.set("query", exchange.getRequestURI().getQuery());
 		return request;
 	}
 	
@@ -225,22 +226,7 @@ public class RequestHandler implements HttpHandler {
 		// If the application specified a view and context data, use the template parser to generate response body
 		String body = "";
 		if(appResponse.getView() != null){
-			
-			// If the application has a page number in the query string, it will be sent to the template system
-			// This has something to do with the feature of redirecting user to last attempted page on login
-			String query = exchange.getRequestURI().getQuery();
-			
-			if(query != null && query != ""){
-				Map<String, String> segments = Helper.map(query, "&*([^=]+)=([^&]+)"); // Parse request query string
-				if(segments.containsKey("page")){
-					if(appResponse.getData() == null){
-						Map<String, Object> data = new HashMap<String, Object>();
-						appResponse.setData(data);
-					}
-					appResponse.getData().put("page", segments.get("page"));
-				}
-			}
-			
+						
 			// Render view
 			body = Server.getTemplateParser().parseTemplate(appResponse.getView(), appResponse.getData());
 		}	

@@ -11,6 +11,8 @@ import core.entity.HttpRequest;
 import core.entity.HttpResponse;
 
 import adapter.controller.Controller;
+import adapter.response.api.json.ApiResponseUserCollection;
+import adapter.response.api.json.ApiResponseUserResource;
 
 import domain.usecase.api.UsecaseGetOneUser;
 import domain.usecase.api.UsecaseGetUsers;
@@ -95,7 +97,9 @@ public class ApiController extends Controller {
 		UsecaseGetUsers usecase = new UsecaseGetUsers();
 		
 		if(usecase.execute()){
-		    return new HttpResponse(HttpURLConnection.HTTP_OK, new Gson().toJson(usecase.users));
+		    return new HttpResponse(
+		    		HttpURLConnection.HTTP_OK, 
+		    		new ApiResponseUserCollection(usecase.users, usecase.roles).getJson());
 		}
 		else{
 			return new HttpResponse(HttpURLConnection.HTTP_OK, "[]");
@@ -115,10 +119,12 @@ public class ApiController extends Controller {
 		usecase.uid = refdUserId;
 		
 		if(usecase.execute()){
-			return new HttpResponse(HttpURLConnection.HTTP_OK, new Gson().toJson(usecase.user));
+			return new HttpResponse(
+					HttpURLConnection.HTTP_OK, 
+					new ApiResponseUserResource(usecase.user, usecase.roles).getJson());
 		}
 		else{
-			return new HttpResponse(HttpURLConnection.HTTP_OK, "{}");
+			return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND, "");
 		}
 	}
 }

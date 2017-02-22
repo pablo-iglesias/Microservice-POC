@@ -20,7 +20,7 @@ public class UsecaseWelcome extends Usecase {
 	
 	// Output data
 	public String username = "";
-	public Role[] roles = null;
+	public Role[] roles = new Role[]{};
 	
 	public UsecaseWelcome() throws Exception{
 		userFactory = new UserFactory();
