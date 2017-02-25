@@ -1,5 +1,8 @@
 package adapter.controller;
 
+import java.util.Map;
+
+import core.Helper;
 import domain.usecase.UsecaseAuthenticateUser;
 
 public class Controller {
@@ -12,7 +15,7 @@ public class Controller {
 	 * @return
 	 * @throws Exception
 	 */
-	public static Integer authenticate(String username, String password) throws Exception{
+	protected static Integer authenticate(String username, String password) throws Exception{
 		
 		UsecaseAuthenticateUser usecase = new UsecaseAuthenticateUser();
 		usecase.username = username;
@@ -23,5 +26,15 @@ public class Controller {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * Parses a POST or GET query string and returns its parameters as a key-value map
+	 * 
+	 * @return
+	 */
+	protected static Map<String, String> parseQueryString(String queryString){
+		
+		return Helper.map(queryString, "&*([^=]+)=([^&]+)");
 	}
 }

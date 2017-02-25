@@ -9,6 +9,9 @@ import java.util.Vector;
  */
 public interface RoleModelInterface{
 
-	public abstract Vector<Object[]> getRolesByIds(int rids[]) throws Exception;
-	public abstract int[] getRoleIdsByUserId(int uid) throws Exception;
+	public abstract Vector<Object[]> getRolesByIds(Integer rids[]) throws Exception;
+	public abstract Integer[] getRoleIdsByUserId(Integer uid) throws Exception;
+	public abstract boolean insertUserHasRoles(Integer uid, Integer[] rids) throws Exception;
+	public abstract boolean deleteUserHasRoles(Integer uid, Integer[] rids) throws Exception;
+	public abstract boolean deleteUserHasRolesByUserId(Integer uid) throws Exception;
 }

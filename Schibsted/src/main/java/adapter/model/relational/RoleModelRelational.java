@@ -26,7 +26,7 @@ public class RoleModelRelational extends Model implements RoleModelInterface{
 	/**
 	 * Takes a user id and returns the ids of the roles assigned to it
 	 */
-	public Vector<Object[]> getRolesByIds(int rids[]) throws SQLException{
+	public Vector<Object[]> getRolesByIds(Integer rids[]) throws SQLException{
 		
 		String[] interrogators = new String[rids.length];
 		Arrays.fill(interrogators, "?");
@@ -55,7 +55,7 @@ public class RoleModelRelational extends Model implements RoleModelInterface{
 	/**
 	 * Takes a user id and returns the ids of the roles assigned to it
 	 */
-	public int[] getRoleIdsByUserId(int uid) throws SQLException{
+	public Integer[] getRoleIdsByUserId(Integer uid) throws SQLException{
 					
 		db.prepare("SELECT role_id FROM roles JOIN user_has_role ON role_id = fk_role_id JOIN users ON fk_user_id = user_id WHERE user_id = ? ORDER BY role_name ASC");
 		db.add(uid);
@@ -70,7 +70,53 @@ public class RoleModelRelational extends Model implements RoleModelInterface{
 		}
 		
 		Object[] roleObjects = roles.toArray();
-		Integer[] integerArray = Arrays.copyOf(roleObjects, roleObjects.length, Integer[].class);
-		return Arrays.stream(integerArray).mapToInt(Integer::intValue).toArray();
+		return Arrays.copyOf(roleObjects, roleObjects.length, Integer[].class);
+	}
+	
+	/**
+	 * Insert rows in the table user_has_role
+	 */
+	public boolean insertUserHasRoles(Integer uid, Integer[] rids) throws Exception{
+		
+		boolean success = true;
+		
+		for(int role : rids){
+			db.prepare("INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(?, ?)");
+			db.add(uid);
+			db.add(role);
+			success = success && db.insert() != null;
+		}
+		
+		return success;
+	}
+	
+	/**
+	 * Delete rows from the table user_has_roles
+	 */
+	public boolean deleteUserHasRoles(Integer uid, Integer[] rids) throws Exception{
+		
+		String[] interrogators = new String[rids.length];
+		Arrays.fill(interrogators, "?");
+		
+		db.prepare("DELETE FROM user_has_role WHERE fk_user_id = ? AND fk_role_id IN (" + String.join(", ", interrogators) + ")");
+		
+		db.add(uid);
+		
+		for(int rid : rids){
+			db.add(Integer.toString(rid));
+		}
+		
+		return db.delete();
+	}
+	
+	/**
+	 * Delete rows from the table user_has_roles
+	 */
+	public boolean deleteUserHasRolesByUserId(Integer uid) throws Exception{
+				
+		db.prepare("DELETE FROM user_has_role WHERE fk_user_id = ?");
+		db.add(uid);
+				
+		return db.delete();
 	}
 }

@@ -1,7 +1,6 @@
 package core.database;
 
 import java.io.File;
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,8 +11,6 @@ import java.util.Vector;
 import core.Helper;
 
 public class DatabaseSQLite extends DatabaseRelational {
-	
-	protected static Connection conn = null;
 	
 	protected PreparedStatement pstmt = null;
 	protected ResultSet rs = null;
@@ -70,7 +67,7 @@ public class DatabaseSQLite extends DatabaseRelational {
 		}
 		
         try {
-        	pstmt = conn.prepareStatement(sql);
+        	pstmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
         	pointer = 1;
             return true;
         } catch (Exception e) {
@@ -109,6 +106,48 @@ public class DatabaseSQLite extends DatabaseRelational {
         }
 	}
 	
+	public boolean startTransaction(){
+		if(conn == null){
+			return false;
+		}
+		
+		try {
+			conn.setAutoCommit(false);
+			return true;
+		} catch (Exception e) {
+	        System.out.println(e.getMessage());
+	        return false;
+	    }
+	}
+	
+	public boolean rollback(){
+		if(conn == null){
+			return false;
+		}
+		
+		try {
+			conn.rollback();
+			return true;
+		} catch (Exception e) {
+	        System.out.println(e.getMessage());
+	        return false;
+	    }
+	}
+	
+	public boolean commit(){
+		if(conn == null){
+			return false;
+		}
+		
+		try {
+			conn.setAutoCommit(true);
+			return true;
+		} catch (Exception e) {
+	        System.out.println(e.getMessage());
+	        return false;
+	    }
+	}
+	
 	public boolean select(){
 		if(conn == null || pstmt == null){
 			return false;
@@ -136,6 +175,54 @@ public class DatabaseSQLite extends DatabaseRelational {
         	else{
         		return false;
         	}
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+	}
+	
+	public Integer insert(){
+		if(conn == null || pstmt == null){
+			return null;
+		}
+		
+        try {
+        	pstmt.executeUpdate();
+        	ResultSet rs = pstmt.getGeneratedKeys();
+
+        	if (rs.next()) {
+        		return rs.getInt(1);
+        	}
+        	
+        	return null;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+	}
+	
+	public boolean update(){
+		if(conn == null || pstmt == null){
+			return false;
+		}
+		
+        try {
+        	pstmt.executeUpdate();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+	}
+	
+	public boolean delete(){
+		if(conn == null || pstmt == null){
+			return false;
+		}
+		
+        try {
+        	pstmt.executeUpdate();
+            return true;
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return false;

@@ -21,11 +21,11 @@ public class RoleFactory {
 		model = new RoleModel();
 	}
 	
-	public Role[] createByIds(int rids[]) throws Exception{
+	public Role[] createByIds(Integer rids[]) throws Exception{
 				
 		Vector<Object[]> roles = model.getRolesByIds(rids);
 		
-		if(roles != null){
+		if(roles != null && roles.size() > 0){
 			Role[] roleObjects = new Role[roles.size()];
 			for(int i = 0; i < roleObjects.length; i++){
 				Integer rid  = (Integer)roles.get(i)[ROLE_ID];

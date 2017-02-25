@@ -9,6 +9,12 @@ public class HttpResponse{
 	private Map<String, String> headers;
 	private String body;
 	
+	public HttpResponse(int code){
+		this.code = code;
+		body = "";
+		headers = new HashMap<String, String>();
+	}
+	
 	public HttpResponse(int code, String body){
 		this.code = code;
 		this.body = body;

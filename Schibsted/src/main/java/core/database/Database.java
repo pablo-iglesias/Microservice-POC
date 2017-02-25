@@ -8,4 +8,7 @@ public abstract class Database extends ResourceLoader {
 	public static final int TYPE_SQLITE_MEMORY = 2;
 	
 	public abstract boolean connect();
+	public abstract boolean startTransaction();
+	public abstract boolean rollback();
+	public abstract boolean commit();
 }

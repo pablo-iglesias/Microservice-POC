@@ -8,6 +8,11 @@ public class ApiResponseUserCollection extends ApiResponse{
 	private User[] users;
 	private Role[] roles;
 	
+	public ApiResponseUserCollection(){
+		users = new User[0];
+		roles = new Role[0];
+	}
+	
 	public ApiResponseUserCollection(User[] users, Role[] roles){
 		this.setUsers(users);
 		this.setRoles(roles);
@@ -18,7 +23,12 @@ public class ApiResponseUserCollection extends ApiResponse{
 	}
 
 	public void setUsers(User[] users) {
-		this.users = users;
+		if(users != null){
+			this.users = users;
+		}
+		else{
+			users = new User[0];
+		}
 	}
 
 	public Role[] getRoles() {
@@ -26,6 +36,11 @@ public class ApiResponseUserCollection extends ApiResponse{
 	}
 
 	public void setRoles(Role[] roles) {
-		this.roles = roles;
+		if(roles != null){
+			this.roles = roles;
+		}
+		else{
+			roles = new Role[0];
+		}
 	}
 }

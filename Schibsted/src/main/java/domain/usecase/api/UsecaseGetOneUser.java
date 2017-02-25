@@ -13,7 +13,7 @@ public class UsecaseGetOneUser extends Usecase{
 	private RoleFactory roleFactory;
 	
 	// Input data
-	public int uid = 0;
+	public Integer uid = null;
 	
 	// Output data
 	public User user = null;
@@ -31,11 +31,14 @@ public class UsecaseGetOneUser extends Usecase{
 	
 	public boolean execute() throws Exception{
 		
-		user = userFactory.create(uid);
-		
-		if(user != null){
-			roles = roleFactory.createByIds(user.getRoles());
+		if(uid != null){
+			user = userFactory.create(uid);
 			
+			if(user == null){
+				return false;
+			}
+			
+			roles = roleFactory.createByIds(user.getRoles());
 			return true;
 		}
 		

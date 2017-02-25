@@ -10,9 +10,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.code.regexp.Pattern;
-import com.google.code.regexp.Matcher;
-
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
@@ -46,7 +43,7 @@ public class RequestHandler implements HttpHandler {
 		{"/logout",						"Application",	"logout"},
 		{"/welcome",					"Application",	"welcome"},
 		{"/page_(?<page>[0-9]+)$",		"Application",	"page"},
-		{"/api/users/?(?<uid>[0-9]*)$",	"Api",			"handler"}
+		{"/api/users/?(?<uid>.*)$",		"Api",			"handler"}
 	};
 	
 	/**
@@ -266,11 +263,16 @@ public class RequestHandler implements HttpHandler {
 		    }
 		}
 		
-		exchange.sendResponseHeaders(response.getCode(), response.getBody().getBytes().length);
-		
 		OutputStream stream = exchange.getResponseBody();
-		stream.write(response.getBody().getBytes());
-		stream.close();
+		int httpCode = response.getCode();
+		if(httpCode == HttpURLConnection.HTTP_NO_CONTENT){
+			exchange.sendResponseHeaders(httpCode, -1);
+		}
+		else{
+			exchange.sendResponseHeaders(httpCode, response.getBody().getBytes().length);
+			stream.write(response.getBody().getBytes());
+			stream.close();
+		}
 	}
 	
 	/**

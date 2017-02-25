@@ -1,8 +1,6 @@
 package domain.factory;
 
-import java.util.Arrays;
 import java.util.Vector;
-import java.util.stream.Stream;
 
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
@@ -48,7 +46,7 @@ public class UserFactory {
 	
 	public User create(int uid) throws Exception{
 		
-		String name = userModel.getUsernameByUserId(uid);
+		String name = userModel.selectUsernameByUserId(uid);
 		if(name != null){
 			return new User(uid, name, roleModel.getRoleIdsByUserId(uid));
 		}
@@ -59,7 +57,7 @@ public class UserFactory {
 		
 		if(name != null && password != null){
 			String hash = Hashing.sha1().hashString(password, Charsets.UTF_8 ).toString();
-			Integer uid = userModel.getUserIdByUseranameAndPassword(name, hash);
+			Integer uid = userModel.selectUserIdByUseranameAndPassword(name, hash);
 			if(uid != null){
 				return new User(uid, name, roleModel.getRoleIdsByUserId(uid));
 			}

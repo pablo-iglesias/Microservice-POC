@@ -21,11 +21,23 @@ public class RoleModel extends Model implements RoleModelInterface {
 		model = (RoleModelInterface) factory.create("Role");
 	}
 	
-	public Vector<Object[]> getRolesByIds(int rids[]) throws Exception{
+	public Vector<Object[]> getRolesByIds(Integer rids[]) throws Exception{
 		return model.getRolesByIds(rids);
 	}
 	
-	public int[] getRoleIdsByUserId(int uid) throws Exception{
+	public Integer[] getRoleIdsByUserId(Integer uid) throws Exception{
 		return model.getRoleIdsByUserId(uid);
+	}
+	
+	public boolean insertUserHasRoles(Integer uid, Integer[] rids) throws Exception{
+		return model.insertUserHasRoles(uid, rids);
+	}
+	
+	public boolean deleteUserHasRoles(Integer uid, Integer[] rids) throws Exception{
+		return model.deleteUserHasRoles(uid, rids);
+	}
+	
+	public boolean deleteUserHasRolesByUserId(Integer uid) throws Exception{
+		return model.deleteUserHasRolesByUserId(uid);
 	}
 }

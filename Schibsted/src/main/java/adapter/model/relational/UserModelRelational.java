@@ -1,13 +1,10 @@
 package adapter.model.relational;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
 import core.Server;
 import core.database.DatabaseRelational;
-
 import adapter.model.Model;
 import adapter.model.UserModelInterface;
 
@@ -27,7 +24,7 @@ public class UserModelRelational extends Model implements UserModelInterface{
 	public Vector<Object[]> getUsers() throws SQLException{
 		db.prepare("SELECT user_id, user_name FROM users");
 		
-		if(db.select()){	
+		if(db.select()){
 			Vector<Object[]> users = new Vector<Object[]>();
 			while(db.next()){
 				users.add(new Object[]{db.getInt("user_id"), db.getString("user_name")});
@@ -37,7 +34,7 @@ public class UserModelRelational extends Model implements UserModelInterface{
 		else{
 			return null;
 		}
-	}	
+	}
 	
 	/**
 	 * Takes user id and returns the user name
@@ -45,11 +42,11 @@ public class UserModelRelational extends Model implements UserModelInterface{
 	 * @return
 	 * @throws SQLException 
 	 */
-	public String getUsernameByUserId(int uid) throws SQLException{
-				
+	public String selectUsernameByUserId(Integer uid) throws SQLException{
+		
 		db.prepare("SELECT user_name FROM users WHERE user_id = ?");
 		db.add(uid);
-				
+		
 		if(db.selectOne()){
 			return db.getString("user_name");
 		}
@@ -62,9 +59,9 @@ public class UserModelRelational extends Model implements UserModelInterface{
 	 * Takes user name and hashed user password and returns the corresponding user id, used for authentication 
 	 * 
 	 * @return
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
-	public Integer getUserIdByUseranameAndPassword(String username, String password) throws SQLException{
+	public Integer selectUserIdByUseranameAndPassword(String username, String password) throws SQLException{
 					
 		db.prepare("SELECT user_id FROM users WHERE user_name = ? AND user_password = ?");
 		db.add(username);
@@ -76,5 +73,58 @@ public class UserModelRelational extends Model implements UserModelInterface{
 		else{
 			return null;
 		}
+	}
+	
+	public boolean	selectUserIsAdminRole(Integer uid) throws Exception
+	{
+		db.prepare("SELECT 1 FROM roles JOIN user_has_role ON role_id = fk_role_id JOIN users ON fk_user_id = user_id WHERE user_id = ? AND role_name = 'ADMIN'");
+		db.add(uid);
+		
+		if(db.selectOne()){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	
+	public boolean	selectUserExists(Integer uid) throws Exception
+	{
+		db.prepare("SELECT 1 FROM users WHERE user_id = ?");
+		db.add(uid);
+		
+		if(db.selectOne()){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	
+	public Integer insertUser(String username, String password) throws Exception{
+		
+		db.prepare("INSERT INTO users(user_name, user_password) VALUES(?, ?)");
+		db.add(username);
+		db.add(password);
+		
+		return db.insert();
+	}
+	
+	public boolean updateUser(Integer uid, String username, String password) throws Exception{
+		
+		db.prepare("UPDATE users SET user_name = ?, user_password = ? WHERE user_id = ?");
+		db.add(username);
+		db.add(password);
+		db.add(uid);
+		
+		return db.update();
+	}
+	
+	public boolean deleteUser(Integer uid) throws Exception{
+
+		db.prepare("DELETE FROM users WHERE user_id = ?");
+		db.add(uid);
+		
+		return db.delete();
 	}
 }

@@ -3,7 +3,6 @@ package adapter.controller.application;
 import java.util.Map;
 import java.util.HashMap;
 
-import core.Helper;
 import core.Server;
 import core.entity.HttpRequest;
 import core.entity.Session;
@@ -35,7 +34,7 @@ public class ApplicationController extends Controller{
 		// If the application has a page number in the query string, it will be sent to the template system
 		// This has something to do with the feature of redirecting user to last attempted page on login
 		if(request.get("query") != null && request.get("query") != ""){
-			Map<String, String> segments = Helper.map(request.get("query"), "&*([^=]+)=([^&]+)"); // Parse request query string
+			Map<String, String> segments = parseQueryString(request.get("query")); // Parse request query string
 			if(segments.containsKey("page")){
 				Map<String, Object> data = new HashMap<String, Object>();
 				data.put("page", segments.get("page"));
@@ -64,7 +63,7 @@ public class ApplicationController extends Controller{
 		if(request.getMethod().matches("POST")){
 			
 			// Parse payload of the post for parameters
-			Map<String, String> params = Helper.map(request.getBody(), "&*([^=]+)=([^&]+)");
+			Map<String, String> params = parseQueryString(request.getBody());
 	        
 			if(params.containsKey("username") && params.containsKey("password")){
 				Integer uid = authenticate(params.get("username"), params.get("password"));
@@ -74,7 +73,7 @@ public class ApplicationController extends Controller{
 					
 					if(params.containsKey("page")){
 						UsecasePage usecasePage = new UsecasePage();
-						usecasePage.uid = session.getUserId();
+						usecasePage.uid = uid.intValue();
 						usecasePage.page = params.get("page");
 						
 						if(usecasePage.execute() && usecasePage.allowed){

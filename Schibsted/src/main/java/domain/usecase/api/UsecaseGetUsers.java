@@ -45,7 +45,7 @@ public class UsecaseGetUsers extends Usecase{
 				}
 			}
 			
-			int[] rolesArray = Arrays.stream(rolesVector.toArray()).mapToInt(o -> (int)o).toArray();
+			Integer[] rolesArray = (Integer[]) rolesVector.toArray(new Integer[0]);
 			
 			roles = roleFactory.createByIds(rolesArray);
 			
