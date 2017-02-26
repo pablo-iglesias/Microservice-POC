@@ -91,6 +91,12 @@ public class ApplicationController extends Controller{
 							.setSession(session);
 				}
 			}
+			
+			if(params.containsKey("page")){
+				return new ApplicationResponse()
+						.setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+						.setLocation("/?page=" + params.get("page"));
+			}
 		}
 		
 		return new ApplicationResponse()

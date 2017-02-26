@@ -7,7 +7,8 @@ import org.junit.Test;
 
 import adapter.model.generic.RoleModel;
 import adapter.model.generic.UserModel;
-import core.Helper;
+
+import domain.Helper;
 import domain.entity.User;
 import domain.usecase.UsecaseTest;
 

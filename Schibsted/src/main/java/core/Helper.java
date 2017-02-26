@@ -12,8 +12,6 @@ import java.util.Vector;
 import java.util.Map.Entry;
 
 import com.google.code.regexp.Pattern;
-import com.google.common.base.Charsets;
-import com.google.common.hash.Hashing;
 import com.google.code.regexp.Matcher;
 
 public class Helper {
@@ -137,14 +135,5 @@ public class Helper {
 		SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy HH:mm:ss z");
 		sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
 		return sdf.format(date);
-	}
-	
-	/**
-	 * Returns the SHA1 of the string
-	 * 
-	 * @param string
-	 */
-	public static String SHA1(String string){
-		return Hashing.sha1().hashString(string, Charsets.UTF_8).toString();
 	}
 }

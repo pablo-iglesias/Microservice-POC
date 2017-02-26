@@ -1,4 +1,4 @@
-package adapter.response.api.json;
+package adapter.response.api;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

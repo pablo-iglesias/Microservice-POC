@@ -1,11 +1,14 @@
-package adapter.response.api.json;
+package adapter.response.api;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import domain.entity.Role;
 import domain.entity.User;
 
-@XmlRootElement
+@XmlRootElement(name="ApiResponse")
 public class ApiResponseUserResource extends ApiResponse{
 	
 	public String getXml() throws Exception{
@@ -13,7 +16,11 @@ public class ApiResponseUserResource extends ApiResponse{
         return ApiResponse.getXml(this);
 	}
 
+	@XmlElement(name="user")
 	private User user;
+	
+	@XmlElementWrapper(name="roles")
+	@XmlElement(name="role")
 	private Role[] roles;
 	
 	public ApiResponseUserResource(){
@@ -26,7 +33,7 @@ public class ApiResponseUserResource extends ApiResponse{
 		this.setRoles(roles);
 	}
 
-	public User getUser() {
+	@XmlTransient public User getUser() {
 		return user;
 	}
 
@@ -34,7 +41,7 @@ public class ApiResponseUserResource extends ApiResponse{
 		this.user = user;
 	}
 
-	public Role[] getRoles() {
+	@XmlTransient public Role[] getRoles() {
 		return roles;
 	}
 

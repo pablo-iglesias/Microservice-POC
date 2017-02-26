@@ -15,11 +15,10 @@ import core.entity.HttpRequest;
 import core.entity.HttpResponse;
 
 import adapter.controller.Controller;
-import adapter.response.api.json.ApiResponse;
-import adapter.response.api.json.ApiResponseError;
-import adapter.response.api.json.ApiResponseUserCollection;
-import adapter.response.api.json.ApiResponseUserResource;
-
+import adapter.response.api.ApiResponse;
+import adapter.response.api.ApiResponseError;
+import adapter.response.api.ApiResponseUserCollection;
+import adapter.response.api.ApiResponseUserResource;
 import domain.entity.User;
 import domain.usecase.api.UsecaseUpdateExistingUser;
 import domain.usecase.api.UsecaseAddNewUser;

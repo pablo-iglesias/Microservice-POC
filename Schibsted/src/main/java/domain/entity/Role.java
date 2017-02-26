@@ -3,7 +3,7 @@ package domain.entity;
 import javax.xml.bind.annotation.XmlElement;
 
 public class Role {
-
+	
 	@XmlElement(name="id")
 	private int id;
 	

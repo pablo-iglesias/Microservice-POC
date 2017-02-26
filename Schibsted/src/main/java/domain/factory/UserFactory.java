@@ -2,11 +2,10 @@ package domain.factory;
 
 import java.util.Vector;
 
-import com.google.common.base.Charsets;
-import com.google.common.hash.Hashing;
-
 import adapter.model.generic.RoleModel;
 import adapter.model.generic.UserModel;
+
+import domain.Helper;
 import domain.entity.User;
 
 public class UserFactory {
@@ -56,7 +55,7 @@ public class UserFactory {
 	public User create(String name, String password) throws Exception{
 		
 		if(name != null && password != null){
-			String hash = Hashing.sha1().hashString(password, Charsets.UTF_8 ).toString();
+			String hash = Helper.SHA1(password);
 			Integer uid = userModel.selectUserIdByUseranameAndPassword(name, hash);
 			if(uid != null){
 				return new User(uid, name, roleModel.getRoleIdsByUserId(uid));

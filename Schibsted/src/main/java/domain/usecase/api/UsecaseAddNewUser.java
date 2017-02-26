@@ -2,7 +2,8 @@ package domain.usecase.api;
 
 import adapter.model.generic.RoleModel;
 import adapter.model.generic.UserModel;
-import core.Helper;
+
+import domain.Helper;
 import domain.entity.User;
 
 public class UsecaseAddNewUser {

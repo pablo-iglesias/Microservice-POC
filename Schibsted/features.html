@@ -1,0 +1,158 @@
+<html>
+<body>
+
+<h1>Features</h1>
+
+<ul>
+	<li>Hexagonal architecture</li>
+	<ul>
+		<li>Design Patterns</li>
+		<ul>
+			<li>Domain Driven Design (package domain)</li>
+			<li>Model View Controller (package adapter)</li>
+			<li>Factory Pattern</li>
+		</ul>
+		<li>Emphasis on decoupling and separation of concerns</li>
+		<li>Based in the <a href="https://8thlight.com/blog/uncle-bob/2012/08/13/the-clean-architecture.html">Clean Architecture whitepaper</a></li>
+	</ul>
+	<br/>
+	<li>Framework (package core)</li>
+	<ul>
+		<li>Request handler with URI routing</li>
+		<li>Session support with cookie management</li>
+		<li>Database abstraction layer (package core.database)</li>
+		<ul>
+			<li>Relational SQL based data source implemented</li>
+			<li>Support for <strong>SQLite</strong></li>
+			<ul>
+				<li>File based SQLite support</li>
+				<li>In memory SQLite support</li>
+			</ul>
+			<li>Possibility to add more relational databases</li>
+			<li>Possibility to add new data sources, even non-relational and NoSQL</li>
+		</ul>
+		<li>Templating engine abstraction layer (package core.templating)</li>
+		<ul>
+			<li>Basic native template parser</li>
+			<li>Support for <strong>JTwig</strong> templating engine</li>
+			<li>Possibility to add new templating engines</li>
+		</ul>
+	</ul>
+	<br/>
+	<li>Adapter (package adapter)</li>
+	<ul>
+		<li>Application controller</li>
+		<ul>
+			<li>Application is able to create new sessions through user login</li>
+			<li>Logged users will go to welcome page by default</li>
+			<ul>
+				<li>Welcome page exposes roles and allowed page links for the logged user, features a logout button</li>
+			</ul>
+			<li>Application records last page access attempt when user is not logged in</li>
+			<ul>
+				<li>Login will redirect to recorded page instead of welcome page</li>
+				<li>If the user does not have the role to access the recorded page or the page does not exist, will go to welcome page</li>
+			</ul>
+			<li>Application has restricted access pages</li>
+			<ul>
+				<li>Access is possible to the users attaining the proper roles</li>
+				<li>Pages display welcome message with user name, back to welcome page button, and logout button</li>
+			</ul>
+			<li>Application has a number of HTTP error pages</li>
+			<ul>
+				<li>HTTP 403 forbidden page when user tries to access page without clearance</li>
+				<li>HTTP 404 not found page when user tries to access inexistent page</li>
+				<li>HTTP 500 internal page when unhandled exceptions emerge</li>
+			</ul>
+		</ul>
+		<li>REST API controller</li>
+		<ul>
+			<li>Basic authentication</li>
+			<ul>
+				<li>REST API is stateless, handles Basic Authentication per request through the Authorization header</li>
+			</ul>
+			<li>Content negotiation</li>
+			<ul>
+				<li>REST API can serve resources in JSON or XML depending on Accept header</li>
+				<li><strong>Gson</strong> and <strong>JAXB</strong> libraries used for response formatting</li>
+			</ul>
+			<li>REST API exposes users collection (endpoint api/users)</li>
+			<ul>
+				<li>GET will retrieve list of users and their roles</li>
+				<li>POST will create a new user resource</li>
+			</ul>
+			<li>REST API exposes user resource (endpoint api/users/<id>)</li>
+			<ul>
+				<li>GET will retrieve the user and his/her roles</li>
+				<li>PUT will update the user resource with supplied data</li>
+				<li>DELETE will remove the user resource permanently</li>
+			</ul>
+		</ul>
+		<li>Model abstraction layer</li>
+		<ul>
+			<li>There are two types of models, User model and Role model, each one has an interface</li>
+			<li>All User models must implement User interface, all Role models must implement Role interface</li>
+			<li>For each model type, there is one generic model</li>
+			<ul>
+				<li>Generic models are immutable and independent from underlying data source and/or query language</li>
+				<li>Generic models will instantiate conditioned models based in the chosen data source</li>
+				<li>Generic models will not implement required methods by themselves, but call conditioned models</li>
+			</ul>
+			<li>For each model type, there is a number of conditioned models</li>
+			<ul>
+				<li>Conditioned models implementation is subject to underlying data source technology</li>
+				<li>Conditioned models, directly implement the methods required by their interfaces, with their target data source</li>
+				<li>Under the package adapter.model.relational, conditioned models of type Role and User have been implemented, targeting a relational database with SQL</li>
+				<ul>
+					Such models are being used for working with SQLite, the same models could be used successfully with MySQL or other SQL relational databases
+				</ul>
+				<li>Other kinds of conditioned models could be developed for document based databases like MongoDB or ElasticSearch</li>
+				<li>Another conditioned model could use LDAP and so on...</i>
+			</ul>
+		</ul>
+	</ul>
+	</br>
+	<li>Domain (package domain)</li>
+	<ul>
+		<li>Code under this layer is immutable, changes in underlying system, framework, data source, viewport etc.. will not affect it</li>
+		<li>Other layers can work with the objects of this layer, a good example are the controllers</li>
+		<li>On the contrary, objects of this layer are agnostic of what lies in the bottom, access to adapter/core packages is not permitted from this context</li>
+		<li>The domain layer features the following</li>
+		<ul>
+			<li>A helper class</li>
+			<ul>
+				<li>Objects of this layer cannot access the Core package so they need to have their own helper</li>
+			</ul>
+			<li>User and Role entities</li>
+			<ul>
+				<li>These are value objects with a constructor and getters, whose purpose is to hold the business data</li> 
+			</ul>
+			<li>A number of usecase classes</li>
+			<ul>
+				<li>Each usecase represents a one type of interaction between the application and the user</li>
+				<li>Each usecase leverages a number of possible results to the interaction</li>
+				<li>The business rules of the platform, including the web application and the REST API, lies within these usecases</li>
+				<li>There are some usecases for the web application, and others for the REST API</li>
+				<li>Yet there is a usecase that applies to both, which is the authentication usecase</li>
+			</ul>
+			<li>User and Role factories</li>
+			<ul>
+				<li>These factories handle entity initialization logic that is common to most usecases</li>
+			</ul>
+		</ul>
+	</ul>
+	</br>
+	<li>Unit tests</li>
+	<ul>
+		<li>Unit tests are currently covering the usecases</li>
+		<li>Each usecase class has a test class that cover all possible usages of this usecase</li>
+		<li>User and Role factories and models are mocked by this test classes</li>
+		<li>Test classes are built with <strong>JUnit</strong> and <strong>Mockito</strong> libraries</li>
+	</ul>
+</ul>
+
+
+
+
+</body>
+</html>

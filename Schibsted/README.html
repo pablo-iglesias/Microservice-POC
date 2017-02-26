@@ -1,0 +1,51 @@
+<html>
+<body>
+
+<h1>Schibsted POC</h2>
+
+<h2>Introduction</h2>
+<ul>
+<li>The application is based in the specifications found in the file <a href="requirements.txt">requirements.txt</a></li>
+<li>The application features are summarized in the file <a href="features.html">features.html</a></li>
+</ul>
+
+<h2>Build</h2>
+<ol>
+	<li>This project has been build on top of a <strong>gradle wrapper</strong></li>
+	<li>Open a console, go to the root folder of the project</li>
+	<li>Run the build command</li>
+	<ul>
+		<li>Linux run "./gradlew build"</li>
+		<li>Windows run "gradlew build"</li>
+	</ul>
+	<li>The Jar file "Schibsted.jar" has been deployed along with dependencies under build/jar</li>
+</ol>
+
+<h2>Run</h2>
+<ol>
+	<li>Open a console, go to the folder of your JAR file</li>
+	<li>Use "java -jar Schibsted.jar"</li>
+</ol>
+
+<h2>Run Tests</h2>
+<ol>
+	<li>Open a console, go to the root folder of the project</li>
+	<li>Run the test command</li>
+	<li>Find tests report in build/reports/tests/test/index.html</li>
+</ol>
+
+<h2>TODO list</h2>
+<p>Development never ends</p>
+<ol>
+	<li>Extend unit tests to cover Domain Factories</li>
+	<li>Extend unit tests to cover Controllers and Models</li>
+	<li>Implement reactive programming where possible</li>
+	<li>Have the REST API to honor JSON API specification (<a href="http://jsonapi.org/">jsonapi.org</a>)</li>
+	<li>Add support for a NoSQL data source, like MongoDB or others</li>
+	<li>Add localization support for application templates and REST API error messages</li>
+	<li>Add by language content negotiation</li>
+</ol>
+
+</body>
+
+</html>

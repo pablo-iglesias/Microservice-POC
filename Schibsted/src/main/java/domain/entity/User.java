@@ -7,7 +7,7 @@ public class User {
 	@XmlElement(name="id")
 	private int id;
 	
-	@XmlElement(name="username")
+	@XmlElement(name="name")
 	private String username = null;
 	
 	private String password = null;
