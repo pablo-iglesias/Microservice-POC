@@ -1,13 +1,14 @@
 package domain.entity;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
 public class User {
 
-	@XmlElement(name="id")
+	@XmlAttribute(name="id")
 	private int id;
 	
-	@XmlElement(name="name")
+	@XmlAttribute(name="name")
 	private String username = null;
 	
 	private String password = null;

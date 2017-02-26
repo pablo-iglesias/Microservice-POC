@@ -1,16 +1,16 @@
 package domain.entity;
 
-import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlAttribute;
 
 public class Role {
 	
-	@XmlElement(name="id")
+	@XmlAttribute(name="id")
 	private int id;
 	
-	@XmlElement(name="name")
+	@XmlAttribute(name="name")
 	private String name;
 	
-	@XmlElement(name="page")
+	@XmlAttribute(name="page")
 	private String page;
 	
 	public Role(int id, String name, String page){
