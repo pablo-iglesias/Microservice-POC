@@ -56,6 +56,23 @@ public class UserModelRelational extends Model implements UserModelInterface{
 	}
 	
 	/**
+	 * Returns true if a user with this username already exists
+	 * 
+	 */
+	public boolean selectUserExistsByUseraname(String username) throws Exception{
+		
+		db.prepare("SELECT 1 FROM users WHERE user_name = ?");
+		db.add(username);
+		
+		if(db.selectOne()){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	
+	/**
 	 * Takes user name and hashed user password and returns the corresponding user id, used for authentication 
 	 * 
 	 * @return
@@ -75,7 +92,28 @@ public class UserModelRelational extends Model implements UserModelInterface{
 		}
 	}
 	
-	public boolean	selectUserIsAdminRole(Integer uid) throws Exception
+	/**
+	 * Takes user name and returns the corresponding user id, used for checking if the username is already taken 
+	 * 
+	 */
+	public Integer selectUserIdByUseraname(String username) throws Exception{
+
+		db.prepare("SELECT user_id FROM users WHERE user_name = ?");
+		db.add(username);
+		
+		if(db.selectOne()){
+			return new Integer(db.getInt("user_id"));
+		}
+		else{
+			return null;
+		}
+	}
+	
+	/**
+	 * Return true if the user has the ADMIN role
+	 * 
+	 */
+	public boolean	selectUserIsAdminRole(Integer uid) throws SQLException
 	{
 		db.prepare("SELECT 1 FROM roles JOIN user_has_role ON role_id = fk_role_id JOIN users ON fk_user_id = user_id WHERE user_id = ? AND role_name = 'ADMIN'");
 		db.add(uid);
@@ -88,7 +126,11 @@ public class UserModelRelational extends Model implements UserModelInterface{
 		}
 	}
 	
-	public boolean	selectUserExists(Integer uid) throws Exception
+	/**
+	 * Return true if a user with this id already exists
+	 * 
+	 */
+	public boolean	selectUserExists(Integer uid) throws SQLException
 	{
 		db.prepare("SELECT 1 FROM users WHERE user_id = ?");
 		db.add(uid);
@@ -101,7 +143,7 @@ public class UserModelRelational extends Model implements UserModelInterface{
 		}
 	}
 	
-	public Integer insertUser(String username, String password) throws Exception{
+	public Integer insertUser(String username, String password) throws SQLException{
 		
 		db.prepare("INSERT INTO users(user_name, user_password) VALUES(?, ?)");
 		db.add(username);
@@ -110,7 +152,7 @@ public class UserModelRelational extends Model implements UserModelInterface{
 		return db.insert();
 	}
 	
-	public boolean updateUser(Integer uid, String username, String password) throws Exception{
+	public boolean updateUser(Integer uid, String username, String password) throws SQLException{
 		
 		db.prepare("UPDATE users SET user_name = ?, user_password = ? WHERE user_id = ?");
 		db.add(username);
@@ -120,7 +162,7 @@ public class UserModelRelational extends Model implements UserModelInterface{
 		return db.update();
 	}
 	
-	public boolean deleteUser(Integer uid) throws Exception{
+	public boolean deleteUser(Integer uid) throws SQLException{
 
 		db.prepare("DELETE FROM users WHERE user_id = ?");
 		db.add(uid);

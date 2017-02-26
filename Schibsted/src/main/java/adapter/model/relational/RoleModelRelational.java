@@ -76,7 +76,7 @@ public class RoleModelRelational extends Model implements RoleModelInterface{
 	/**
 	 * Insert rows in the table user_has_role
 	 */
-	public boolean insertUserHasRoles(Integer uid, Integer[] rids) throws Exception{
+	public boolean insertUserHasRoles(Integer uid, Integer[] rids) throws SQLException{
 		
 		boolean success = true;
 		
@@ -93,7 +93,7 @@ public class RoleModelRelational extends Model implements RoleModelInterface{
 	/**
 	 * Delete rows from the table user_has_roles
 	 */
-	public boolean deleteUserHasRoles(Integer uid, Integer[] rids) throws Exception{
+	public boolean deleteUserHasRoles(Integer uid, Integer[] rids) throws SQLException{
 		
 		String[] interrogators = new String[rids.length];
 		Arrays.fill(interrogators, "?");
@@ -112,7 +112,7 @@ public class RoleModelRelational extends Model implements RoleModelInterface{
 	/**
 	 * Delete rows from the table user_has_roles
 	 */
-	public boolean deleteUserHasRolesByUserId(Integer uid) throws Exception{
+	public boolean deleteUserHasRolesByUserId(Integer uid) throws SQLException{
 				
 		db.prepare("DELETE FROM user_has_role WHERE fk_user_id = ?");
 		db.add(uid);

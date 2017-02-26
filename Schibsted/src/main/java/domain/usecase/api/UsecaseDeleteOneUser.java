@@ -1,15 +1,7 @@
 package domain.usecase.api;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Vector;
-
-import com.google.common.base.Charsets;
-import com.google.common.hash.Hashing;
-
 import adapter.model.generic.RoleModel;
 import adapter.model.generic.UserModel;
-import domain.entity.User;
 
 public class UsecaseDeleteOneUser {
 

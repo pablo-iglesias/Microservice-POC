@@ -24,9 +24,17 @@ public class UserModel extends Model implements UserModelInterface {
 	public Vector<Object[]> getUsers() throws Exception{
 		return model.getUsers();
 	}
+	
+	public boolean selectUserExistsByUseraname(String username) throws Exception{
+		return model.selectUserExistsByUseraname(username);
+	}
 		
 	public Integer selectUserIdByUseranameAndPassword(String username, String password) throws Exception{
 		return model.selectUserIdByUseranameAndPassword(username, password);
+	}
+	
+	public Integer selectUserIdByUseraname(String username) throws Exception{
+		return model.selectUserIdByUseraname(username);
 	}
 	
 	public String selectUsernameByUserId(Integer uid) throws Exception{

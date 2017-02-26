@@ -1,11 +1,8 @@
 package domain.usecase.api;
 
-import com.google.common.base.Charsets;
-import com.google.common.hash.Hashing;
-
 import adapter.model.generic.RoleModel;
 import adapter.model.generic.UserModel;
-
+import core.Helper;
 import domain.entity.User;
 
 public class UsecaseAddNewUser {
@@ -23,9 +20,6 @@ public class UsecaseAddNewUser {
 	public Integer uid = null;
 	public User user = null;
 	
-	// Output data
-	public boolean allowed = false;
-	
 	public UsecaseAddNewUser() throws Exception{
 		userModel = new UserModel();
 		roleModel = new RoleModel();
@@ -38,15 +32,15 @@ public class UsecaseAddNewUser {
 	
 	public int execute() throws Exception{
 		
-		if(uid != null && user != null && user.getPassword() != null){
-			allowed = userModel.selectUserIsAdminRole(uid.intValue());
+		if(uid != null && user != null && user.getUsername() != null && user.getPassword() != null && user.getRoles() != null){
+			boolean allowed = userModel.selectUserIsAdminRole(uid.intValue());
 			if(allowed){
-				String hash = Hashing.sha1().hashString(user.getPassword(), Charsets.UTF_8 ).toString();
-				if(userModel.selectUserIdByUseranameAndPassword(user.getUsername(), hash) != null){
+				
+				if(userModel.selectUserExistsByUseraname(user.getUsername())){
 					return RESULT_USER_ALREADY_EXISTS;
 				}
 				
-				Integer newUserId = userModel.insertUser(user.getUsername(), hash);
+				Integer newUserId = userModel.insertUser(user.getUsername(), Helper.SHA1(user.getPassword()));
 				if(newUserId != null){
 					if(roleModel.insertUserHasRoles(newUserId, user.getRoles())){
 						return RESULT_USER_CREATED_SUCCESSFULLY;

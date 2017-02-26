@@ -74,7 +74,7 @@ public class ApplicationController extends Controller{
 					if(params.containsKey("page")){
 						UsecasePage usecasePage = new UsecasePage();
 						usecasePage.uid = uid.intValue();
-						usecasePage.page = params.get("page");
+						usecasePage.page = params.get("page") == null ? null : Integer.parseInt(params.get("page"));
 						
 						if(usecasePage.execute() && usecasePage.allowed){
 							return new ApplicationResponse()
@@ -174,7 +174,7 @@ public class ApplicationController extends Controller{
 			
 			UsecasePage usecase = new UsecasePage();
 			usecase.uid = session.getUserId();
-			usecase.page = request.get("page");
+			usecase.page = request.get("page") == null ? null : Integer.parseInt(request.get("page"));
 			
 			if(usecase.execute() && usecase.allowed){
 				Map<String, Object> data = new HashMap<String, Object>();

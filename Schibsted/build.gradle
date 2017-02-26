@@ -26,6 +26,9 @@ dependencies {
     // Use JUnit for test framework
     testCompile 'junit:junit:4.12'
     
+    // Use Mockito for mocking framework
+    testCompile "org.mockito:mockito-core:2.0.57-beta"
+    
     // Use Sqlite for embedded database
     compile 'org.xerial:sqlite-jdbc:3.7.2'
     
@@ -35,7 +38,7 @@ dependencies {
     // Use gson for JSON parser
     compile "com.google.code.gson:gson:2.8.0"
     
-        // Library for XML parser
+    // Use jaxb for XML parser
     compile "javax.xml:jaxb-api:2.1"    
     
     // Additional dependence for preventing a little problem with Jtwig

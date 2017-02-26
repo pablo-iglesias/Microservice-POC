@@ -14,7 +14,7 @@ public class UsecasePage extends Usecase{
 		
 	// Input data
 	public int uid = 0;
-	public String page = "";
+	public int page = 0;
 			
 	// Output data
 	public String username = "";
@@ -33,14 +33,14 @@ public class UsecasePage extends Usecase{
 	public boolean execute() throws Exception{
 		
 		User user = userFactory.create(uid);
-		username = user.getUsername();
-		
+				
 		if(user != null){
+			username = user.getUsername();
 			
 			Role[] roles = roleFactory.createByIds(user.getRoles());
 			
 			for(Role role : roles){
-				if(role.getName().matches("PAGE_" + page)){
+				if(role.getPage().matches("page_" + page)){
 					allowed = true;
 				}
 			}

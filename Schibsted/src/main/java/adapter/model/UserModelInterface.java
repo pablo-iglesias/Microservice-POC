@@ -10,7 +10,9 @@ import java.util.Vector;
 public interface UserModelInterface{
 
 	public abstract Vector<Object[]> getUsers() throws Exception;
+	public abstract boolean selectUserExistsByUseraname(String username) throws Exception;
 	public abstract Integer selectUserIdByUseranameAndPassword(String username, String password) throws Exception;
+	public abstract Integer selectUserIdByUseraname(String username) throws Exception;
 	public abstract String 	selectUsernameByUserId(Integer uid) throws Exception;
 	public abstract boolean	selectUserIsAdminRole(Integer uid) throws Exception;
 	public abstract boolean selectUserExists(Integer uid) throws Exception;

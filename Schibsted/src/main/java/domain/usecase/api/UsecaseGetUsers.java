@@ -1,6 +1,5 @@
 package domain.usecase.api;
 
-import java.util.Arrays;
 import java.util.Vector;
 
 import domain.entity.Role;

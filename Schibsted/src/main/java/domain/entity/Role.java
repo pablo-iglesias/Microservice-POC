@@ -30,4 +30,22 @@ public class Role {
 	public String getPage() {
 		return page;
 	}
+	
+	public boolean equals(Object o){
+		
+		if(o.getClass() != this.getClass()){
+			return false;
+		}
+			
+		Role role = (Role) o;
+		
+		if(	role.getId() != id || 
+			role.getName() != name ||
+			role.getPage() != page){
+			
+			return false;
+		}
+			
+		return true;
+	}
 }
