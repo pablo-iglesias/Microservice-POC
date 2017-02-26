@@ -79,7 +79,8 @@ public class Helper {
         	Map<String, String> groups = matcher.namedGroups();
         	Iterator<Entry<String, String>> it = groups.entrySet().iterator();
 		    while (it.hasNext()) {
-		        if(it.next().getValue().isEmpty()){
+		    	String value = it.next().getValue();
+		        if(value == null || value.isEmpty()){
 		        	it.remove();
 		        }
 		    }

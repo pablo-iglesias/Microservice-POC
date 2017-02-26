@@ -35,6 +35,9 @@ dependencies {
     // Use gson for JSON parser
     compile "com.google.code.gson:gson:2.8.0"
     
+        // Library for XML parser
+    compile "javax.xml:jaxb-api:2.1"    
+    
     // Additional dependence for preventing a little problem with Jtwig
     compile "org.slf4j:slf4j-jdk14:1.7.12"
     

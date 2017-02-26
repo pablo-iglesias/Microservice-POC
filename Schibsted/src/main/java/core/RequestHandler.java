@@ -104,7 +104,6 @@ public class RequestHandler implements HttpHandler {
 								method = controller.getMethod(methodName, new Class[]{HttpRequest.class});
 								
 								HttpResponse apiResponse = (HttpResponse) method.invoke(null, request);
-								apiResponse.setHeader("Content-Type", "application/json");
 								
 								// Run controller and send HTTP response
 								dispatchHttpResponse(exchange, apiResponse);

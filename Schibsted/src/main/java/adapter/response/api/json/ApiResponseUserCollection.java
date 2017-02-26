@@ -1,10 +1,18 @@
 package adapter.response.api.json;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 import domain.entity.Role;
 import domain.entity.User;
 
+@XmlRootElement
 public class ApiResponseUserCollection extends ApiResponse{
 
+	public String getXml() throws Exception{
+		
+        return ApiResponse.getXml(this);
+	}
+	
 	private User[] users;
 	private Role[] roles;
 	

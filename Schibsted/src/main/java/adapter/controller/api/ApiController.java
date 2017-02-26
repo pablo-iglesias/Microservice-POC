@@ -2,6 +2,7 @@ package adapter.controller.api;
 
 import java.net.HttpURLConnection;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.google.gson.Gson;
@@ -14,6 +15,7 @@ import core.entity.HttpRequest;
 import core.entity.HttpResponse;
 
 import adapter.controller.Controller;
+import adapter.response.api.json.ApiResponse;
 import adapter.response.api.json.ApiResponseError;
 import adapter.response.api.json.ApiResponseUserCollection;
 import adapter.response.api.json.ApiResponseUserResource;
@@ -26,6 +28,8 @@ import domain.usecase.api.UsecaseGetOneUser;
 import domain.usecase.api.UsecaseGetUsers;
 
 public class ApiController extends Controller {
+	
+	private static final String[] supportedMediaTypes = {"application/json", "application/xml"};
 	
 	/**
 	 * Perform Basic Authentication check
@@ -59,6 +63,63 @@ public class ApiController extends Controller {
 	}
 	
 	/**
+	 * Creates and returns final HttpResponse object, handles content negotiation
+	 * 
+	 * @param request
+	 * @param httpCode
+	 * @param message
+	 * @return
+	 */
+	private static HttpResponse respond(HttpRequest request, int httpCode, ApiResponse response) throws Exception{
+		String accept = request.getHeaders().getFirst("Accept");
+		
+		double highest = 0;
+		String type = "";
+		
+		for(String mediaType : supportedMediaTypes)
+		{
+			Map<String, String> match = Helper.group(accept, mediaType + "(;q=(?<quality>[0-9.]*))?");
+			
+			if(match != null){
+				double quality = 0;
+				if(match.containsKey("quality") && match.get("quality") != null){
+					quality = Double.valueOf(match.get("quality"));
+				}
+				else{
+					quality = 1d;
+				}
+				
+				if(quality > highest){
+					highest = quality;
+					type = mediaType;
+				}
+				
+				if(quality >= 1)
+					break;
+			}
+		}
+		
+		HttpResponse httpResponse = null;
+		
+		switch(type){
+			case "application/json": 
+				httpResponse = new HttpResponse(httpCode, response.getJson());
+				break;
+			case "application/xml":  
+				httpResponse = new HttpResponse(httpCode, response.getXml());
+				break;
+		}
+		
+		if(httpResponse != null){
+			httpResponse.setHeader("Content-Type", type);
+			return httpResponse;
+		}
+		else{
+			return new HttpResponse(HttpURLConnection.HTTP_NOT_ACCEPTABLE);
+		}
+	}
+	
+	/**
 	 * Handler for Api requests, diverts requests to appropriate method of the controller
 	 * 
 	 * @param request
@@ -73,7 +134,7 @@ public class ApiController extends Controller {
 		if(authUserId != null){
 			
 			// Requests that refer an specific user id in the URI
-			if(request.contains("uid")){
+			if(request.contains("uid") && request.get("uid") != null){
 				
 				Integer refUserId = null;
 				
@@ -82,20 +143,20 @@ public class ApiController extends Controller {
 					refUserId = new Integer(request.get("uid"));
 				}
 				catch(NumberFormatException e){
-					return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, new ApiResponseError("Invalid user resource identifier format, integer expected").getJson());
+					return respond(request, HttpURLConnection.HTTP_BAD_REQUEST, new ApiResponseError("Invalid user resource identifier format, integer expected"));
 				}
 				
 				switch(request.getMethod()){
-					case "GET":  	return GET(refUserId);
-					case "PUT":  	return PUT(authUserId, refUserId, request.getBody());
-					case "DELETE":	return DELETE(authUserId, refUserId);
+					case "GET":  	return GET(request, refUserId);
+					case "PUT":  	return PUT(request, authUserId, refUserId, request.getBody());
+					case "DELETE":	return DELETE(request, authUserId, refUserId);
 				}
 			}
 			// Request that refer the entire collection of users
 			else{
 				switch(request.getMethod()){
-					case "GET":  return GET();
-					case "POST": return POST(authUserId, request.getBody());
+					case "GET":  return GET(request);
+					case "POST": return POST(request, authUserId, request.getBody());
 				}
 			}
 		}
@@ -103,7 +164,7 @@ public class ApiController extends Controller {
 			return new HttpResponse(HttpURLConnection.HTTP_UNAUTHORIZED);
 		}
 		
-		return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, new ApiResponseError("The requested action is not supported by the specified resource").getJson());
+		return respond(request, HttpURLConnection.HTTP_BAD_REQUEST, new ApiResponseError("The requested action is not supported by the specified resource"));
 	}
 	
 	/**
@@ -112,25 +173,27 @@ public class ApiController extends Controller {
 	 * @return
 	 * @throws Exception 
 	 */
-	private static HttpResponse GET(){
+	private static HttpResponse GET(HttpRequest request) throws Exception{
 		
 		try {
 			UsecaseGetUsers usecase = new UsecaseGetUsers();
 			
 			if(usecase.execute()){
-			    return new HttpResponse(
+			    return respond(
+			    		request,
 			    		HttpURLConnection.HTTP_OK, 
-			    		new ApiResponseUserCollection(usecase.users, usecase.roles).getJson());
+			    		new ApiResponseUserCollection(usecase.users, usecase.roles));
 			}
 			else{
-				return new HttpResponse(
+				return respond(
+						request,
 						HttpURLConnection.HTTP_OK, 
-						new ApiResponseUserCollection().getJson());
+						new ApiResponseUserCollection());
 			}
 		}
 		catch(Exception e){
 			e.printStackTrace(System.out);
-			return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError(e.getMessage()).getJson());
+			return respond(request, HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError(e.getMessage()));
 		}
 	}
 
@@ -141,24 +204,25 @@ public class ApiController extends Controller {
 	 * @return
 	 * @throws Exception
 	 */
-	private static HttpResponse GET(Integer refdUserId){
+	private static HttpResponse GET(HttpRequest request, Integer refdUserId) throws Exception{
 	
 		try {
 			UsecaseGetOneUser usecase = new UsecaseGetOneUser();
 			usecase.uid = refdUserId;
 			
 			if(usecase.execute()){
-				return new HttpResponse(
+				return respond(
+						request,
 						HttpURLConnection.HTTP_OK, 
-						new ApiResponseUserResource(usecase.user, usecase.roles).getJson());
+						new ApiResponseUserResource(usecase.user, usecase.roles));
 			}
 			else{
-				return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND, new ApiResponseError("User with this id does not exist").getJson());
+				return respond(request, HttpURLConnection.HTTP_NOT_FOUND, new ApiResponseError("User with this id does not exist"));
 			}
 		}
 		catch(Exception e){
 			e.printStackTrace(System.out);
-			return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError(e.getMessage()).getJson());
+			return respond(request, HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError(e.getMessage()));
 		}
 	}
 	
@@ -169,7 +233,7 @@ public class ApiController extends Controller {
 	 * @return
 	 * @throws Exception
 	 */
-	private static HttpResponse POST(Integer authUserId, String body){
+	private static HttpResponse POST(HttpRequest request, Integer authUserId, String body) throws Exception{
 		
 		try{
 			Gson gson = new Gson();
@@ -179,7 +243,7 @@ public class ApiController extends Controller {
 				!(user.getPassword() != null && user.getPassword().length() > 0) ||
 				!(user.getRoles() != null && user.getRoles().length > 0)){
 				
-				return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, new ApiResponseError("Insufficient data supplied, need username, password and at least one role").getJson());
+				return respond(request, HttpURLConnection.HTTP_BAD_REQUEST, new ApiResponseError("Insufficient data supplied, need username, password and at least one role"));
 			}
 			
 			Database db = Server.getDatabase();
@@ -206,20 +270,20 @@ public class ApiController extends Controller {
 					return new HttpResponse(HttpURLConnection.HTTP_UNAUTHORIZED);
 					
 				case UsecaseAddNewUser.RESULT_USER_ALREADY_EXISTS:
-					return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, new ApiResponseError("User with this username and password already exists").getJson());
+					return respond(request, HttpURLConnection.HTTP_BAD_REQUEST, new ApiResponseError("User with this username and password already exists"));
 				
 				case UsecaseAddNewUser.RESULT_BAD_INPUT_DATA:
 				case UsecaseAddNewUser.RESULT_USER_NOT_CREATED:
 				default:
-					return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError("Unknown error").getJson());
+					return respond(request, HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError("Unknown error"));
 			}
 		}
 		catch(JsonSyntaxException e){
-			return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, new ApiResponseError("Json syntax").getJson());
+			return respond(request, HttpURLConnection.HTTP_BAD_REQUEST, new ApiResponseError("Json syntax"));
 		}
 		catch(Exception e){
 			e.printStackTrace(System.out);
-			return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError(e.getMessage()).getJson());
+			return respond(request, HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError(e.getMessage()));
 		}
 	}
 	
@@ -230,7 +294,7 @@ public class ApiController extends Controller {
 	 * @return
 	 * @throws Exception
 	 */
-	private static HttpResponse PUT(Integer authUserId, Integer refUserId, String body){
+	private static HttpResponse PUT(HttpRequest request, Integer authUserId, Integer refUserId, String body) throws Exception{
 		
 		try{
 			Gson gson = new Gson();
@@ -240,7 +304,7 @@ public class ApiController extends Controller {
 				!(user.getPassword() != null && user.getPassword().length() > 0) ||
 				!(user.getRoles() != null && user.getRoles().length > 0)){
 				
-				return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, new ApiResponseError("Insufficient data supplied, need username, password and at least one role").getJson());
+				return respond(request, HttpURLConnection.HTTP_BAD_REQUEST, new ApiResponseError("Insufficient data supplied, need username, password and at least one role"));
 			}
 			
 			Database db = Server.getDatabase();
@@ -268,20 +332,20 @@ public class ApiController extends Controller {
 					return new HttpResponse(HttpURLConnection.HTTP_UNAUTHORIZED);
 					
 				case UsecaseUpdateExistingUser.RESULT_USER_DOES_NOT_EXIST:
-					return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND, new ApiResponseError("User with this id does not exist").getJson());
+					return respond(request, HttpURLConnection.HTTP_NOT_FOUND, new ApiResponseError("User with this id does not exist"));
 				
 				case UsecaseUpdateExistingUser.RESULT_BAD_INPUT_DATA:
 				case UsecaseUpdateExistingUser.RESULT_USER_NOT_CREATED:
 				default:
-					return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError("Unknown error").getJson());
+					return respond(request, HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError("Unknown error"));
 			}
 		}
 		catch(JsonSyntaxException e){
-			return new HttpResponse(HttpURLConnection.HTTP_BAD_REQUEST, new ApiResponseError("Json syntax").getJson());
+			return respond(request, HttpURLConnection.HTTP_BAD_REQUEST, new ApiResponseError("Json syntax"));
 		}
 		catch(Exception e){
 			e.printStackTrace(System.out);
-			return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError(e.getMessage()).getJson());
+			return respond(request, HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError(e.getMessage()));
 		}
 	}
 	
@@ -292,7 +356,7 @@ public class ApiController extends Controller {
 	 * @return
 	 * @throws Exception
 	 */
-	private static HttpResponse DELETE(Integer authUserId, Integer refUserId){
+	private static HttpResponse DELETE(HttpRequest request, Integer authUserId, Integer refUserId) throws Exception{
 	
 		try {
 			Database db = Server.getDatabase();
@@ -319,17 +383,17 @@ public class ApiController extends Controller {
 					return new HttpResponse(HttpURLConnection.HTTP_UNAUTHORIZED);
 					
 				case UsecaseDeleteOneUser.RESULT_USER_DOES_NOT_EXIST:
-					return new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND, new ApiResponseError("User with this id does not exist").getJson());
+					return respond(request, HttpURLConnection.HTTP_NOT_FOUND, new ApiResponseError("User with this id does not exist"));
 				
 				case UsecaseDeleteOneUser.RESULT_BAD_INPUT_DATA:
 				case UsecaseDeleteOneUser.RESULT_USER_NOT_DELETED:
 				default:
-					return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError("Unknown error").getJson());
+					return respond(request, HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError("Unknown error"));
 			}
 		}
 		catch(Exception e){
 			e.printStackTrace(System.out);
-			return new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError(e.getMessage()).getJson());
+			return respond(request, HttpURLConnection.HTTP_INTERNAL_ERROR, new ApiResponseError(e.getMessage()));
 		}
 	}
 }
