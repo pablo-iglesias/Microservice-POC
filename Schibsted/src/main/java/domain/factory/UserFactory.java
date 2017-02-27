@@ -26,6 +26,12 @@ public class UserFactory {
 		roleModel = new RoleModel();
 	}
 	
+	/**
+	 * Create an array of User objects representing all the users in existance
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	public User[] create() throws Exception{
 		
 		Vector<Object[]> records = userModel.getUsers();
@@ -43,6 +49,13 @@ public class UserFactory {
 		return null;
 	}
 	
+	/**
+	 * Create a User object from the user id
+	 * 
+	 * @param uid
+	 * @return
+	 * @throws Exception
+	 */
 	public User create(int uid) throws Exception{
 		
 		String name = userModel.selectUsernameByUserId(uid);
@@ -52,6 +65,14 @@ public class UserFactory {
 		return null;
 	}
 	
+	/**
+	 * Create user object from username and password
+	 * 
+	 * @param name
+	 * @param password
+	 * @return
+	 * @throws Exception
+	 */
 	public User create(String name, String password) throws Exception{
 		
 		if(name != null && password != null){

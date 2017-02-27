@@ -62,7 +62,7 @@ public class ApiController extends Controller {
 	}
 	
 	/**
-	 * Creates and returns final HttpResponse object, handles content negotiation
+	 * Creates and returns final HttpResponse object, used only for those responses that deliver actual content, handles content negotiation
 	 * 
 	 * @param request
 	 * @param httpCode
@@ -403,7 +403,7 @@ public class ApiController extends Controller {
 	}
 	
 	/**
-	 * Get a single user resource
+	 * Remove a user resource
 	 * 
 	 * @param refdUserId
 	 * @return

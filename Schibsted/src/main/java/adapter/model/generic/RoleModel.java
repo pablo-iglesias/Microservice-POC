@@ -7,7 +7,7 @@ import adapter.model.RoleModelInterface;
 import adapter.model.factory.ModelFactory;
 
 /**
- * Standard Role model, abstracted from data source
+ * Generic Role model, abstracted from data source, suitable to be used from the domain scope
  * 
  * @author Peibol
  */

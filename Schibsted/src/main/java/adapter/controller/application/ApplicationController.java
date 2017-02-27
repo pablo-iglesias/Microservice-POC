@@ -51,7 +51,7 @@ public class ApplicationController extends Controller{
 	}
 	
 	/**
-	 * Login endpoint, receives user data by POST
+	 * Login endpoint, receives user data by POST, authenticates user, creates session, redirects to recorded page or to welcome page 
 	 * 
 	 * @param request
 	 * @param session
@@ -105,7 +105,7 @@ public class ApplicationController extends Controller{
 	}
 	
 	/**
-	 * Logs the user out, sends it to the index page
+	 * Logs the user out, redirects to index page
 	 * 
 	 * @param request
 	 * @param session
@@ -116,9 +116,6 @@ public class ApplicationController extends Controller{
 		
 		if(session != null){
 			Server.removeSession(session.getSessionToken());			
-			return new ApplicationResponse()
-					.setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
-					.setLocation("/");
 		}
 		
 		return new ApplicationResponse()
@@ -127,7 +124,7 @@ public class ApplicationController extends Controller{
 	}
 	
 	/**
-	 * Welcome page, displays user name and logout button
+	 * Welcome page, displays user name, list of roles and page links, and logout button
 	 * 
 	 * @param request
 	 * @param session

@@ -6,10 +6,16 @@ import core.templating.TemplateParserDefault;
 
 public class ResourceLoader {
 	
+	/**
+	 * Load a file from the filesystem as an input stream
+	 * 
+	 * @param path
+	 * @return
+	 */
 	protected InputStream loadResourceAsInputStream(String path){
 		
 		try{
-			InputStream resource = TemplateParserDefault.class.getClassLoader().getResourceAsStream(path);
+			InputStream resource = ResourceLoader.class.getClassLoader().getResourceAsStream(path);
 			return resource;
 		}
 		catch(Exception e){
@@ -18,6 +24,12 @@ public class ResourceLoader {
 		}
 	}
 
+	/**
+	 * Load a file from the filesystem as a String
+	 * 
+	 * @param path
+	 * @return
+	 */
 	protected String loadResourceAsString(String path){
 		
 		InputStream resource = loadResourceAsInputStream(path);

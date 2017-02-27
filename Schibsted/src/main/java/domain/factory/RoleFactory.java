@@ -21,6 +21,13 @@ public class RoleFactory {
 		model = new RoleModel();
 	}
 	
+	/**
+	 * Create array of Role objects from an array of their respective ids
+	 * 
+	 * @param rids
+	 * @return
+	 * @throws Exception
+	 */
 	public Role[] createByIds(Integer rids[]) throws Exception{
 				
 		Vector<Object[]> roles = model.getRolesByIds(rids);

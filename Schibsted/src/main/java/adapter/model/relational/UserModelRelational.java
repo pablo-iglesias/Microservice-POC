@@ -143,6 +143,9 @@ public class UserModelRelational extends Model implements UserModelInterface{
 		}
 	}
 	
+	/**
+	 * Inserts new user
+	 */
 	public Integer insertUser(String username, String password) throws SQLException{
 		
 		db.prepare("INSERT INTO users(user_name, user_password) VALUES(?, ?)");
@@ -152,6 +155,9 @@ public class UserModelRelational extends Model implements UserModelInterface{
 		return db.insert();
 	}
 	
+	/**
+	 * Updates existing user
+	 */
 	public boolean updateUser(Integer uid, String username, String password) throws SQLException{
 		
 		db.prepare("UPDATE users SET user_name = ?, user_password = ? WHERE user_id = ?");
@@ -162,6 +168,9 @@ public class UserModelRelational extends Model implements UserModelInterface{
 		return db.update();
 	}
 	
+	/**
+	 * Removes existing user
+	 */
 	public boolean deleteUser(Integer uid) throws SQLException{
 
 		db.prepare("DELETE FROM users WHERE user_id = ?");

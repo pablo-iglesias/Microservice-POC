@@ -7,7 +7,7 @@ import adapter.model.UserModelInterface;
 import adapter.model.factory.ModelFactory;
 
 /**
- * Standard User model, abstracted from data source
+ * Generic User model, abstracted from data source, suitable to be used from the domain scope
  * 
  * @author Peibol
  */
