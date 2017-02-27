@@ -1,7 +1,7 @@
 package domain.usecase.api;
 
-import adapter.model.generic.RoleModel;
-import adapter.model.generic.UserModel;
+import adapter.model.RoleModel;
+import adapter.model.UserModel;
 
 import domain.Helper;
 import domain.entity.User;
@@ -20,12 +20,7 @@ public class UsecaseAddNewUser {
 	// Input data
 	public Integer uid = null;
 	public User user = null;
-	
-	public UsecaseAddNewUser() throws Exception{
-		userModel = new UserModel();
-		roleModel = new RoleModel();
-	}
-	
+		
 	public UsecaseAddNewUser(UserModel userModel, RoleModel roleModel){
 		this.userModel = userModel;
 		this.roleModel = roleModel;

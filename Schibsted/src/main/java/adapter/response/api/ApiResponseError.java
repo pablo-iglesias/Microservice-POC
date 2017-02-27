@@ -2,7 +2,7 @@ package adapter.response.api;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement
+@XmlRootElement(name="ApiResponse")
 public class ApiResponseError extends ApiResponse{
 
 	public String getXml() throws Exception{

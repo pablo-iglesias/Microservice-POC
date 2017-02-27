@@ -2,7 +2,7 @@ package domain.factory;
 
 import java.util.Vector;
 
-import adapter.model.generic.RoleModel;
+import adapter.model.RoleModel;
 import domain.entity.Role;
 
 public class RoleFactory {
@@ -15,10 +15,6 @@ public class RoleFactory {
 	
 	public RoleFactory(RoleModel model) throws Exception{
 		this.model = model;
-	}
-	
-	public RoleFactory() throws Exception{
-		model = new RoleModel();
 	}
 	
 	/**

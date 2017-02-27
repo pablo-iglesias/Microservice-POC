@@ -1,7 +1,7 @@
 package domain.usecase.api;
 
-import adapter.model.generic.RoleModel;
-import adapter.model.generic.UserModel;
+import adapter.model.RoleModel;
+import adapter.model.UserModel;
 
 public class UsecaseDeleteOneUser {
 
@@ -17,11 +17,6 @@ public class UsecaseDeleteOneUser {
 	// Input data
 	public Integer authUserId = null;
 	public Integer refUserId = null;
-	
-	public UsecaseDeleteOneUser() throws Exception{
-		userModel = new UserModel();
-		roleModel = new RoleModel();
-	}
 	
 	public UsecaseDeleteOneUser(UserModel userModel, RoleModel roleModel){
 		this.userModel = userModel;

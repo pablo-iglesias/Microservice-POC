@@ -92,22 +92,14 @@
 		<ul>
 			<li>There are two types of models, User model and Role model, each one has an interface</li>
 			<li>All User models must implement User interface, all Role models must implement Role interface</li>
-			<li>For each model type, there is one generic model</li>
+			<li>For each model type, there can be a number of derivative models subject to underlying data source technology</li>
 			<ul>
-				<li>Generic models are immutable and independent from underlying data source and/or query language</li>
-				<li>Generic models will instantiate conditioned models based in the chosen data source</li>
-				<li>Generic models will not implement required methods by themselves, but call conditioned models</li>
-			</ul>
-			<li>For each model type, there is a number of conditioned models</li>
-			<ul>
-				<li>Conditioned models implementation is subject to underlying data source technology</li>
-				<li>Conditioned models, directly implement the methods required by their interfaces, with their target data source</li>
-				<li>Under the package adapter.model.relational, conditioned models of type Role and User have been implemented, targeting a relational database with SQL</li>
+				<li>Under the package adapter.model.relational, models of type Role and User have been implemented, targeting a relational database with SQL</li>
 				<ul>
 					Such models are being used for working with SQLite, the same models could be used successfully with MySQL or other SQL relational databases
 				</ul>
-				<li>Other kinds of conditioned models could be developed for document based databases like MongoDB or ElasticSearch</li>
-				<li>Another conditioned model could use LDAP and so on...</i>
+				<li>Other kinds of models could be developed for document based databases like MongoDB or ElasticSearch</li>
+				<li>Another model could use LDAP and so on...</i>
 			</ul>
 		</ul>
 	</ul>
@@ -150,9 +142,6 @@
 		<li>Test classes are built with <strong>JUnit</strong> and <strong>Mockito</strong> libraries</li>
 	</ul>
 </ul>
-
-
-
 
 </body>
 </html>

@@ -7,7 +7,7 @@ import java.util.Vector;
  * 
  * @author Peibol
  */
-public interface UserModelInterface{
+public interface UserModel{
 
 	public abstract Vector<Object[]> getUsers() throws Exception;
 	public abstract boolean selectUserExistsByUseraname(String username) throws Exception;

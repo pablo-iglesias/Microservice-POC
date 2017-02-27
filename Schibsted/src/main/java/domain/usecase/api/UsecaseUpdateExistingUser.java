@@ -7,8 +7,8 @@ import java.util.Vector;
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 
-import adapter.model.generic.RoleModel;
-import adapter.model.generic.UserModel;
+import adapter.model.RoleModel;
+import adapter.model.UserModel;
 
 import domain.entity.User;
 
@@ -28,12 +28,7 @@ public class UsecaseUpdateExistingUser {
 	public Integer authUserId = null;
 	public Integer refUserId = null;
 	public User userData = null;
-	
-	public UsecaseUpdateExistingUser() throws Exception{
-		userModel = new UserModel();
-		roleModel = new RoleModel();
-	}
-	
+		
 	public UsecaseUpdateExistingUser(UserModel userModel, RoleModel roleModel){
 		this.userModel = userModel;
 		this.roleModel = roleModel;

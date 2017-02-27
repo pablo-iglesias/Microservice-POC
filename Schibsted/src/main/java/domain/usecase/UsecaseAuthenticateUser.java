@@ -1,5 +1,7 @@
 package domain.usecase;
 
+import adapter.model.RoleModel;
+import adapter.model.UserModel;
 import domain.entity.User;
 import domain.factory.UserFactory;
 
@@ -15,8 +17,8 @@ public class UsecaseAuthenticateUser extends Usecase {
 	// Output data
 	public int uid = 0;
 	
-	public UsecaseAuthenticateUser() throws Exception{
-		factory = new UserFactory();
+	public UsecaseAuthenticateUser(UserModel userModel, RoleModel roleModel) throws Exception{
+		factory = new UserFactory(userModel, roleModel);
 	}
 	
 	public UsecaseAuthenticateUser(UserFactory factory){

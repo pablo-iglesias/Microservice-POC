@@ -15,6 +15,9 @@ import core.entity.HttpRequest;
 import core.entity.HttpResponse;
 
 import adapter.controller.Controller;
+import adapter.model.RoleModel;
+import adapter.model.UserModel;
+import adapter.model.factory.ModelFactory;
 import adapter.response.api.ApiResponse;
 import adapter.response.api.ApiResponseError;
 import adapter.response.api.ApiResponseUserCollection;
@@ -184,7 +187,11 @@ public class ApiController extends Controller {
 	private static HttpResponse GET(HttpRequest request) throws Exception{
 		
 		try {
-			UsecaseGetUsers usecase = new UsecaseGetUsers();
+			ModelFactory factory = new ModelFactory();
+			UserModel userModel = (UserModel) factory.create("User");
+			RoleModel roleModel = (RoleModel) factory.create("Role");
+			
+			UsecaseGetUsers usecase = new UsecaseGetUsers(userModel, roleModel);
 			
 			if(usecase.execute()){
 			    return respond(
@@ -218,7 +225,11 @@ public class ApiController extends Controller {
 	private static HttpResponse GET(HttpRequest request, Integer refdUserId) throws Exception{
 	
 		try {
-			UsecaseGetOneUser usecase = new UsecaseGetOneUser();
+			ModelFactory factory = new ModelFactory();
+			UserModel userModel = (UserModel) factory.create("User");
+			RoleModel roleModel = (RoleModel) factory.create("Role");
+			
+			UsecaseGetOneUser usecase = new UsecaseGetOneUser(userModel, roleModel);
 			usecase.uid = refdUserId;
 			
 			if(usecase.execute()){
@@ -269,7 +280,11 @@ public class ApiController extends Controller {
 			Database db = Server.getDatabase();
 			db.startTransaction();
 			
-			UsecaseAddNewUser usecase = new UsecaseAddNewUser();
+			ModelFactory factory = new ModelFactory();
+			UserModel userModel = (UserModel) factory.create("User");
+			RoleModel roleModel = (RoleModel) factory.create("Role");
+			
+			UsecaseAddNewUser usecase = new UsecaseAddNewUser(userModel, roleModel);
 			usecase.uid = authUserId;
 			usecase.user = user;
 				
@@ -345,7 +360,11 @@ public class ApiController extends Controller {
 			Database db = Server.getDatabase();
 			db.startTransaction();
 			
-			UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser();
+			ModelFactory factory = new ModelFactory();
+			UserModel userModel = (UserModel) factory.create("User");
+			RoleModel roleModel = (RoleModel) factory.create("Role");
+			
+			UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
 			usecase.authUserId = authUserId;
 			usecase.refUserId = refUserId;
 			usecase.userData = user;
@@ -415,7 +434,11 @@ public class ApiController extends Controller {
 			Database db = Server.getDatabase();
 			db.startTransaction();
 			
-			UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser();
+			ModelFactory factory = new ModelFactory();
+			UserModel userModel = (UserModel) factory.create("User");
+			RoleModel roleModel = (RoleModel) factory.create("Role");
+			
+			UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userModel, roleModel);
 			usecase.authUserId = authUserId;
 			usecase.refUserId = refUserId;
 			

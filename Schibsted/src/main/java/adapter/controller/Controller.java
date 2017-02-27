@@ -3,6 +3,11 @@ package adapter.controller;
 import java.util.Map;
 
 import core.Helper;
+
+import adapter.model.RoleModel;
+import adapter.model.UserModel;
+import adapter.model.factory.ModelFactory;
+
 import domain.usecase.UsecaseAuthenticateUser;
 
 public class Controller {
@@ -17,7 +22,11 @@ public class Controller {
 	 */
 	protected static Integer authenticate(String username, String password) throws Exception{
 		
-		UsecaseAuthenticateUser usecase = new UsecaseAuthenticateUser();
+		ModelFactory factory = new ModelFactory();
+		UserModel userModel = (UserModel) factory.create("User");
+		RoleModel roleModel = (RoleModel) factory.create("Role");
+		
+		UsecaseAuthenticateUser usecase = new UsecaseAuthenticateUser(userModel, roleModel);
 		usecase.username = username;
 		usecase.password = password;
 		

@@ -7,7 +7,7 @@ import java.util.Vector;
  * 
  * @author Peibol
  */
-public interface RoleModelInterface{
+public interface RoleModel{
 
 	public abstract Vector<Object[]> getRolesByIds(Integer rids[]) throws Exception;
 	public abstract Integer[] getRoleIdsByUserId(Integer uid) throws Exception;

@@ -5,8 +5,8 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
-import adapter.model.generic.RoleModel;
-import adapter.model.generic.UserModel;
+import adapter.model.RoleModel;
+import adapter.model.UserModel;
 
 import domain.Helper;
 import domain.entity.User;

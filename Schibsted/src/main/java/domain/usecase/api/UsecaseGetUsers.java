@@ -2,6 +2,9 @@ package domain.usecase.api;
 
 import java.util.Vector;
 
+import adapter.model.RoleModel;
+import adapter.model.UserModel;
+
 import domain.entity.Role;
 import domain.entity.User;
 import domain.factory.RoleFactory;
@@ -18,9 +21,9 @@ public class UsecaseGetUsers extends Usecase{
 	public User[] users = null;
 	public Role[] roles = null;
 		
-	public UsecaseGetUsers() throws Exception{
-		userFactory = new UserFactory();
-		roleFactory = new RoleFactory();
+	public UsecaseGetUsers(UserModel userModel, RoleModel roleModel) throws Exception{
+		userFactory = new UserFactory(userModel, roleModel);
+		roleFactory = new RoleFactory(roleModel);
 	}
 	
 	public UsecaseGetUsers(UserFactory userFactory, RoleFactory roleFactory){

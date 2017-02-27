@@ -6,14 +6,14 @@ import java.util.Vector;
 import core.Server;
 import core.database.DatabaseRelational;
 import adapter.model.Model;
-import adapter.model.UserModelInterface;
+import adapter.model.UserModel;
 
 /**
  * User model that expects the database to be relational and SQL driven
  * 
  * @author Peibol
  */
-public class UserModelRelational extends Model implements UserModelInterface{
+public class UserModelRelational extends Model implements UserModel{
 
 	private DatabaseRelational db;
 	

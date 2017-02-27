@@ -8,14 +8,14 @@ import core.Server;
 import core.database.DatabaseRelational;
 
 import adapter.model.Model;
-import adapter.model.RoleModelInterface;
+import adapter.model.RoleModel;
 
 /**
  * Role model that expects the database to be relational and SQL driven
  * 
  * @author Peibol
  */
-public class RoleModelRelational extends Model implements RoleModelInterface{
+public class RoleModelRelational extends Model implements RoleModel{
 
 	private DatabaseRelational db;
 	

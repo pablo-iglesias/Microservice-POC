@@ -1,5 +1,8 @@
 package domain.usecase.application;
 
+import adapter.model.RoleModel;
+import adapter.model.UserModel;
+
 import domain.entity.Role;
 import domain.entity.User;
 import domain.factory.RoleFactory;
@@ -20,9 +23,9 @@ public class UsecasePage extends Usecase{
 	public String username = "";
 	public boolean allowed = false;
 	
-	public UsecasePage() throws Exception{
-		userFactory = new UserFactory();
-		roleFactory = new RoleFactory();
+	public UsecasePage(UserModel userModel, RoleModel roleModel) throws Exception{
+		userFactory = new UserFactory(userModel, roleModel);
+		roleFactory = new RoleFactory(roleModel);
 	}
 	
 	public UsecasePage(UserFactory userFactory, RoleFactory roleFactory){

@@ -8,6 +8,9 @@ import core.entity.HttpRequest;
 import core.entity.Session;
 
 import adapter.controller.Controller;
+import adapter.model.RoleModel;
+import adapter.model.UserModel;
+import adapter.model.factory.ModelFactory;
 import adapter.response.application.ApplicationResponse;
 
 import domain.entity.Role;
@@ -72,7 +75,11 @@ public class ApplicationController extends Controller{
 					session = Server.createSession(uid.intValue());
 					
 					if(params.containsKey("page")){
-						UsecasePage usecasePage = new UsecasePage();
+						ModelFactory factory = new ModelFactory();
+						UserModel userModel = (UserModel) factory.create("User");
+						RoleModel roleModel = (RoleModel) factory.create("Role");
+						
+						UsecasePage usecasePage = new UsecasePage(userModel, roleModel);
 						usecasePage.uid = uid.intValue();
 						usecasePage.page = params.get("page") == null ? null : Integer.parseInt(params.get("page"));
 						
@@ -135,7 +142,11 @@ public class ApplicationController extends Controller{
 		
 		if(session != null){
 			
-			UsecaseWelcome usecase = new UsecaseWelcome();
+			ModelFactory factory = new ModelFactory();
+			UserModel userModel = (UserModel) factory.create("User");
+			RoleModel roleModel = (RoleModel) factory.create("Role");
+			
+			UsecaseWelcome usecase = new UsecaseWelcome(userModel, roleModel);
 			usecase.uid = session.getUserId();
 			
 			if(usecase.execute()){
@@ -175,7 +186,11 @@ public class ApplicationController extends Controller{
 		
 		if(session != null && request.contains("page")){
 			
-			UsecasePage usecase = new UsecasePage();
+			ModelFactory factory = new ModelFactory();
+			UserModel userModel = (UserModel) factory.create("User");
+			RoleModel roleModel = (RoleModel) factory.create("Role");
+			
+			UsecasePage usecase = new UsecasePage(userModel, roleModel);
 			usecase.uid = session.getUserId();
 			usecase.page = request.get("page") == null ? null : Integer.parseInt(request.get("page"));
 			

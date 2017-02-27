@@ -1,9 +1,14 @@
 package domain.usecase.api;
 
+import adapter.model.RoleModel;
+import adapter.model.UserModel;
+
 import domain.entity.Role;
 import domain.entity.User;
+
 import domain.factory.RoleFactory;
 import domain.factory.UserFactory;
+
 import domain.usecase.Usecase;
 
 public class UsecaseGetOneUser extends Usecase{
@@ -19,9 +24,9 @@ public class UsecaseGetOneUser extends Usecase{
 	public User user = null;
 	public Role[] roles = new Role[]{};
 		
-	public UsecaseGetOneUser() throws Exception{
-		userFactory = new UserFactory();
-		roleFactory = new RoleFactory();
+	public UsecaseGetOneUser(UserModel userModel, RoleModel roleModel) throws Exception{
+		userFactory = new UserFactory(userModel, roleModel);
+		roleFactory = new RoleFactory(roleModel);
 	}
 	
 	public UsecaseGetOneUser(UserFactory userFactory, RoleFactory roleFactory){
