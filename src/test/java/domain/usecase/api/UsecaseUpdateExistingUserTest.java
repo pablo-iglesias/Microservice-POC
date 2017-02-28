@@ -49,19 +49,16 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
 		when(
         	model.updateUser(null, "user2", Helper.SHA1("pass2"))
         )
-        .thenReturn(true)
         .thenThrow(new Exception("Handling invalid update request to user model"));
 		
 		when(
         	model.updateUser(3, null, Helper.SHA1("pass2"))
         )
-        .thenReturn(true)
         .thenThrow(new Exception("Handling invalid update request to user model"));
 		
 		when(
 	        model.updateUser(3, "user2", null)
         )
-        .thenReturn(true)
         .thenThrow(new Exception("Handling invalid update request to user model"));
 		
 		return model;
@@ -80,19 +77,16 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
         when(
         	model.insertUserHasRoles(null, new Integer[]{1, 2})
         )
-        .thenReturn(true)
         .thenThrow(new Exception("Handling invalid insert request to role model"));
         
         when(
         	model.insertUserHasRoles(3, null)
         )
-        .thenReturn(true)
         .thenThrow(new Exception("Handling invalid insert request to role model"));
         
         when(
         	model.insertUserHasRoles(4, new Integer[]{4})
         )
-        .thenReturn(true)
         .thenThrow(new Exception("Inserting the roles to a user that does not exist"));
         
         when(
@@ -104,13 +98,11 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
         when(
         	model.deleteUserHasRoles(null, new Integer[]{3})
         )
-        .thenReturn(true)
         .thenThrow(new Exception("Handling invalid delete request to role model"));
         
         when(
         	model.deleteUserHasRoles(3, null)
         )
-        .thenReturn(true)
         .thenThrow(new Exception("Handling invalid delete request to role model"));
         
         return model;
