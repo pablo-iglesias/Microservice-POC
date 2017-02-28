@@ -273,9 +273,9 @@ public class ApiController extends Controller {
             Gson gson = new Gson();
             User user = gson.fromJson(body, User.class);
 
-            if (    (user.getUsername() == null || user.getUsername().length() > 0)
-                 || (user.getPassword() == null || user.getPassword().length() > 0)
-                 || (user.getRoles()    == null || user.getRoles().length > 0)) {
+            if (    (user.getUsername() == null || user.getUsername().length() == 0)
+                 || (user.getPassword() == null || user.getPassword().length() == 0)
+                 || (user.getRoles()    == null || user.getRoles().length == 0)) {
 
                 return respond(
                         request, 
@@ -353,9 +353,9 @@ public class ApiController extends Controller {
             Gson gson = new Gson();
             User user = gson.fromJson(body, User.class);
 
-            if (    (user.getUsername() == null || user.getUsername().length() > 0)
-                    || (user.getPassword() == null || user.getPassword().length() > 0)
-                    || (user.getRoles()    == null || user.getRoles().length > 0)) {
+            if (    (user.getUsername() == null || user.getUsername().length() == 0)
+                    || (user.getPassword() == null || user.getPassword().length() == 0)
+                    || (user.getRoles()    == null || user.getRoles().length == 0)) {
 
                 return respond(
                         request, 
