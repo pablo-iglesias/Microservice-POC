@@ -12,8 +12,7 @@
 3.  Run the build command
 	*   Linux run "./gradlew build"
 	*   Windows run "gradlew build"
-
-5.  The Jar file "Schibsted.jar" has been deployed along with dependencies under build/jar
+4.  The Jar file "Schibsted.jar" has been deployed along with dependencies under build/jar
 
 ## Run
 
@@ -35,7 +34,6 @@
 2.  Run the test command
 	*   Linux run "./gradlew test"
 	*   Windows run "gradlew test"
-
 4.  Find tests report in build/reports/tests/test/index.html
 
 ## TODO list
