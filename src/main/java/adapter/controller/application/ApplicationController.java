@@ -64,7 +64,7 @@ public class ApplicationController extends Controller {
      */
     public static ApplicationResponse login(HttpRequest request, Session session) throws Exception {
 
-        if (request.getMethod().matches("POST")) {
+        if (request.getMethod().matches("POST") && session == null) {
 
             // Parse payload of the post for parameters
             Map<String, String> params = parseQueryString(request.getBody());
