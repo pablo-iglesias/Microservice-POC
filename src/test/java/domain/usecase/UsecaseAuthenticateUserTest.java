@@ -18,16 +18,18 @@ public class UsecaseAuthenticateUserTest extends UsecaseTest {
             UsecaseAuthenticateUser usecase;
 
             usecase = new UsecaseAuthenticateUser(factory);
-            usecase.username = "user1";
-            usecase.password = "pass1";
+            usecase.setUsername("user1");
+            usecase.setPassword("pass1");
 
-            assertEquals(true, usecase.execute() && usecase.uid == 2);
+            assertEquals(UsecaseAuthenticateUser.RESULT_USER_AUTHENTICATED_SUCCESSFULLY, usecase.execute());
+            assertEquals(true, usecase.getRefUserId() == 2);
 
             usecase = new UsecaseAuthenticateUser(factory);
-            usecase.username = "user2";
-            usecase.password = "pass2";
+            usecase.setUsername("user2");
+            usecase.setPassword("pass2");
 
-            assertEquals(true, usecase.execute() && usecase.uid == 3);
+            assertEquals(UsecaseAuthenticateUser.RESULT_USER_AUTHENTICATED_SUCCESSFULLY, usecase.execute());
+            assertEquals(true, usecase.getRefUserId() == 3);
         } 
         catch (Exception e) {
             e.printStackTrace(System.out);
@@ -44,10 +46,10 @@ public class UsecaseAuthenticateUserTest extends UsecaseTest {
             UsecaseAuthenticateUser usecase;
 
             usecase = new UsecaseAuthenticateUser(factory);
-            usecase.username = "user1";
-            usecase.password = "pass2";
+            usecase.setUsername("user1");
+            usecase.setPassword("pass2");
 
-            assertEquals(false, usecase.execute());
+            assertEquals(UsecaseAuthenticateUser.RESULT_DID_NOT_AUTHENTICATE, usecase.execute());
         } 
         catch (Exception e) {
             e.printStackTrace(System.out);

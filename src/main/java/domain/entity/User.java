@@ -27,7 +27,7 @@ public class User {
         this.id = id;
         this.username = username;
         this.roles = roles;
-        password = null;
+        password = "";
     }
 
     public int getId() {
@@ -55,15 +55,15 @@ public class User {
         User user = (User) o;
 
         if (    user.getId() != id || 
-                user.getUsername() != username || 
-                user.getPassword() != password || 
+                !user.getUsername().equals(username) ||
+                !user.getPassword().equals(password) ||
                 user.getRoles().length != roles.length) {
 
             return false;
         }
 
         for (int i = 0; i < roles.length; i++) {
-            if (user.getRoles()[i] != roles[i]) {
+            if (!user.getRoles()[i].equals(roles[i])) {
                 return false;
             }
         }

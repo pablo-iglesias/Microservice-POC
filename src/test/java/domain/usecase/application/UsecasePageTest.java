@@ -19,10 +19,11 @@ public class UsecasePageTest extends UsecaseTest {
             RoleFactory roleFactory = createMockedRoleFactoryObject();
 
             UsecasePage usecase = new UsecasePage(userFactory, roleFactory);
-            usecase.uid = 2;
-            usecase.page = 1;
+            usecase.setRefUserId(2);
+            usecase.setPage(1);
 
-            assertEquals(true, usecase.execute() && usecase.allowed && usecase.username == "user1");
+            assertEquals(UsecasePage.RESULT_PAGE_RETRIEVED_SUCCESSFULLY, usecase.execute());
+            assertEquals("user1", usecase.getUsername());
         } 
         catch (Exception e) {
             e.printStackTrace(System.out);
@@ -39,10 +40,10 @@ public class UsecasePageTest extends UsecaseTest {
             RoleFactory roleFactory = createMockedRoleFactoryObject();
 
             UsecasePage usecase = new UsecasePage(userFactory, roleFactory);
-            usecase.uid = 4;
-            usecase.page = 1;
+            usecase.setRefUserId(4);
+            usecase.setPage(1);
 
-            assertEquals(false, usecase.execute());
+            assertEquals(UsecasePage.RESULT_PAGE_NOT_FOUND, usecase.execute());
         } 
         catch (Exception e) {
             e.printStackTrace(System.out);
@@ -59,10 +60,10 @@ public class UsecasePageTest extends UsecaseTest {
             RoleFactory roleFactory = createMockedRoleFactoryObject();
 
             UsecasePage usecase = new UsecasePage(userFactory, roleFactory);
-            usecase.uid = 3;
-            usecase.page = 1;
+            usecase.setRefUserId(3);
+            usecase.setPage(1);
 
-            assertEquals(true, usecase.execute() && usecase.allowed == false);
+            assertEquals(UsecasePage.RESULT_PAGE_NOT_ALLOWED, usecase.execute());
         } 
         catch (Exception e) {
             e.printStackTrace(System.out);

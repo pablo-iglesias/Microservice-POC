@@ -8,15 +8,21 @@ import core.entity.HttpRequest;
 import core.entity.Session;
 
 import adapter.controller.Controller;
-import adapter.model.RoleModel;
-import adapter.model.UserModel;
-import adapter.model.factory.ModelFactory;
+
+import adapter.repository.factory.RepositoryFactory;
 import adapter.response.application.ApplicationResponse;
 
 import domain.entity.Role;
+
+import domain.model.RoleModel;
+import domain.model.UserModel;
+
 import domain.usecase.application.UsecasePage;
 import domain.usecase.application.UsecaseWelcome;
 
+/**
+ * Controller for the HTML based application
+ */
 public class ApplicationController extends Controller {
 
     /**
@@ -29,28 +35,28 @@ public class ApplicationController extends Controller {
     public static ApplicationResponse index(HttpRequest request, Session session) {
         if (session != null) {
             return new ApplicationResponse()
-                    .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
-                    .setLocation("/welcome")
-                    .setSession(session);
+                .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+                .setLocation("/welcome")
+                .setSession(session);
         }
 
         // If the application has a page number in the query string, it will be sent to the template system
         // This has something to do with the feature of redirecting user to last attempted page on login
-        if (request.get("query") != null && request.get("query") != "") {
+        if (request.get("query") != null && !request.get("query").equals("")) {
             Map<String, String> segments = parseQueryString(request.get("query"));
             if (segments.containsKey("page")) {
                 Map<String, Object> data = new HashMap<String, Object>();
                 data.put("page", segments.get("page"));
                 return new ApplicationResponse()
-                        .setResponseCode(ApplicationResponse.RESPONSE_OK)
-                        .setView("templates/login.html")
-                        .setData(data);
+                    .setResponseCode(ApplicationResponse.RESPONSE_OK)
+                    .setView(ApplicationResponse.TEMPLATE_LOGIN)
+                    .setData(data);
             }
         }
 
         return new ApplicationResponse()
-                .setResponseCode(ApplicationResponse.RESPONSE_OK)
-                .setView("templates/login.html");
+            .setResponseCode(ApplicationResponse.RESPONSE_OK)
+            .setView(ApplicationResponse.TEMPLATE_LOGIN);
     }
 
     /**
@@ -64,46 +70,52 @@ public class ApplicationController extends Controller {
      */
     public static ApplicationResponse login(HttpRequest request, Session session) throws Exception {
 
-        if (request.getMethod().matches("POST") && session == null) {
-
+        if (request.getMethod().matches("POST") && session == null)
+        {
             // Parse payload of the post for parameters
             Map<String, String> params = parseQueryString(request.getBody());
 
             if (params.containsKey("username") && params.containsKey("password")) {
-                Integer uid = authenticate(params.get("username"), params.get("password"));
+                Integer refUserId = authenticate(params.get("username"), params.get("password"));
 
-                if (uid != null) {
-                    session = Server.createSession(uid.intValue());
+                if (refUserId != null) {
+                    session = Server.createSession(refUserId.intValue());
 
                     if (params.containsKey("page")) {
-                        ModelFactory factory = new ModelFactory();
+                        RepositoryFactory factory = new RepositoryFactory();
                         UserModel userModel = (UserModel) factory.create("User");
                         RoleModel roleModel = (RoleModel) factory.create("Role");
 
                         UsecasePage usecasePage = new UsecasePage(userModel, roleModel);
-                        usecasePage.uid = uid.intValue();
-                        usecasePage.page = params.get("page") == null ? null : Integer.parseInt(params.get("page"));
+                        usecasePage.setRefUserId(refUserId);
+                        usecasePage.setPage(params.get("page") == null ? null : Integer.parseInt(params.get("page")));
 
-                        if (usecasePage.execute() && usecasePage.allowed) {
-                            return new ApplicationResponse()
+                        switch(usecasePage.execute())
+                        {
+                            case UsecasePage.RESULT_PAGE_RETRIEVED_SUCCESSFULLY:
+                                return new ApplicationResponse()
                                     .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
                                     .setLocation("/page_" + params.get("page"))
                                     .setSession(session);
 
+                            case UsecasePage.RESULT_PAGE_NOT_ALLOWED:
+                            case UsecasePage.RESULT_PAGE_NOT_FOUND:
+                            default:
+                                break;
                         }
                     }
 
                     return new ApplicationResponse()
-                            .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
-                            .setLocation("/welcome")
-                            .setSession(session);
+                        .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+                        .setLocation("/welcome")
+                        .setSession(session);
                 }
             }
 
             if (params.containsKey("page")) {
                 return new ApplicationResponse()
-                        .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
-                        .setLocation("/?page=" + params.get("page"));
+                    .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+                    .setLocation("/?page=" + params.get("page"));
             }
         }
 
@@ -127,8 +139,8 @@ public class ApplicationController extends Controller {
         }
 
         return new ApplicationResponse()
-                .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
-                .setLocation("/");
+            .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+            .setLocation("/");
     }
 
     /**
@@ -142,39 +154,49 @@ public class ApplicationController extends Controller {
      */
     public static ApplicationResponse welcome(HttpRequest request, Session session) throws Exception {
 
-        if (session != null) {
-
-            ModelFactory factory = new ModelFactory();
+        if (session != null)
+        {
+            RepositoryFactory factory = new RepositoryFactory();
             UserModel userModel = (UserModel) factory.create("User");
             RoleModel roleModel = (RoleModel) factory.create("Role");
 
             UsecaseWelcome usecase = new UsecaseWelcome(userModel, roleModel);
-            usecase.uid = session.getUserId();
+            usecase.setRefUserId(session.getUserId());
 
-            if (usecase.execute()) {
+            switch(usecase.execute())
+            {
+                case UsecaseWelcome.RESULT_USER_RETRIEVED_SUCCESSFULLY:
 
-                Map<String, Object> data = new HashMap<String, Object>();
-                data.put("user_name", usecase.username);
+                    Map<String, Object> data = new HashMap<String, Object>();
+                    data.put("user_name", usecase.getUsername());
 
-                if (usecase.roles != null) {
-                    Map<String, String> roles = new HashMap<String, String>();
-                    for (Role role : usecase.roles) {
-                        roles.put(role.getName(), role.getPage());
+                    if (usecase.getRoles() != null) {
+                        Map<String, String> roles = new HashMap<String, String>();
+                        for (Role role : usecase.getRoles()) {
+                            roles.put(role.getName(), role.getPage());
+                        }
+
+                        data.put("roles", roles);
                     }
 
-                    data.put("roles", roles);
-                }
-
-                return new ApplicationResponse()
+                    return new ApplicationResponse()
                         .setResponseCode(ApplicationResponse.RESPONSE_OK)
-                        .setView("templates/welcome.html")
+                        .setView(ApplicationResponse.TEMPLATE_WELCOME)
                         .setData(data);
+
+                case UsecaseWelcome.RESULT_USER_NOT_FOUND:
+                default:
+                    Server.removeSession(session.getSessionToken());
+                    return new ApplicationResponse()
+                        .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+                        .setLocation("/");
+
             }
         }
 
         return new ApplicationResponse()
-                .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
-                .setLocation("/");
+            .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+            .setLocation("/");
     }
 
     /**
@@ -188,29 +210,41 @@ public class ApplicationController extends Controller {
 
         if (session != null && request.contains("page")) {
 
-            ModelFactory factory = new ModelFactory();
+            RepositoryFactory factory = new RepositoryFactory();
             UserModel userModel = (UserModel) factory.create("User");
             RoleModel roleModel = (RoleModel) factory.create("Role");
 
             UsecasePage usecase = new UsecasePage(userModel, roleModel);
-            usecase.uid = session.getUserId();
-            usecase.page = request.get("page") == null ? null : Integer.parseInt(request.get("page"));
+            usecase.setRefUserId(session.getUserId());
+            usecase.setPage(request.get("page") == null ? null : Integer.parseInt(request.get("page")));
 
-            if (usecase.execute() && usecase.allowed) {
-                Map<String, Object> data = new HashMap<String, Object>();
-                data.put("page", request.get("page"));
-                data.put("user_name", usecase.username);
-                return new ApplicationResponse()
+            switch(usecase.execute())
+            {
+                case UsecasePage.RESULT_PAGE_RETRIEVED_SUCCESSFULLY:
+                    Map<String, Object> data = new HashMap<String, Object>();
+                    data.put("page", request.get("page"));
+                    data.put("user_name", usecase.getUsername());
+                    return new ApplicationResponse()
                         .setResponseCode(ApplicationResponse.RESPONSE_OK)
-                        .setView("templates/page.html")
+                        .setView(ApplicationResponse.TEMPLATE_PAGE)
                         .setData(data);
-            }
 
-            return new ApplicationResponse().setResponseCode(ApplicationResponse.RESPONSE_DENIED);
+                case UsecasePage.RESULT_PAGE_NOT_ALLOWED:
+                case UsecasePage.RESULT_PAGE_NOT_FOUND:
+                default:
+                    return new ApplicationResponse().setResponseCode(ApplicationResponse.RESPONSE_DENIED);
+
+            }
+        }
+
+        if(request.contains("page")) {
+            return new ApplicationResponse()
+                .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+                .setLocation("/?page=" + request.get("page"));
         }
 
         return new ApplicationResponse()
-                .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
-                .setLocation("/?page=" + request.get("page"));
+            .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
+            .setLocation("/");
     }
 }

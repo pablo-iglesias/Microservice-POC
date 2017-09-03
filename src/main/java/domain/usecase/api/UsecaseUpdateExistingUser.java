@@ -4,13 +4,15 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
-import adapter.model.RoleModel;
-import adapter.model.UserModel;
+import domain.usecase.Usecase;
 
 import domain.Helper;
 import domain.entity.User;
 
-public class UsecaseUpdateExistingUser {
+import domain.model.RoleModel;
+import domain.model.UserModel;
+
+public class UsecaseUpdateExistingUser extends Usecase{
 
     public static final int RESULT_USER_UPDATED_SUCCESSFULLY = 1;
     public static final int RESULT_NOT_AUTHORISED = 2;
@@ -23,24 +25,72 @@ public class UsecaseUpdateExistingUser {
     private RoleModel roleModel;
 
     // Input data
-    public Integer authUserId = null;
-    public Integer refUserId = null;
-    public User userData = null;
+    private Integer authUserId = null;
+    private Integer refUserId = null;
+    private User userData = null;
 
+    // Getter & Setter
+    public Integer getAuthUserId() {
+        return authUserId;
+    }
+
+    public void setAuthUserId(Integer authUserId) {
+        if (authUserId == null) {
+            throw new IllegalArgumentException("authUserId cannot be null");
+        }
+
+        this.authUserId = authUserId;
+    }
+
+    public Integer getRefUserId() {
+        return refUserId;
+    }
+
+    public void setRefUserId(Integer refUserId) {
+        if (refUserId == null) {
+            throw new IllegalArgumentException("refUserId cannot be null");
+        }
+
+        this.refUserId = refUserId;
+    }
+
+    public User getUserData() {
+        return userData;
+    }
+
+    public void setUserData(User userData) {
+        if (userData == null) {
+            throw new IllegalArgumentException("userData cannot be null");
+        }
+
+        this.userData = userData;
+    }
+
+    // Constructor
     public UsecaseUpdateExistingUser(UserModel userModel, RoleModel roleModel) {
         this.userModel = userModel;
         this.roleModel = roleModel;
     }
 
+    // Business Logic
     public int execute() throws Exception {
 
-        if (    authUserId != null && 
-                refUserId != null && 
-                userData != null && 
-                userData.getUsername() != null && 
-                userData.getPassword() != null && 
-                userData.getRoles() != null) {
-            
+        if(authUserId == null){
+            throw new IllegalStateException("authUserId not provided");
+        }
+
+        if(refUserId == null){
+            throw new IllegalStateException("refUserId not provided");
+        }
+
+        if(userData == null){
+            throw new IllegalStateException("userData not provided");
+        }
+
+        if ( userData.getUsername() != null && userData.getUsername().length() > 0 &&
+             userData.getPassword() != null && userData.getPassword().length() > 0 &&
+             userData.getRoles() != null && userData.getRoles().length > 0)
+        {
             if (userModel.selectUserIsAdminRole(authUserId)) 
             {
                 if (userModel.selectUserExists(refUserId)) 

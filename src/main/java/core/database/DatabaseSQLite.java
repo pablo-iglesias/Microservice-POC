@@ -15,7 +15,6 @@ public class DatabaseSQLite extends DatabaseRelational {
     protected PreparedStatement pstmt = null;
     protected ResultSet rs = null;
     protected int pointer = 0;
-    protected boolean closed = false;
 
     public boolean connect() {
         if (conn != null) {

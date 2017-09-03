@@ -51,7 +51,7 @@ public class RequestHandler implements HttpHandler {
      */
     public void handle(HttpExchange exchange) {
 
-        String controllerName = null;
+        String controllerName = "";
 
         try {
             try {
@@ -91,7 +91,7 @@ public class RequestHandler implements HttpHandler {
     
                                 // Send HTTP response
                                 propagateSession(exchange, appResponse, session);
-                                dispatchHttpResponse(exchange, createHttpResponse(exchange, appResponse, session));
+                                dispatchHttpResponse(exchange, createHttpResponse(exchange, appResponse));
     
                                 return;
     
@@ -136,8 +136,8 @@ public class RequestHandler implements HttpHandler {
 
     /**
      * Retrieve session data using session token if found in the cookie
-     * 
-     * @param exchange
+     *
+     * @param cookie
      * @return
      */
     private Session retrieveHttpSession(Cookie cookie) {
@@ -217,11 +217,10 @@ public class RequestHandler implements HttpHandler {
      * 
      * @param exchange
      * @param appResponse
-     * @param session
      * @return
      * @throws Exception
      */
-    private HttpResponse createHttpResponse(HttpExchange exchange, ApplicationResponse appResponse, Session session)
+    private HttpResponse createHttpResponse(HttpExchange exchange, ApplicationResponse appResponse)
             throws Exception {
 
         // If the application specified a view and context data, use the

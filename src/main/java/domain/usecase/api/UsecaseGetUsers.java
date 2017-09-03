@@ -2,25 +2,40 @@ package domain.usecase.api;
 
 import java.util.Vector;
 
-import adapter.model.RoleModel;
-import adapter.model.UserModel;
+import domain.usecase.Usecase;
 
 import domain.entity.Role;
 import domain.entity.User;
+
+import domain.model.RoleModel;
+import domain.model.UserModel;
+
 import domain.factory.RoleFactory;
 import domain.factory.UserFactory;
-import domain.usecase.Usecase;
 
 public class UsecaseGetUsers extends Usecase {
+
+    public static final int RESULT_USERS_RETRIEVED_SUCCESSFULLY = 1;
+    public static final int RESULT_NO_USERS_FOUND = 2;
 
     // Factory
     private UserFactory userFactory;
     private RoleFactory roleFactory;
 
     // Output data
-    public User[] users = null;
-    public Role[] roles = null;
+    private User[] users = null;
+    private Role[] roles = null;
 
+    // Getter & Setter
+    public User[] getUsers() {
+        return users;
+    }
+
+    public Role[] getRoles() {
+        return roles;
+    }
+
+    // Constructor
     public UsecaseGetUsers(UserModel userModel, RoleModel roleModel) throws Exception {
         userFactory = new UserFactory(userModel, roleModel);
         roleFactory = new RoleFactory(roleModel);
@@ -31,7 +46,8 @@ public class UsecaseGetUsers extends Usecase {
         this.roleFactory = roleFactory;
     }
 
-    public boolean execute() throws Exception {
+    // Business Logic
+    public int execute() throws Exception {
 
         users = userFactory.create();
 
@@ -51,9 +67,9 @@ public class UsecaseGetUsers extends Usecase {
 
             roles = roleFactory.createByIds(rolesArray);
 
-            return true;
+            return RESULT_USERS_RETRIEVED_SUCCESSFULLY;
         }
 
-        return false;
+        return RESULT_NO_USERS_FOUND;
     }
 }

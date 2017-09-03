@@ -1,29 +1,54 @@
 package domain.usecase.api;
 
-import adapter.model.RoleModel;
-import adapter.model.UserModel;
+import domain.usecase.Usecase;
 
 import domain.entity.Role;
 import domain.entity.User;
 
+import domain.model.RoleModel;
+import domain.model.UserModel;
+
 import domain.factory.RoleFactory;
 import domain.factory.UserFactory;
 
-import domain.usecase.Usecase;
-
 public class UsecaseGetOneUser extends Usecase {
+
+    public static final int RESULT_USER_RETRIEVED_SUCCESSFULLY = 1;
+    public static final int RESULT_USER_NOT_FOUND = 2;
 
     // Factory
     private UserFactory userFactory;
     private RoleFactory roleFactory;
 
     // Input data
-    public Integer uid = null;
+    private Integer refUserId = null;
 
     // Output data
-    public User user = null;
-    public Role[] roles = new Role[] {};
+    private User user = null;
+    private Role[] roles = null;
 
+    // Getter & Setter
+    public Integer getRefUserId() {
+        return refUserId;
+    }
+
+    public void setRefUserId(Integer refUserId) {
+        if (refUserId == null) {
+            throw new IllegalArgumentException("refUserId cannot be null");
+        }
+
+        this.refUserId = refUserId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public Role[] getRoles() {
+        return roles;
+    }
+
+    // Constructor
     public UsecaseGetOneUser(UserModel userModel, RoleModel roleModel) throws Exception {
         userFactory = new UserFactory(userModel, roleModel);
         roleFactory = new RoleFactory(roleModel);
@@ -34,20 +59,21 @@ public class UsecaseGetOneUser extends Usecase {
         this.roleFactory = roleFactory;
     }
 
-    public boolean execute() throws Exception {
+    // Business Logic
+    public int execute() throws Exception {
 
-        if (uid != null) {
-            user = userFactory.create(uid);
-
-            if (user == null) {
-                return false;
-            }
-
-            roles = roleFactory.createByIds(user.getRoles());
-            return true;
+        if (refUserId == null) {
+            throw new IllegalStateException("refUserId not provided");
         }
 
-        return false;
+        user = userFactory.create(refUserId);
+
+        if (user == null) {
+            return RESULT_USER_NOT_FOUND;
+        }
+
+        roles = roleFactory.createByIds(user.getRoles());
+        return RESULT_USER_RETRIEVED_SUCCESSFULLY;
     }
 
 }

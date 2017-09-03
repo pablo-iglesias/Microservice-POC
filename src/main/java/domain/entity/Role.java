@@ -39,7 +39,9 @@ public class Role {
 
         Role role = (Role) o;
 
-        if (role.getId() != id || role.getName() != name || role.getPage() != page) {
+        if (role.getId() != id ||
+            !role.getName().equals(name) ||
+            !role.getPage().equals(page)) {
 
             return false;
         }

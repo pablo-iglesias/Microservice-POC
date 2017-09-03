@@ -1,4 +1,4 @@
-package adapter.model.relational;
+package adapter.repository.relational;
 
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -7,19 +7,19 @@ import java.util.Vector;
 import core.Server;
 import core.database.DatabaseRelational;
 
-import adapter.model.Model;
-import adapter.model.RoleModel;
+import adapter.repository.Repository;
+import domain.model.RoleModel;
 
 /**
  * Role model that expects the database to be relational and SQL driven
  * 
  * @author Peibol
  */
-public class RoleModelRelational extends Model implements RoleModel {
+public class RoleRepositoryRelational extends Repository implements RoleModel {
 
     private DatabaseRelational db;
 
-    public RoleModelRelational() throws Exception {
+    public RoleRepositoryRelational() throws Exception {
         db = (DatabaseRelational) Server.getDatabase();
     }
 

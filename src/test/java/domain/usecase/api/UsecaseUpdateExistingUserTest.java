@@ -5,8 +5,8 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
-import adapter.model.RoleModel;
-import adapter.model.UserModel;
+import domain.model.RoleModel;
+import domain.model.UserModel;
 
 import domain.Helper;
 import domain.entity.User;
@@ -85,9 +85,9 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
             RoleModel roleModel = createMockedRoleModelObject();
 
             UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
-            usecase.authUserId = 1;
-            usecase.refUserId = 3;
-            usecase.userData = new User(0, "user2", "pass2", new Integer[] { 1, 2 });
+            usecase.setAuthUserId(1);
+            usecase.setRefUserId(3);
+            usecase.setUserData(new User(0, "user2", "pass2", new Integer[] { 1, 2 }));
 
             assertEquals(UsecaseUpdateExistingUser.RESULT_USER_UPDATED_SUCCESSFULLY, usecase.execute());
         } 
@@ -105,9 +105,9 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
             RoleModel roleModel = createMockedRoleModelObject();
 
             UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
-            usecase.authUserId = 2;
-            usecase.refUserId = 3;
-            usecase.userData = new User(0, "user2", "pass2", new Integer[] { 3 });
+            usecase.setAuthUserId(2);
+            usecase.setRefUserId(3);
+            usecase.setUserData(new User(0, "user2", "pass2", new Integer[] { 3 }));
 
             assertEquals(UsecaseUpdateExistingUser.RESULT_NOT_AUTHORISED, usecase.execute());
         } 
@@ -125,9 +125,9 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
             RoleModel roleModel = createMockedRoleModelObject();
 
             UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
-            usecase.authUserId = 1;
-            usecase.refUserId = 4;
-            usecase.userData = new User(0, "user3", "pass3", new Integer[] { 4 });
+            usecase.setAuthUserId(1);
+            usecase.setRefUserId(4);
+            usecase.setUserData(new User(0, "user3", "pass3", new Integer[] { 4 }));
 
             assertEquals(UsecaseUpdateExistingUser.RESULT_USER_DOES_NOT_EXIST, usecase.execute());
         } 
@@ -145,9 +145,9 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
             RoleModel roleModel = createMockedRoleModelObject();
 
             UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
-            usecase.authUserId = 1;
-            usecase.refUserId = 2;
-            usecase.userData = new User(0, "admin", "admin", new Integer[] { 1, 2, 3, 4 });
+            usecase.setAuthUserId(1);
+            usecase.setRefUserId(2);
+            usecase.setUserData(new User(0, "admin", "admin", new Integer[] { 1, 2, 3, 4 }));
 
             assertEquals(UsecaseUpdateExistingUser.RESULT_USERNAME_ALREADY_TAKEN, usecase.execute());
         } 
@@ -167,45 +167,60 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
             UsecaseUpdateExistingUser usecase;
 
             usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
-            usecase.authUserId = null;
-            usecase.refUserId = 3;
-            usecase.userData = new User(0, "user2", "pass2", new Integer[] { 1, 2 });
 
+            try {
+                usecase.setAuthUserId(null);
+            }
+            catch(IllegalArgumentException e){
+                assertEquals(e.getMessage(), "authUserId cannot be null");
+            }
+
+            try {
+                usecase.setRefUserId(null);
+            }
+            catch(IllegalArgumentException e){
+                assertEquals(e.getMessage(), "refUserId cannot be null");
+            }
+
+            try {
+                usecase.setUserData(null);
+            }
+            catch(IllegalArgumentException e){
+                assertEquals(e.getMessage(), "userData cannot be null");
+            }
+
+            try {
+                usecase.execute();
+            }
+            catch(IllegalStateException e){
+                assertEquals(e.getMessage(), "authUserId not provided");
+            }
+
+            usecase.setAuthUserId(1);
+
+            try {
+                usecase.execute();
+            }
+            catch(IllegalStateException e){
+                assertEquals(e.getMessage(), "refUserId not provided");
+            }
+
+            usecase.setRefUserId(3);
+
+            try {
+                usecase.execute();
+            }
+            catch(IllegalStateException e){
+                assertEquals(e.getMessage(), "userData not provided");
+            }
+
+            usecase.setUserData(new User(0, null, "pass2", new Integer[] { 1, 2 }));
             assertEquals(UsecaseUpdateExistingUser.RESULT_BAD_INPUT_DATA, usecase.execute());
 
-            usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
-            usecase.authUserId = 1;
-            usecase.refUserId = null;
-            usecase.userData = new User(0, "user2", "pass2", new Integer[] { 1, 2 });
-
+            usecase.setUserData(new User(0, "user2", null, new Integer[] { 1, 2 }));
             assertEquals(UsecaseUpdateExistingUser.RESULT_BAD_INPUT_DATA, usecase.execute());
 
-            usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
-            usecase.authUserId = 1;
-            usecase.refUserId = 3;
-            usecase.userData = new User(0, null, "pass2", new Integer[] { 1, 2 });
-
-            assertEquals(UsecaseUpdateExistingUser.RESULT_BAD_INPUT_DATA, usecase.execute());
-
-            usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
-            usecase.authUserId = 1;
-            usecase.refUserId = 3;
-            usecase.userData = new User(0, "user2", null, new Integer[] { 1, 2 });
-
-            assertEquals(UsecaseUpdateExistingUser.RESULT_BAD_INPUT_DATA, usecase.execute());
-
-            usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
-            usecase.authUserId = 1;
-            usecase.refUserId = 3;
-            usecase.userData = new User(0, "user2", "pass2", null);
-
-            assertEquals(UsecaseUpdateExistingUser.RESULT_BAD_INPUT_DATA, usecase.execute());
-
-            usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
-            usecase.authUserId = 1;
-            usecase.refUserId = 3;
-            usecase.userData = null;
-
+            usecase.setUserData(new User(0, "user2", "pass2", null));
             assertEquals(UsecaseUpdateExistingUser.RESULT_BAD_INPUT_DATA, usecase.execute());
         } 
         catch (Exception e) {

@@ -15,7 +15,7 @@ public class SessionFactory {
      */
     public Session create(int uid) {
 
-        String sessionToken = "";
+        String sessionToken;
 
         do {
             Random rand = new Random(System.currentTimeMillis());

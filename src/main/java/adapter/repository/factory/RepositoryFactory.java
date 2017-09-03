@@ -1,11 +1,11 @@
-package adapter.model.factory;
+package adapter.repository.factory;
 
 import core.Server;
 import core.database.Database;
 
-import adapter.model.Model;
+import adapter.repository.Repository;
 
-public class ModelFactory {
+public class RepositoryFactory {
 
     /**
      * Creates a model of the appropriate class depending on the kind of model
@@ -15,7 +15,7 @@ public class ModelFactory {
      * @return
      * @throws Exception
      */
-    public Model create(String name) throws Exception {
+    public Repository create(String name) throws Exception {
 
         String className = name;
 
@@ -24,9 +24,9 @@ public class ModelFactory {
                 case Database.TYPE_SQLITE:
                 case Database.TYPE_SQLITE_MEMORY:
                 default:
-                    className = "adapter.model.relational." + name + "ModelRelational";
+                    className = "adapter.repository.relational." + name + "RepositoryRelational";
                     Class<?> c = Class.forName(className);
-                    return (Model) c.newInstance();
+                    return (Repository) c.newInstance();
             }
         } 
         catch (ClassNotFoundException e) {

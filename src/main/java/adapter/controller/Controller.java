@@ -4,9 +4,9 @@ import java.util.Map;
 
 import core.Helper;
 
-import adapter.model.RoleModel;
-import adapter.model.UserModel;
-import adapter.model.factory.ModelFactory;
+import domain.model.RoleModel;
+import domain.model.UserModel;
+import adapter.repository.factory.RepositoryFactory;
 
 import domain.usecase.UsecaseAuthenticateUser;
 
@@ -23,19 +23,22 @@ public class Controller {
      */
     protected static Integer authenticate(String username, String password) throws Exception {
 
-        ModelFactory factory = new ModelFactory();
+        RepositoryFactory factory = new RepositoryFactory();
         UserModel userModel = (UserModel) factory.create("User");
         RoleModel roleModel = (RoleModel) factory.create("Role");
 
         UsecaseAuthenticateUser usecase = new UsecaseAuthenticateUser(userModel, roleModel);
-        usecase.username = username;
-        usecase.password = password;
+        usecase.setUsername(username);
+        usecase.setPassword(password);
 
-        if (usecase.execute()) {
-            return new Integer(usecase.uid);
+        switch(usecase.execute()) {
+            case UsecaseAuthenticateUser.RESULT_USER_AUTHENTICATED_SUCCESSFULLY:
+                return new Integer(usecase.getRefUserId());
+
+            case UsecaseAuthenticateUser.RESULT_DID_NOT_AUTHENTICATE:
+            default:
+                return null;
         }
-
-        return null;
     }
 
     /**

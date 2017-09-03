@@ -1,12 +1,14 @@
 package domain.usecase.api;
 
-import adapter.model.RoleModel;
-import adapter.model.UserModel;
+import domain.usecase.Usecase;
 
 import domain.Helper;
 import domain.entity.User;
 
-public class UsecaseAddNewUser {
+import domain.model.UserModel;
+import domain.model.RoleModel;
+
+public class UsecaseAddNewUser extends Usecase{
 
     public static final int RESULT_USER_CREATED_SUCCESSFULLY = 1;
     public static final int RESULT_NOT_AUTHORISED = 2;
@@ -18,32 +20,69 @@ public class UsecaseAddNewUser {
     private RoleModel roleModel;
 
     // Input data
-    public Integer uid = null;
-    public User user = null;
+    private Integer authUserId = null;
+    private User userData = null;
 
+    // Getter & Setter
+    public Integer getAuthUserId() {
+        return authUserId;
+    }
+
+    public void setAuthUserId(Integer authUserId) {
+        if (authUserId == null) {
+            throw new IllegalArgumentException("authUserId cannot be null");
+        }
+
+        this.authUserId = authUserId;
+    }
+
+    public User getUserData() {
+        return userData;
+    }
+
+    public void setUserData(User userData) {
+        if (userData == null) {
+            throw new IllegalArgumentException("userData cannot be null");
+        }
+
+        this.userData = userData;
+    }
+
+    // Constructor
     public UsecaseAddNewUser(UserModel userModel, RoleModel roleModel) {
         this.userModel = userModel;
         this.roleModel = roleModel;
     }
 
+    // Business Logic
     public int execute() throws Exception {
 
-        if (    uid != null && 
-                user != null && 
-                user.getUsername() != null && 
-                user.getPassword() != null && 
-                user.getRoles() != null) {
-            
-            boolean allowed = userModel.selectUserIsAdminRole(uid.intValue());
+        if (authUserId == null) {
+            throw new IllegalStateException("authUserId not provided");
+        }
+
+        if (userData == null) {
+            throw new IllegalStateException("userData not provided");
+        }
+
+        if ( userData.getUsername() != null && userData.getUsername().length() > 0 &&
+             userData.getPassword() != null && userData.getPassword().length() > 0 &&
+             userData.getRoles() != null && userData.getRoles().length > 0)
+        {
+            boolean allowed = userModel.selectUserIsAdminRole(authUserId.intValue());
             
             if (allowed) {
-                if (userModel.selectUserExistsByUseraname(user.getUsername())) {
+                if (userModel.selectUserExistsByUseraname(userData.getUsername())) {
                     return RESULT_USER_ALREADY_EXISTS;
                 }
 
-                Integer newUserId = userModel.insertUser(user.getUsername(), Helper.SHA1(user.getPassword()));
+                Integer newUserId = userModel.insertUser(
+                        userData.getUsername(),
+                        Helper.SHA1(userData.getPassword())
+                );
+
                 if (newUserId != null) {
-                    if (roleModel.insertUserHasRoles(newUserId, user.getRoles())) {
+                    if (roleModel.insertUserHasRoles(newUserId, userData.getRoles())) {
                         return RESULT_USER_CREATED_SUCCESSFULLY;
                     }
                 }

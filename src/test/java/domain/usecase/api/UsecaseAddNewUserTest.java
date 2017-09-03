@@ -5,8 +5,8 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
-import adapter.model.RoleModel;
-import adapter.model.UserModel;
+import domain.model.RoleModel;
+import domain.model.UserModel;
 
 import domain.Helper;
 import domain.entity.User;
@@ -62,8 +62,8 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
             RoleModel roleModel = createMockedRoleModelObject();
 
             UsecaseAddNewUser usecase = new UsecaseAddNewUser(userModel, roleModel);
-            usecase.uid = 1;
-            usecase.user = new User(0, "user3", "pass3", new Integer[] { 4 });
+            usecase.setAuthUserId(1);
+            usecase.setUserData(new User(0, "user3", "pass3", new Integer[] { 4 }));
 
             assertEquals(UsecaseAddNewUser.RESULT_USER_CREATED_SUCCESSFULLY, usecase.execute());
         } 
@@ -81,8 +81,8 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
             RoleModel roleModel = createMockedRoleModelObject();
 
             UsecaseAddNewUser usecase = new UsecaseAddNewUser(userModel, roleModel);
-            usecase.uid = 2;
-            usecase.user = new User(0, "user3", "pass3", new Integer[] { 4 });
+            usecase.setAuthUserId(2);
+            usecase.setUserData(new User(0, "user3", "pass3", new Integer[] { 4 }));
 
             assertEquals(UsecaseAddNewUser.RESULT_NOT_AUTHORISED, usecase.execute());
         } 
@@ -100,8 +100,8 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
             RoleModel roleModel = createMockedRoleModelObject();
 
             UsecaseAddNewUser usecase = new UsecaseAddNewUser(userModel, roleModel);
-            usecase.uid = 1;
-            usecase.user = new User(0, "admin", "admin", new Integer[] { 4 });
+            usecase.setAuthUserId(1);
+            usecase.setUserData(new User(0, "admin", "admin", new Integer[] { 4 }));
 
             assertEquals(UsecaseAddNewUser.RESULT_USER_ALREADY_EXISTS, usecase.execute());
         } 
@@ -119,8 +119,38 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
             RoleModel roleModel = createMockedRoleModelObject();
 
             UsecaseAddNewUser usecase = new UsecaseAddNewUser(userModel, roleModel);
-            usecase.uid = null;
-            usecase.user = null;
+
+            try {
+                usecase.setAuthUserId(null);
+            }
+            catch(IllegalArgumentException e){
+                assertEquals(e.getMessage(), "authUserId cannot be null");
+            }
+
+            try {
+                usecase.setUserData(null);
+            }
+            catch(IllegalArgumentException e){
+                assertEquals(e.getMessage(), "userData cannot be null");
+            }
+
+            try {
+                usecase.execute();
+            }
+            catch(IllegalStateException e){
+                assertEquals(e.getMessage(), "authUserId not provided");
+            }
+
+            usecase.setAuthUserId(1);
+
+            try {
+                usecase.execute();
+            }
+            catch(IllegalStateException e){
+                assertEquals(e.getMessage(), "userData not provided");
+            }
+
+            usecase.setUserData(new User(0, "", "", new Integer[0]));
 
             assertEquals(UsecaseAddNewUser.RESULT_BAD_INPUT_DATA, usecase.execute());
         } 

@@ -42,8 +42,6 @@ public class ApiResponseUserCollection extends ApiResponse {
     public void setUsers(User[] users) {
         if (users != null) {
             this.users = users;
-        } else {
-            users = new User[0];
         }
     }
 
@@ -55,8 +53,6 @@ public class ApiResponseUserCollection extends ApiResponse {
     public void setRoles(Role[] roles) {
         if (roles != null) {
             this.roles = roles;
-        } else {
-            roles = new Role[0];
         }
     }
 }

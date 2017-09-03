@@ -2,8 +2,8 @@ package domain.factory;
 
 import java.util.Vector;
 
-import adapter.model.RoleModel;
-import adapter.model.UserModel;
+import domain.model.RoleModel;
+import domain.model.UserModel;
 
 import domain.Helper;
 import domain.entity.User;
@@ -16,7 +16,7 @@ public class UserFactory {
     private UserModel userModel;
     private RoleModel roleModel;
 
-    public UserFactory(UserModel userModel, RoleModel roleModel) throws Exception {
+    public UserFactory(UserModel userModel, RoleModel roleModel) {
         this.userModel = userModel;
         this.roleModel = roleModel;
     }

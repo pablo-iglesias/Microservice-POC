@@ -2,7 +2,7 @@ package domain.factory;
 
 import java.util.Vector;
 
-import adapter.model.RoleModel;
+import domain.model.RoleModel;
 import domain.entity.Role;
 
 public class RoleFactory {
@@ -13,7 +13,7 @@ public class RoleFactory {
 
     private RoleModel model;
 
-    public RoleFactory(RoleModel model) throws Exception {
+    public RoleFactory(RoleModel model) {
         this.model = model;
     }
 

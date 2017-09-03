@@ -20,14 +20,15 @@ public class UsecaseWelcomeTest extends UsecaseTest {
             RoleFactory roleFactory = createMockedRoleFactoryObject();
 
             UsecaseWelcome usecase = new UsecaseWelcome(userFactory, roleFactory);
-            usecase.uid = 1;
+            usecase.setRefUserId(1);
 
-            assertEquals(true, usecase.execute() && usecase.username == "admin");
+            assertEquals(UsecaseWelcome.RESULT_USER_RETRIEVED_SUCCESSFULLY, usecase.execute());
+            assertEquals("admin", usecase.getUsername());
 
-            assertEquals(new Role(1, "ADMIN", ""), usecase.roles[0]);
-            assertEquals(new Role(2, "PAGE_1", "page_1"), usecase.roles[1]);
-            assertEquals(new Role(3, "PAGE_2", "page_2"), usecase.roles[2]);
-            assertEquals(new Role(4, "PAGE_3", "page_3"), usecase.roles[3]);
+            assertEquals(new Role(1, "ADMIN", ""), usecase.getRoles()[0]);
+            assertEquals(new Role(2, "PAGE_1", "page_1"), usecase.getRoles()[1]);
+            assertEquals(new Role(3, "PAGE_2", "page_2"), usecase.getRoles()[2]);
+            assertEquals(new Role(4, "PAGE_3", "page_3"), usecase.getRoles()[3]);
         } 
         catch (Exception e) {
             e.printStackTrace(System.out);
@@ -44,9 +45,9 @@ public class UsecaseWelcomeTest extends UsecaseTest {
             RoleFactory roleFactory = createMockedRoleFactoryObject();
 
             UsecaseWelcome usecase = new UsecaseWelcome(userFactory, roleFactory);
-            usecase.uid = 4;
+            usecase.setRefUserId(4);
 
-            assertEquals(false, usecase.execute());
+            assertEquals(UsecaseWelcome.RESULT_USER_NOT_FOUND, usecase.execute());
         } 
         catch (Exception e) {
             e.printStackTrace(System.out);

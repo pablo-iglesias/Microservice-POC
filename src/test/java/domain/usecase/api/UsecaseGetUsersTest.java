@@ -22,16 +22,16 @@ public class UsecaseGetUsersTest extends UsecaseTest {
 
             UsecaseGetUsers usecase = new UsecaseGetUsers(userFactory, roleFactory);
 
-            assertEquals(true, usecase.execute());
+            assertEquals(UsecaseGetUsers.RESULT_USERS_RETRIEVED_SUCCESSFULLY, usecase.execute());
 
-            assertEquals(new User(1, "admin", new Integer[] { 1, 2, 3, 4 }), usecase.users[0]);
-            assertEquals(new User(2, "user1", new Integer[] { 2 }), usecase.users[1]);
-            assertEquals(new User(3, "user2", new Integer[] { 3 }), usecase.users[2]);
+            assertEquals(new User(1, "admin", new Integer[] { 1, 2, 3, 4 }), usecase.getUsers()[0]);
+            assertEquals(new User(2, "user1", new Integer[] { 2 }), usecase.getUsers()[1]);
+            assertEquals(new User(3, "user2", new Integer[] { 3 }), usecase.getUsers()[2]);
 
-            assertEquals(new Role(1, "ADMIN", ""), usecase.roles[0]);
-            assertEquals(new Role(2, "PAGE_1", "page_1"), usecase.roles[1]);
-            assertEquals(new Role(3, "PAGE_2", "page_2"), usecase.roles[2]);
-            assertEquals(new Role(4, "PAGE_3", "page_3"), usecase.roles[3]);
+            assertEquals(new Role(1, "ADMIN", ""), usecase.getRoles()[0]);
+            assertEquals(new Role(2, "PAGE_1", "page_1"), usecase.getRoles()[1]);
+            assertEquals(new Role(3, "PAGE_2", "page_2"), usecase.getRoles()[2]);
+            assertEquals(new Role(4, "PAGE_3", "page_3"), usecase.getRoles()[3]);
         } 
         catch (Exception e) {
             e.printStackTrace(System.out);

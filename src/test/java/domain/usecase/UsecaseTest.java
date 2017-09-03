@@ -4,8 +4,8 @@ import static org.mockito.Mockito.when;
 
 import org.mockito.Mockito;
 
-import adapter.model.RoleModel;
-import adapter.model.UserModel;
+import domain.model.RoleModel;
+import domain.model.UserModel;
 
 import domain.entity.Role;
 import domain.entity.User;

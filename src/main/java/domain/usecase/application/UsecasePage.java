@@ -1,28 +1,63 @@
 package domain.usecase.application;
 
-import adapter.model.RoleModel;
-import adapter.model.UserModel;
+import domain.usecase.Usecase;
 
 import domain.entity.Role;
 import domain.entity.User;
+
+import domain.model.RoleModel;
+import domain.model.UserModel;
+
 import domain.factory.RoleFactory;
 import domain.factory.UserFactory;
-import domain.usecase.Usecase;
 
 public class UsecasePage extends Usecase {
+
+    public static final int RESULT_PAGE_RETRIEVED_SUCCESSFULLY = 1;
+    public static final int RESULT_PAGE_NOT_ALLOWED = 2;
+    public static final int RESULT_PAGE_NOT_FOUND = 3;
 
     // Factory
     private UserFactory userFactory;
     private RoleFactory roleFactory;
 
     // Input data
-    public int uid = 0;
-    public int page = 0;
+    private Integer refUserId = 0;
+    private Integer page = 0;
 
     // Output data
-    public String username = "";
-    public boolean allowed = false;
+    private String username = null;
 
+    // Getter & Setter
+    public int getRefUserId() {
+        return refUserId;
+    }
+
+    public void setRefUserId(Integer refUserId) {
+        if (refUserId == null) {
+            throw new IllegalArgumentException("refUserId cannot be null");
+        }
+
+        this.refUserId = refUserId;
+    }
+
+    public Integer getPage() {
+        return page;
+    }
+
+    public void setPage(Integer page) {
+        if (page == null) {
+            throw new IllegalArgumentException("page cannot be null");
+        }
+
+        this.page = page;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    // Constructor
     public UsecasePage(UserModel userModel, RoleModel roleModel) throws Exception {
         userFactory = new UserFactory(userModel, roleModel);
         roleFactory = new RoleFactory(roleModel);
@@ -33,23 +68,39 @@ public class UsecasePage extends Usecase {
         this.roleFactory = roleFactory;
     }
 
-    public boolean execute() throws Exception {
+    // Business Logic
+    public int execute() throws Exception {
 
-        User user = userFactory.create(uid);
+        if (refUserId == null) {
+            throw new IllegalStateException("refUserId not provided");
+        }
+
+        if (page == null) {
+            throw new IllegalStateException("page not provided");
+        }
+
+        User user = userFactory.create(refUserId);
 
         if (user != null) {
             username = user.getUsername();
 
             Role[] roles = roleFactory.createByIds(user.getRoles());
 
+            boolean allowed = false;
             for (Role role : roles) {
                 if (role.getPage().matches("page_" + page)) {
                     allowed = true;
                 }
             }
-            return true;
+
+            if(allowed) {
+                return RESULT_PAGE_RETRIEVED_SUCCESSFULLY;
+            }
+            else{
+                return RESULT_PAGE_NOT_ALLOWED;
+            }
         }
 
-        return false;
+        return RESULT_PAGE_NOT_FOUND;
     }
 }

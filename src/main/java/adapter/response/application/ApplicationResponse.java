@@ -17,6 +17,11 @@ public class ApplicationResponse {
     public static final int RESPONSE_OK = 0;
     public static final int RESPONSE_REDIRECT = 1;
 
+    // HTML Templates
+    public static final String TEMPLATE_LOGIN = "templates/login.html";
+    public static final String TEMPLATE_WELCOME = "templates/welcome.html";
+    public static final String TEMPLATE_PAGE = "templates/page.html";
+
     private int response; // Application response code
     private Session session = null; // New session created by the Application
     private String location = null; // Redirect to this location

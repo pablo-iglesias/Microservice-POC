@@ -1,23 +1,23 @@
-package adapter.model.relational;
+package adapter.repository.relational;
 
 import java.sql.SQLException;
 import java.util.Vector;
 
 import core.Server;
 import core.database.DatabaseRelational;
-import adapter.model.Model;
-import adapter.model.UserModel;
+import adapter.repository.Repository;
+import domain.model.UserModel;
 
 /**
  * User model that expects the database to be relational and SQL driven
  * 
  * @author Peibol
  */
-public class UserModelRelational extends Model implements UserModel {
+public class UserRepositoryRelational extends Repository implements UserModel {
 
     private DatabaseRelational db;
 
-    public UserModelRelational() throws Exception {
+    public UserRepositoryRelational() throws Exception {
         db = (DatabaseRelational) Server.getDatabase();
     }
 

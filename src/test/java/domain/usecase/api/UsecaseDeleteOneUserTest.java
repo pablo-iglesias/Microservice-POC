@@ -5,8 +5,8 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
-import adapter.model.RoleModel;
-import adapter.model.UserModel;
+import domain.model.RoleModel;
+import domain.model.UserModel;
 
 import domain.usecase.UsecaseTest;
 
@@ -54,8 +54,8 @@ public class UsecaseDeleteOneUserTest extends UsecaseTest {
             RoleModel roleModel = createMockedRoleModelObject();
 
             UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userModel, roleModel);
-            usecase.authUserId = 1;
-            usecase.refUserId = 3;
+            usecase.setAuthUserId(1);
+            usecase.setRefUserId(3);
 
             assertEquals(UsecaseDeleteOneUser.RESULT_USER_DELETED_SUCCESSFULLY, usecase.execute());
         } 
@@ -73,8 +73,8 @@ public class UsecaseDeleteOneUserTest extends UsecaseTest {
             RoleModel roleModel = createMockedRoleModelObject();
 
             UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userModel, roleModel);
-            usecase.authUserId = 2;
-            usecase.refUserId = 3;
+            usecase.setAuthUserId(2);
+            usecase.setRefUserId(3);
 
             assertEquals(UsecaseDeleteOneUser.RESULT_NOT_AUTHORISED, usecase.execute());
         } 
@@ -92,8 +92,8 @@ public class UsecaseDeleteOneUserTest extends UsecaseTest {
             RoleModel roleModel = createMockedRoleModelObject();
 
             UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userModel, roleModel);
-            usecase.authUserId = 1;
-            usecase.refUserId = 4;
+            usecase.setAuthUserId(1);
+            usecase.setRefUserId(4);
 
             assertEquals(UsecaseDeleteOneUser.RESULT_USER_DOES_NOT_EXIST, usecase.execute());
         } 
@@ -113,17 +113,37 @@ public class UsecaseDeleteOneUserTest extends UsecaseTest {
             UsecaseDeleteOneUser usecase;
 
             usecase = new UsecaseDeleteOneUser(userModel, roleModel);
-            usecase.authUserId = null;
-            usecase.refUserId = 3;
 
-            assertEquals(UsecaseDeleteOneUser.RESULT_BAD_INPUT_DATA, usecase.execute());
+            try {
+                usecase.setAuthUserId(null);
+            }
+            catch(IllegalArgumentException e){
+                assertEquals(e.getMessage(), "authUserId cannot be null");
+            }
 
-            usecase = new UsecaseDeleteOneUser(userModel, roleModel);
-            usecase.authUserId = 1;
-            usecase.refUserId = null;
+            try {
+                usecase.setRefUserId(null);
+            }
+            catch(IllegalArgumentException e){
+                assertEquals(e.getMessage(), "refUserId cannot be null");
+            }
 
-            assertEquals(UsecaseDeleteOneUser.RESULT_BAD_INPUT_DATA, usecase.execute());
-        } 
+            try {
+                usecase.execute();
+            }
+            catch(IllegalStateException e){
+                assertEquals(e.getMessage(), "authUserId not provided");
+            }
+
+            usecase.setAuthUserId(1);
+
+            try {
+                usecase.execute();
+            }
+            catch(IllegalStateException e){
+                assertEquals(e.getMessage(), "refUserId not provided");
+            }
+        }
         catch (Exception e) {
             e.printStackTrace(System.out);
             fail(e.getMessage());

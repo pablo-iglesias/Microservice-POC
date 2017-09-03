@@ -1,30 +1,54 @@
 package domain.usecase.application;
 
-import adapter.model.RoleModel;
-import adapter.model.UserModel;
+import domain.usecase.Usecase;
 
 import domain.entity.User;
 import domain.entity.Role;
+
+import domain.model.RoleModel;
+import domain.model.UserModel;
+
 import domain.factory.RoleFactory;
 import domain.factory.UserFactory;
-import domain.usecase.Usecase;
 
 public class UsecaseWelcome extends Usecase {
 
-    public static final int ROLE_ID = 0;
-    public static final int ROLE_NAME = 1;
+    public static final int RESULT_USER_RETRIEVED_SUCCESSFULLY = 1;
+    public static final int RESULT_USER_NOT_FOUND = 2;
 
     // Factory
     private UserFactory userFactory;
     private RoleFactory roleFactory;
 
     // Input data
-    public int uid = 0;
+    private Integer refUserId = null;
 
     // Output data
-    public String username = "";
-    public Role[] roles = new Role[] {};
+    private String username = null;
+    private Role[] roles = null;
 
+    // Getter & Setter
+    public Integer getRefUserId() {
+        return refUserId;
+    }
+
+    public void setRefUserId(Integer refUserId) {
+        if (refUserId == null) {
+            throw new IllegalArgumentException("refUserId cannot be null");
+        }
+
+        this.refUserId = refUserId;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public Role[] getRoles() {
+        return roles;
+    }
+
+    // Constructor
     public UsecaseWelcome(UserModel userModel, RoleModel roleModel) throws Exception {
         userFactory = new UserFactory(userModel, roleModel);
         roleFactory = new RoleFactory(roleModel);
@@ -35,17 +59,22 @@ public class UsecaseWelcome extends Usecase {
         this.roleFactory = roleFactory;
     }
 
-    public boolean execute() throws Exception {
+    // Business Logic
+    public int execute() throws Exception {
 
-        User user = userFactory.create(uid);
+        if (refUserId == null) {
+            throw new IllegalStateException("refUserId not provided");
+        }
+
+        User user = userFactory.create(refUserId);
 
         if (user != null) {
             username = user.getUsername();
             roles = roleFactory.createByIds(user.getRoles());
 
-            return true;
+            return RESULT_USER_RETRIEVED_SUCCESSFULLY;
         }
 
-        return false;
+        return RESULT_USER_NOT_FOUND;
     }
 }
