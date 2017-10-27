@@ -29,9 +29,12 @@ dependencies {
     // Use Mockito for mocking framework
     testCompile "org.mockito:mockito-core:2.0.57-beta"
     
-    // Use Sqlite for embedded database
+    // Add Sqlite support
     compile 'org.xerial:sqlite-jdbc:3.7.2'
-    
+
+    // Add MySQL support
+    compile 'mysql:mysql-connector-java:5.1.6'
+
     // Use Jtwig for template engine
     compile "org.jtwig:jtwig-core:5.75"
     

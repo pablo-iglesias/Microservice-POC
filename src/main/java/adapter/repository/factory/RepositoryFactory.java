@@ -20,9 +20,10 @@ public class RepositoryFactory {
         String className = name;
 
         try {
-            switch (Server.DATABASE_ENGINE) {
+            switch (Server.getConfig(Server.DATABASE_ENGINE)) {
                 case Database.TYPE_SQLITE:
                 case Database.TYPE_SQLITE_MEMORY:
+                case Database.TYPE_MYSQL:
                 default:
                     className = "adapter.repository.relational." + name + "RepositoryRelational";
                     Class<?> c = Class.forName(className);

@@ -88,7 +88,7 @@ public class UsecasePage extends Usecase {
 
             boolean allowed = false;
             for (Role role : roles) {
-                if (role.getPage().matches("page_" + page)) {
+                if (role.getPage() != null && role.getPage().matches("page_" + page)) {
                     allowed = true;
                 }
             }

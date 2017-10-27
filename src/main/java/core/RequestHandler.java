@@ -237,7 +237,7 @@ public class RequestHandler implements HttpHandler {
                 return new HttpResponse(HttpURLConnection.HTTP_OK, body);
     
             case ApplicationResponse.RESPONSE_DENIED:
-                return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN, "<h1>403 Forbidden (~_^)</h1>");
+                return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN, "<head><meta charset=\"UTF-8\"></head><body><h1>403 Forbidden (~_^)</h1></body>");
     
             case ApplicationResponse.RESPONSE_REDIRECT:
             default:
@@ -284,7 +284,7 @@ public class RequestHandler implements HttpHandler {
      * @throws IOException
      */
     private void respondResourceNotFound(HttpExchange exchange) throws IOException {
-        HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND, "<h1>404 Not Found (¬_¬)</h1>");
+        HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_NOT_FOUND, "<head><meta charset=\"UTF-8\"></head><body><h1>404 Not Found (¬_¬)</h1></body>");
         dispatchHttpResponse(exchange, response);
     }
 
@@ -295,7 +295,7 @@ public class RequestHandler implements HttpHandler {
      * @throws IOException
      */
     private void respondInternalServerError(HttpExchange exchange, boolean html) throws IOException {
-        HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, html ? "<h1>500 Internal (ò_ó)</h1>" : "");
+        HttpResponse response = new HttpResponse(HttpURLConnection.HTTP_INTERNAL_ERROR, html ? "<head><meta charset=\"UTF-8\"></head><body><h1>500 Internal (ò_ó)</h1></body>" : "");
         dispatchHttpResponse(exchange, response);
     }
 }
