@@ -34,8 +34,8 @@ public class Server {
 
     public static void Initialize() {
         try {
-            // Default config
-            setConfigToDefaults();
+            // Load configs from enviornment or set to defaults
+            loadConfigs();
 
             // Init database
             Database database = getDatabase();
@@ -64,16 +64,24 @@ public class Server {
         }
     }
 
-    private static void setConfigToDefaults(){
+    private static void loadConfigs(){
 
-        config.put(PORT, "8000");
-        config.put(DATABASE_ENGINE, Database.TYPE_MYSQL);
-        config.put(TEMPLATE_ENGINE, TemplateEngine.TYPE_TWIG);
-        config.put(MYSQL_HOST, "localhost");
-        config.put(MYSQL_PORT, "3306");
-        config.put(MYSQL_DB, "poc");
-        config.put(MYSQL_USER, "user");
-        config.put(MYSQL_PASS, "pass");
+        loadConfig(PORT, "8000");
+        loadConfig(DATABASE_ENGINE, Database.TYPE_MYSQL);
+        loadConfig(TEMPLATE_ENGINE, TemplateEngine.TYPE_TWIG);
+        loadConfig(MYSQL_HOST, "localhost");
+        loadConfig(MYSQL_PORT, "3306");
+        loadConfig(MYSQL_DB, "poc");
+        loadConfig(MYSQL_USER, "user");
+        loadConfig(MYSQL_PASS, "pass");
+    }
+
+    private static void loadConfig(String name, String defaultValue){
+        String value = System.getenv(name);
+        if(value == null){
+            value = defaultValue;
+        }
+        setConfig(name, value);
     }
 
     public static Database getDatabase() {
@@ -101,6 +109,10 @@ public class Server {
     public static Session getSession(String sessionToken) {
         Session session = sessions.get(sessionToken);
         return session;
+    }
+
+    private static void setConfig(String name, String value){
+        config.put(name, value);
     }
 
     public static String getConfig(String entry){
