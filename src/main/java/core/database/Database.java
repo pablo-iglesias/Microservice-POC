@@ -4,8 +4,9 @@ import core.ResourceLoader;
 
 public abstract class Database extends ResourceLoader {
 
-    public static final int TYPE_SQLITE = 1;
-    public static final int TYPE_SQLITE_MEMORY = 2;
+    public static final String TYPE_SQLITE = "SQLITE";
+    public static final String TYPE_SQLITE_MEMORY = "SQLITE_MEMORY";
+    public static final String TYPE_MYSQL = "MYSQL";
 
     public abstract boolean connect();
     public abstract boolean startTransaction();

@@ -7,7 +7,7 @@ import core.templating.TemplateParserTwig;
 
 public class TemplateFactory extends ResourceLoader {
 
-    public TemplateEngine create(int type) {
+    public TemplateEngine create(String type) {
         try {
             switch (type) {
                 case TemplateEngine.TYPE_DEFAULT:

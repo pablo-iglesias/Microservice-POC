@@ -1,7 +1,7 @@
 CREATE TABLE users (
-	user_id integer PRIMARY KEY,
-	user_name text UNIQUE NOT NULL,
-	user_password text NOT NULL
+	user_id INTEGER PRIMARY KEY /*!40101 AUTO_INCREMENT */,
+	user_name TEXT NOT NULL,
+	user_password TEXT NOT NULL
 );
 
 INSERT INTO users(user_name, user_password) VALUES('admin', 'd033e22ae348aeb5660fc2140aec35850c4da997');
@@ -12,9 +12,9 @@ INSERT INTO users(user_name, user_password) VALUES('user4', '2db4c1811f424582a90
 INSERT INTO users(user_name, user_password) VALUES('user5', '9e5ca6b0ffb417997ffb844c76f9c24bbc20fe88');
 
 CREATE TABLE roles (
-	role_id integer PRIMARY KEY,
-	role_name text DEFAULT '',
-	role_page text DEFAULT ''
+	role_id INTEGER PRIMARY KEY /*!40101 AUTO_INCREMENT */,
+	role_name TEXT,
+	role_page TEXT
 );
 
 INSERT INTO roles(role_name) VALUES('ADMIN');
@@ -23,8 +23,8 @@ INSERT INTO roles(role_name, role_page) VALUES('PAGE_2', 'page_2');
 INSERT INTO roles(role_name, role_page) VALUES('PAGE_3', 'page_3');
 
 CREATE TABLE user_has_role (
-	fk_user_id integer,
-	fk_role_id integer
+	fk_user_id INTEGER,
+	fk_role_id INTEGER
 );
 
 INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(1, 1);
