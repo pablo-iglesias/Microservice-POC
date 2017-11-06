@@ -1,4 +1,4 @@
-# Schibsted POC
+# Microservice POC
 
 ## Introduction
 
@@ -12,12 +12,12 @@
 3.  Run the build command
 	*   Linux run "./gradlew build"
 	*   Windows run "gradlew build"
-4.  The Jar file "Schibsted.jar" has been deployed along with dependencies under build/jar
+4.  The Jar file "Microservice.jar" has been deployed along with dependencies under build/jar
 
 ## Run
 
 1.  Open a console, go to the folder of your JAR file
-2.  Use "java -jar Schibsted.jar"
+2.  Use "java -jar Microservice.jar"
 3.  Go to http://localhost:8000 to see login page
 4.  REST API is published under http://localhost:8000/api/users with Basic Authentication (use Postman)
 
