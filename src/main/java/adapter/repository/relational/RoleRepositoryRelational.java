@@ -8,14 +8,14 @@ import core.Server;
 import core.database.DatabaseRelational;
 
 import adapter.repository.Repository;
-import domain.model.RoleModel;
+import adapter.repository.RoleRepository;
 
 /**
  * Role model that expects the database to be relational and SQL driven
  * 
  * @author Peibol
  */
-public class RoleRepositoryRelational extends Repository implements RoleModel {
+public class RoleRepositoryRelational extends Repository implements RoleRepository {
 
     private DatabaseRelational db;
 

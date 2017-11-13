@@ -1,10 +1,10 @@
 package domain.usecase;
 
 import domain.entity.User;
-import domain.factory.UserFactory;
+import domain.entity.factory.UserFactory;
 
-import domain.model.UserModel;
-import domain.model.RoleModel;
+import adapter.repository.UserRepository;
+import adapter.repository.RoleRepository;
 
 public class UsecaseAuthenticateUser extends Usecase {
 
@@ -51,9 +51,9 @@ public class UsecaseAuthenticateUser extends Usecase {
     }
 
     // Constructor
-    public UsecaseAuthenticateUser(UserModel userModel, RoleModel roleModel) throws Exception {
+    public UsecaseAuthenticateUser(UserRepository userRepository, RoleRepository roleRepository) throws Exception {
 
-        factory = new UserFactory(userModel, roleModel);
+        factory = new UserFactory(userRepository, roleRepository);
     }
 
     public UsecaseAuthenticateUser(UserFactory factory) {

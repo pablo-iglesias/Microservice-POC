@@ -5,11 +5,14 @@ import domain.usecase.Usecase;
 import domain.entity.Role;
 import domain.entity.User;
 
-import domain.model.RoleModel;
 import domain.model.UserModel;
+import domain.model.RoleModel;
 
-import domain.factory.RoleFactory;
-import domain.factory.UserFactory;
+import adapter.repository.RoleRepository;
+import adapter.repository.UserRepository;
+
+import domain.entity.factory.RoleFactory;
+import domain.entity.factory.UserFactory;
 
 public class UsecaseGetOneUser extends Usecase {
 
@@ -40,18 +43,18 @@ public class UsecaseGetOneUser extends Usecase {
         this.refUserId = refUserId;
     }
 
-    public User getUser() {
+    public UserModel getUser() {
         return user;
     }
 
-    public Role[] getRoles() {
+    public RoleModel[] getRoles() {
         return roles;
     }
 
     // Constructor
-    public UsecaseGetOneUser(UserModel userModel, RoleModel roleModel) throws Exception {
-        userFactory = new UserFactory(userModel, roleModel);
-        roleFactory = new RoleFactory(roleModel);
+    public UsecaseGetOneUser(UserRepository userRepository, RoleRepository roleRepository) throws Exception {
+        userFactory = new UserFactory(userRepository, roleRepository);
+        roleFactory = new RoleFactory(roleRepository);
     }
 
     public UsecaseGetOneUser(UserFactory userFactory, RoleFactory roleFactory) {
@@ -75,5 +78,4 @@ public class UsecaseGetOneUser extends Usecase {
         roles = roleFactory.createByIds(user.getRoles());
         return RESULT_USER_RETRIEVED_SUCCESSFULLY;
     }
-
 }

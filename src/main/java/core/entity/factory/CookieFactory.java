@@ -1,4 +1,4 @@
-package core.factory;
+package core.entity.factory;
 
 import com.sun.net.httpserver.HttpExchange;
 

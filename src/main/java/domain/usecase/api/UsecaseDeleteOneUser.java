@@ -2,8 +2,8 @@ package domain.usecase.api;
 
 import domain.usecase.Usecase;
 
-import domain.model.RoleModel;
-import domain.model.UserModel;
+import adapter.repository.RoleRepository;
+import adapter.repository.UserRepository;
 
 public class UsecaseDeleteOneUser extends Usecase{
 
@@ -12,8 +12,8 @@ public class UsecaseDeleteOneUser extends Usecase{
     public static final int RESULT_USER_DOES_NOT_EXIST = 3;
     public static final int RESULT_USER_NOT_DELETED = 4;
 
-    private UserModel userModel;
-    private RoleModel roleModel;
+    private UserRepository userRepository;
+    private RoleRepository roleRepository;
 
     // Input data
     private Integer authUserId = null;
@@ -45,9 +45,9 @@ public class UsecaseDeleteOneUser extends Usecase{
     }
 
     // Constructor
-    public UsecaseDeleteOneUser(UserModel userModel, RoleModel roleModel) {
-        this.userModel = userModel;
-        this.roleModel = roleModel;
+    public UsecaseDeleteOneUser(UserRepository userRepository, RoleRepository roleRepository) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     // Business Logic
@@ -61,10 +61,10 @@ public class UsecaseDeleteOneUser extends Usecase{
             throw new IllegalStateException("refUserId not provided");
         }
 
-        if (userModel.selectUserIsAdminRole(authUserId)) {
-            if (userModel.selectUserExists(refUserId)) {
-                if (userModel.deleteUser(refUserId)) {
-                    if (!roleModel.deleteUserHasRolesByUserId(refUserId)) {
+        if (userRepository.selectUserIsAdminRole(authUserId)) {
+            if (userRepository.selectUserExists(refUserId)) {
+                if (userRepository.deleteUser(refUserId)) {
+                    if (!roleRepository.deleteUserHasRolesByUserId(refUserId)) {
                         return RESULT_USER_NOT_DELETED;
                     }
                 }

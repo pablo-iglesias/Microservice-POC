@@ -12,10 +12,10 @@ import adapter.controller.Controller;
 import adapter.repository.factory.RepositoryFactory;
 import adapter.response.application.ApplicationResponse;
 
-import domain.entity.Role;
-
 import domain.model.RoleModel;
-import domain.model.UserModel;
+
+import adapter.repository.RoleRepository;
+import adapter.repository.UserRepository;
 
 import domain.usecase.application.UsecasePage;
 import domain.usecase.application.UsecaseWelcome;
@@ -83,10 +83,10 @@ public class ApplicationController extends Controller {
 
                     if (params.containsKey("page")) {
                         RepositoryFactory factory = new RepositoryFactory();
-                        UserModel userModel = (UserModel) factory.create("User");
-                        RoleModel roleModel = (RoleModel) factory.create("Role");
+                        UserRepository userRepository = (UserRepository) factory.create("User");
+                        RoleRepository roleRepository = (RoleRepository) factory.create("Role");
 
-                        UsecasePage usecasePage = new UsecasePage(userModel, roleModel);
+                        UsecasePage usecasePage = new UsecasePage(userRepository, roleRepository);
                         usecasePage.setRefUserId(refUserId);
                         usecasePage.setPage(params.get("page") == null ? null : Integer.parseInt(params.get("page")));
 
@@ -157,10 +157,10 @@ public class ApplicationController extends Controller {
         if (session != null)
         {
             RepositoryFactory factory = new RepositoryFactory();
-            UserModel userModel = (UserModel) factory.create("User");
-            RoleModel roleModel = (RoleModel) factory.create("Role");
+            UserRepository userRepository = (UserRepository) factory.create("User");
+            RoleRepository roleRepository = (RoleRepository) factory.create("Role");
 
-            UsecaseWelcome usecase = new UsecaseWelcome(userModel, roleModel);
+            UsecaseWelcome usecase = new UsecaseWelcome(userRepository, roleRepository);
             usecase.setRefUserId(session.getUserId());
 
             switch(usecase.execute())
@@ -172,7 +172,7 @@ public class ApplicationController extends Controller {
 
                     if (usecase.getRoles() != null) {
                         Map<String, String> roles = new HashMap<String, String>();
-                        for (Role role : usecase.getRoles()) {
+                        for (RoleModel role : usecase.getRoles()) {
                             roles.put(role.getName(), role.getPage());
                         }
 
@@ -211,10 +211,10 @@ public class ApplicationController extends Controller {
         if (session != null && request.contains("page")) {
 
             RepositoryFactory factory = new RepositoryFactory();
-            UserModel userModel = (UserModel) factory.create("User");
-            RoleModel roleModel = (RoleModel) factory.create("Role");
+            UserRepository userRepository = (UserRepository) factory.create("User");
+            RoleRepository roleRepository = (RoleRepository) factory.create("Role");
 
-            UsecasePage usecase = new UsecasePage(userModel, roleModel);
+            UsecasePage usecase = new UsecasePage(userRepository, roleRepository);
             usecase.setRefUserId(session.getUserId());
             usecase.setPage(request.get("page") == null ? null : Integer.parseInt(request.get("page")));
 

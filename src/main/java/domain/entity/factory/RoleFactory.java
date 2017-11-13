@@ -1,8 +1,8 @@
-package domain.factory;
+package domain.entity.factory;
+
+import adapter.repository.RoleRepository;
 
 import java.util.Vector;
-
-import domain.model.RoleModel;
 import domain.entity.Role;
 
 public class RoleFactory {
@@ -11,10 +11,10 @@ public class RoleFactory {
     private static final int ROLE_NAME = 1;
     private static final int ROLE_PAGE = 2;
 
-    private RoleModel model;
+    private RoleRepository roleRepository;
 
-    public RoleFactory(RoleModel model) {
-        this.model = model;
+    public RoleFactory(RoleRepository model) {
+        this.roleRepository = model;
     }
 
     /**
@@ -26,7 +26,7 @@ public class RoleFactory {
      */
     public Role[] createByIds(Integer rids[]) throws Exception {
 
-        Vector<Object[]> roles = model.getRolesByIds(rids);
+        Vector<Object[]> roles = roleRepository.getRolesByIds(rids);
 
         if (roles != null && roles.size() > 0) {
             Role[] roleObjects = new Role[roles.size()];

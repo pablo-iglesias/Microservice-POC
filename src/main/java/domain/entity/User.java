@@ -1,20 +1,15 @@
 package domain.entity;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
+import domain.model.UserModel;
 
-public class User {
+public class User extends UserModel{
 
-    @XmlAttribute(name = "id")
-    private int id;
-
-    @XmlAttribute(name = "name")
-    private String username = null;
-
-    private String password = null;
-
-    @XmlElement(name = "role_id")
-    private Integer[] roles = null;
+    public User(UserModel m){
+        id = m.getId();
+        username = m.getUsername();
+        password = m.getPassword();
+        roles = m.getRoles();
+    }
 
     public User(int id, String username, String password, Integer[] roles) {
         this.id = id;
@@ -28,22 +23,6 @@ public class User {
         this.username = username;
         this.roles = roles;
         password = "";
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public Integer[] getRoles() {
-        return roles;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public boolean equals(Object o) {

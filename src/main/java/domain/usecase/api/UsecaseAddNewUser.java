@@ -1,12 +1,13 @@
 package domain.usecase.api;
 
+import domain.model.UserModel;
 import domain.usecase.Usecase;
 
 import domain.Helper;
 import domain.entity.User;
 
-import domain.model.UserModel;
-import domain.model.RoleModel;
+import adapter.repository.UserRepository;
+import adapter.repository.RoleRepository;
 
 public class UsecaseAddNewUser extends Usecase{
 
@@ -16,8 +17,8 @@ public class UsecaseAddNewUser extends Usecase{
     public static final int RESULT_USER_NOT_CREATED = 4;
     public static final int RESULT_BAD_INPUT_DATA = 5;
 
-    private UserModel userModel;
-    private RoleModel roleModel;
+    private UserRepository userRepository;
+    private RoleRepository roleRepository;
 
     // Input data
     private Integer authUserId = null;
@@ -36,22 +37,22 @@ public class UsecaseAddNewUser extends Usecase{
         this.authUserId = authUserId;
     }
 
-    public User getUserData() {
+    public UserModel getUserData() {
         return userData;
     }
 
-    public void setUserData(User userData) {
+    public void setUserData(UserModel userData) {
         if (userData == null) {
             throw new IllegalArgumentException("userData cannot be null");
         }
 
-        this.userData = userData;
+        this.userData = new User(userData);
     }
 
     // Constructor
-    public UsecaseAddNewUser(UserModel userModel, RoleModel roleModel) {
-        this.userModel = userModel;
-        this.roleModel = roleModel;
+    public UsecaseAddNewUser(UserRepository userRepository, RoleRepository roleRepository) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     // Business Logic
@@ -69,20 +70,20 @@ public class UsecaseAddNewUser extends Usecase{
              userData.getPassword() != null && userData.getPassword().length() > 0 &&
              userData.getRoles() != null && userData.getRoles().length > 0)
         {
-            boolean allowed = userModel.selectUserIsAdminRole(authUserId.intValue());
+            boolean allowed = userRepository.selectUserIsAdminRole(authUserId.intValue());
             
             if (allowed) {
-                if (userModel.selectUserExistsByUseraname(userData.getUsername())) {
+                if (userRepository.selectUserExistsByUseraname(userData.getUsername())) {
                     return RESULT_USER_ALREADY_EXISTS;
                 }
 
-                Integer newUserId = userModel.insertUser(
+                Integer newUserId = userRepository.insertUser(
                         userData.getUsername(),
                         Helper.SHA1(userData.getPassword())
                 );
 
                 if (newUserId != null) {
-                    if (roleModel.insertUserHasRoles(newUserId, userData.getRoles())) {
+                    if (roleRepository.insertUserHasRoles(newUserId, userData.getRoles())) {
                         return RESULT_USER_CREATED_SUCCESSFULLY;
                     }
                 }

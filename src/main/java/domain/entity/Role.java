@@ -1,34 +1,19 @@
 package domain.entity;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import domain.model.RoleModel;
 
-public class Role {
+public class Role extends RoleModel{
 
-    @XmlAttribute(name = "id")
-    private int id;
-
-    @XmlAttribute(name = "name")
-    private String name;
-
-    @XmlAttribute(name = "page")
-    private String page;
+    public Role(RoleModel m){
+        id = m.getId();
+        name = m.getName();
+        page = m.getPage();
+    }
 
     public Role(int id, String name, String page) {
         this.id = id;
         this.name = name;
         this.page = page;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPage() {
-        return page;
     }
 
     public boolean equals(Object o) {

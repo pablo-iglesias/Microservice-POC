@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import domain.factory.UserFactory;
+import domain.entity.factory.UserFactory;
 
 public class UsecaseAuthenticateUserTest extends UsecaseTest {
 

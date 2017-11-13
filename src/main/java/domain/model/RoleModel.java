@@ -1,17 +1,27 @@
 package domain.model;
 
-import java.util.Vector;
+import javax.xml.bind.annotation.XmlAttribute;
 
-/**
- * All repos of the type Role must implement this
- * 
- * @author Peibol
- */
-public interface RoleModel {
+public class RoleModel {
 
-    Vector<Object[]> getRolesByIds(Integer rids[]) throws Exception;
-    Integer[] getRoleIdsByUserId(Integer uid) throws Exception;
-    boolean insertUserHasRoles(Integer uid, Integer[] rids) throws Exception;
-    boolean deleteUserHasRoles(Integer uid, Integer[] rids) throws Exception;
-    boolean deleteUserHasRolesByUserId(Integer uid) throws Exception;
+    @XmlAttribute(name = "id")
+    protected int id;
+
+    @XmlAttribute(name = "name")
+    protected String name;
+
+    @XmlAttribute(name = "page")
+    protected String page;
+
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPage() {
+        return page;
+    }
 }

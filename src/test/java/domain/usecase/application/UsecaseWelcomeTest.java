@@ -5,8 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import domain.entity.Role;
-import domain.factory.RoleFactory;
-import domain.factory.UserFactory;
+import domain.entity.factory.RoleFactory;
+import domain.entity.factory.UserFactory;
 import domain.usecase.UsecaseTest;
 
 public class UsecaseWelcomeTest extends UsecaseTest {

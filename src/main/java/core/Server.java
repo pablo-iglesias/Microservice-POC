@@ -8,9 +8,9 @@ import com.sun.net.httpserver.HttpServer;
 
 import core.database.Database;
 import core.entity.Session;
-import core.factory.DatabaseFactory;
-import core.factory.SessionFactory;
-import core.factory.TemplateFactory;
+import core.entity.factory.DatabaseFactory;
+import core.entity.factory.SessionFactory;
+import core.entity.factory.TemplateFactory;
 import core.templating.TemplateEngine;
 
 /**
@@ -56,7 +56,7 @@ public class Server {
             server.createContext("/", handler);
             server.start();
             System.out.println("Running in port " + getConfig(PORT) + "... \r\n");
-        } 
+        }
         catch (Exception e) {
             System.out.println("Initialization failed, aborting");
             System.out.println(e);

@@ -5,8 +5,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import domain.entity.Role;
-import domain.entity.User;
+import domain.model.RoleModel;
+import domain.model.UserModel;
 
 @XmlRootElement(name = "ApiResponse")
 public class ApiResponseUserResource extends ApiResponse {
@@ -17,37 +17,37 @@ public class ApiResponseUserResource extends ApiResponse {
     }
 
     @XmlElement(name = "user")
-    private User user;
+    private UserModel user;
 
     @XmlElementWrapper(name = "roles")
     @XmlElement(name = "role")
-    private Role[] roles;
+    private RoleModel[] roles;
 
     public ApiResponseUserResource() {
         user = null;
         roles = null;
     }
 
-    public ApiResponseUserResource(User user, Role[] roles) {
+    public ApiResponseUserResource(UserModel user, RoleModel[] roles) {
         this.setUser(user);
         this.setRoles(roles);
     }
 
     @XmlTransient
-    public User getUser() {
+    public UserModel getUser() {
         return user;
     }
 
-    public void setUser(User user) {
+    public void setUser(UserModel user) {
         this.user = user;
     }
 
     @XmlTransient
-    public Role[] getRoles() {
+    public RoleModel[] getRoles() {
         return roles;
     }
 
-    public void setRoles(Role[] roles) {
+    public void setRoles(RoleModel[] roles) {
         this.roles = roles;
     }
 

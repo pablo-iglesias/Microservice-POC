@@ -4,13 +4,13 @@ import static org.mockito.Mockito.when;
 
 import org.mockito.Mockito;
 
-import domain.model.RoleModel;
-import domain.model.UserModel;
+import adapter.repository.RoleRepository;
+import adapter.repository.UserRepository;
 
 import domain.entity.Role;
 import domain.entity.User;
-import domain.factory.RoleFactory;
-import domain.factory.UserFactory;
+import domain.entity.factory.RoleFactory;
+import domain.entity.factory.UserFactory;
 
 /**
  * All usecases work within an initial scenario where admin, user1 and user2 already exist, and user3 does not 
@@ -67,9 +67,9 @@ public class UsecaseTest {
         return factory;
     }
 
-    protected UserModel createMockedUserModelObject() throws Exception {
+    protected UserRepository createMockedUserModelObject() throws Exception {
 
-        UserModel model = Mockito.mock(UserModel.class);
+        UserRepository model = Mockito.mock(UserRepository.class);
 
         when(model.selectUserIsAdminRole(1)).thenReturn(true);
         when(model.selectUserIsAdminRole(2)).thenReturn(false);
@@ -94,9 +94,9 @@ public class UsecaseTest {
         return model;
     }
 
-    protected RoleModel createMockedRoleModelObject() throws Exception {
+    protected RoleRepository createMockedRoleModelObject() throws Exception {
 
-        RoleModel model = Mockito.mock(RoleModel.class);
+        RoleRepository model = Mockito.mock(RoleRepository.class);
 
         when(model.getRoleIdsByUserId(1)).thenReturn(new Integer[] { 1, 2, 3, 4 });
         when(model.getRoleIdsByUserId(2)).thenReturn(new Integer[] { 2 });

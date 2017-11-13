@@ -5,8 +5,8 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
-import domain.model.RoleModel;
-import domain.model.UserModel;
+import adapter.repository.RoleRepository;
+import adapter.repository.UserRepository;
 
 import domain.Helper;
 import domain.entity.User;
@@ -14,9 +14,9 @@ import domain.usecase.UsecaseTest;
 
 public class UsecaseAddNewUserTest extends UsecaseTest {
 
-    protected UserModel createMockedUserModelObject() throws Exception {
+    protected UserRepository createMockedUserModelObject() throws Exception {
 
-        UserModel model = super.createMockedUserModelObject();
+        UserRepository model = super.createMockedUserModelObject();
 
         when(model.insertUser("user3", Helper.SHA1("pass3")))
         .thenReturn(4)
@@ -34,9 +34,9 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
         return model;
     }
 
-    protected RoleModel createMockedRoleModelObject() throws Exception {
+    protected RoleRepository createMockedRoleModelObject() throws Exception {
 
-        RoleModel model = super.createMockedRoleModelObject();
+        RoleRepository model = super.createMockedRoleModelObject();
 
         when(model.insertUserHasRoles(4, new Integer[] { 4 }))
         .thenReturn(true)
@@ -58,8 +58,8 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
     public void testAddNewUser_Success() {
 
         try {
-            UserModel userModel = createMockedUserModelObject();
-            RoleModel roleModel = createMockedRoleModelObject();
+            UserRepository userModel = createMockedUserModelObject();
+            RoleRepository roleModel = createMockedRoleModelObject();
 
             UsecaseAddNewUser usecase = new UsecaseAddNewUser(userModel, roleModel);
             usecase.setAuthUserId(1);
@@ -77,8 +77,8 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
     public void testAddNewUser_NotAuthorised() {
 
         try {
-            UserModel userModel = createMockedUserModelObject();
-            RoleModel roleModel = createMockedRoleModelObject();
+            UserRepository userModel = createMockedUserModelObject();
+            RoleRepository roleModel = createMockedRoleModelObject();
 
             UsecaseAddNewUser usecase = new UsecaseAddNewUser(userModel, roleModel);
             usecase.setAuthUserId(2);
@@ -96,8 +96,8 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
     public void testAddNewUser_UserAlreadyExists() {
 
         try {
-            UserModel userModel = createMockedUserModelObject();
-            RoleModel roleModel = createMockedRoleModelObject();
+            UserRepository userModel = createMockedUserModelObject();
+            RoleRepository roleModel = createMockedRoleModelObject();
 
             UsecaseAddNewUser usecase = new UsecaseAddNewUser(userModel, roleModel);
             usecase.setAuthUserId(1);
@@ -115,8 +115,8 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
     public void testAddNewUser_BadInputData() {
 
         try {
-            UserModel userModel = createMockedUserModelObject();
-            RoleModel roleModel = createMockedRoleModelObject();
+            UserRepository userModel = createMockedUserModelObject();
+            RoleRepository roleModel = createMockedRoleModelObject();
 
             UsecaseAddNewUser usecase = new UsecaseAddNewUser(userModel, roleModel);
 

@@ -5,8 +5,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import domain.entity.Role;
-import domain.entity.User;
+import domain.model.RoleModel;
+import domain.model.UserModel;
 
 @XmlRootElement(name = "ApiResponse")
 public class ApiResponseUserCollection extends ApiResponse {
@@ -18,39 +18,39 @@ public class ApiResponseUserCollection extends ApiResponse {
 
     @XmlElementWrapper(name = "users")
     @XmlElement(name = "user")
-    private User[] users;
+    private UserModel[] users;
 
     @XmlElementWrapper(name = "roles")
     @XmlElement(name = "role")
-    private Role[] roles;
+    private RoleModel[] roles;
 
     public ApiResponseUserCollection() {
-        users = new User[0];
-        roles = new Role[0];
+        users = new UserModel[0];
+        roles = new RoleModel[0];
     }
 
-    public ApiResponseUserCollection(User[] users, Role[] roles) {
+    public ApiResponseUserCollection(UserModel[] users, RoleModel[] roles) {
         this.setUsers(users);
         this.setRoles(roles);
     }
 
     @XmlTransient
-    public User[] getUsers() {
+    public UserModel[] getUsers() {
         return users;
     }
 
-    public void setUsers(User[] users) {
+    public void setUsers(UserModel[] users) {
         if (users != null) {
             this.users = users;
         }
     }
 
     @XmlTransient
-    public Role[] getRoles() {
+    public RoleModel[] getRoles() {
         return roles;
     }
 
-    public void setRoles(Role[] roles) {
+    public void setRoles(RoleModel[] roles) {
         if (roles != null) {
             this.roles = roles;
         }

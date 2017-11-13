@@ -6,14 +6,14 @@ import java.util.Vector;
 import core.Server;
 import core.database.DatabaseRelational;
 import adapter.repository.Repository;
-import domain.model.UserModel;
+import adapter.repository.UserRepository;
 
 /**
  * User model that expects the database to be relational and SQL driven
  * 
  * @author Peibol
  */
-public class UserRepositoryRelational extends Repository implements UserModel {
+public class UserRepositoryRelational extends Repository implements UserRepository {
 
     private DatabaseRelational db;
 

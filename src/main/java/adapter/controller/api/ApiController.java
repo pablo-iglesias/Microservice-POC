@@ -25,9 +25,10 @@ import adapter.response.api.ApiResponseUserResource;
 
 import domain.entity.User;
 
-import domain.model.RoleModel;
-import domain.model.UserModel;
+import adapter.repository.RoleRepository;
+import adapter.repository.UserRepository;
 
+import domain.model.UserModel;
 import domain.usecase.api.UsecaseUpdateExistingUser;
 import domain.usecase.api.UsecaseAddNewUser;
 import domain.usecase.api.UsecaseDeleteOneUser;
@@ -208,10 +209,10 @@ public class ApiController extends Controller {
     {
         try {
             RepositoryFactory factory = new RepositoryFactory();
-            UserModel userModel = (UserModel) factory.create("User");
-            RoleModel roleModel = (RoleModel) factory.create("Role");
+            UserRepository userRepository = (UserRepository) factory.create("User");
+            RoleRepository roleRepository = (RoleRepository) factory.create("Role");
 
-            UsecaseGetUsers usecase = new UsecaseGetUsers(userModel, roleModel);
+            UsecaseGetUsers usecase = new UsecaseGetUsers(userRepository, roleRepository);
 
             switch(usecase.execute())
             {
@@ -256,10 +257,10 @@ public class ApiController extends Controller {
     {
         try {
             RepositoryFactory factory = new RepositoryFactory();
-            UserModel userModel = (UserModel) factory.create("User");
-            RoleModel roleModel = (RoleModel) factory.create("Role");
+            UserRepository userRepository = (UserRepository) factory.create("User");
+            RoleRepository roleRepository = (RoleRepository) factory.create("Role");
 
-            UsecaseGetOneUser usecase = new UsecaseGetOneUser(userModel, roleModel);
+            UsecaseGetOneUser usecase = new UsecaseGetOneUser(userRepository, roleRepository);
             usecase.setRefUserId(refdUserId);
 
             switch(usecase.execute())
@@ -306,16 +307,16 @@ public class ApiController extends Controller {
     {
         try {
             Gson gson = new Gson();
-            User userData = gson.fromJson(body, User.class);
+            UserModel userData = gson.fromJson(body, User.class);
 
             Database db = Server.getDatabase();
             db.startTransaction();
 
             RepositoryFactory factory = new RepositoryFactory();
-            UserModel userRepo = (UserModel) factory.create("User");
-            RoleModel roleRepo = (RoleModel) factory.create("Role");
+            UserRepository userRepository = (UserRepository) factory.create("User");
+            RoleRepository roleRepository = (RoleRepository) factory.create("Role");
 
-            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userRepo, roleRepo);
+            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userRepository, roleRepository);
             usecase.setAuthUserId(authUserId);
             usecase.setUserData(userData);
 
@@ -389,16 +390,16 @@ public class ApiController extends Controller {
     {
         try {
             Gson gson = new Gson();
-            User user = gson.fromJson(body, User.class);
+            UserModel user = gson.fromJson(body, User.class);
 
             Database db = Server.getDatabase();
             db.startTransaction();
 
             RepositoryFactory factory = new RepositoryFactory();
-            UserModel userModel = (UserModel) factory.create("User");
-            RoleModel roleModel = (RoleModel) factory.create("Role");
+            UserRepository userRepository = (UserRepository) factory.create("User");
+            RoleRepository roleRepository = (RoleRepository) factory.create("Role");
 
-            UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
+            UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userRepository, roleRepository);
             usecase.setAuthUserId(authUserId);
             usecase.setRefUserId(refUserId);
             usecase.setUserData(user);
@@ -480,10 +481,10 @@ public class ApiController extends Controller {
             db.startTransaction();
 
             RepositoryFactory factory = new RepositoryFactory();
-            UserModel userModel = (UserModel) factory.create("User");
-            RoleModel roleModel = (RoleModel) factory.create("Role");
+            UserRepository userRepository = (UserRepository) factory.create("User");
+            RoleRepository roleRepository = (RoleRepository) factory.create("Role");
 
-            UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userModel, roleModel);
+            UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userRepository, roleRepository);
             usecase.setAuthUserId(authUserId);
             usecase.setRefUserId(refUserId);
 

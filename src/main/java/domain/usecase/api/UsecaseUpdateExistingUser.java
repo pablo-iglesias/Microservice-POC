@@ -4,13 +4,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 
+import domain.model.UserModel;
 import domain.usecase.Usecase;
 
 import domain.Helper;
 import domain.entity.User;
 
-import domain.model.RoleModel;
-import domain.model.UserModel;
+import adapter.repository.RoleRepository;
+import adapter.repository.UserRepository;
 
 public class UsecaseUpdateExistingUser extends Usecase{
 
@@ -21,8 +22,8 @@ public class UsecaseUpdateExistingUser extends Usecase{
     public static final int RESULT_USER_NOT_UPDATED = 5;
     public static final int RESULT_BAD_INPUT_DATA = 6;
 
-    private UserModel userModel;
-    private RoleModel roleModel;
+    private UserRepository userRepository;
+    private RoleRepository roleRepository;
 
     // Input data
     private Integer authUserId = null;
@@ -54,22 +55,22 @@ public class UsecaseUpdateExistingUser extends Usecase{
         this.refUserId = refUserId;
     }
 
-    public User getUserData() {
+    public UserModel getUserData() {
         return userData;
     }
 
-    public void setUserData(User userData) {
+    public void setUserData(UserModel userData) {
         if (userData == null) {
             throw new IllegalArgumentException("userData cannot be null");
         }
 
-        this.userData = userData;
+        this.userData = new User(userData);
     }
 
     // Constructor
-    public UsecaseUpdateExistingUser(UserModel userModel, RoleModel roleModel) {
-        this.userModel = userModel;
-        this.roleModel = roleModel;
+    public UsecaseUpdateExistingUser(UserRepository userRepository, RoleRepository roleRepository) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
     }
 
     // Business Logic
@@ -91,19 +92,19 @@ public class UsecaseUpdateExistingUser extends Usecase{
              userData.getPassword() != null && userData.getPassword().length() > 0 &&
              userData.getRoles() != null && userData.getRoles().length > 0)
         {
-            if (userModel.selectUserIsAdminRole(authUserId)) 
+            if (userRepository.selectUserIsAdminRole(authUserId))
             {
-                if (userModel.selectUserExists(refUserId)) 
+                if (userRepository.selectUserExists(refUserId))
                 {
-                    Integer currentUsernameHolder = userModel.selectUserIdByUseraname(userData.getUsername());
+                    Integer currentUsernameHolder = userRepository.selectUserIdByUseraname(userData.getUsername());
                     if (currentUsernameHolder == null || currentUsernameHolder.equals(refUserId)) 
                     {
                         String hash = Helper.SHA1(userData.getPassword());
-                        if (!userModel.updateUser(refUserId, userData.getUsername(), hash)) {
+                        if (!userRepository.updateUser(refUserId, userData.getUsername(), hash)) {
                             return RESULT_USER_NOT_UPDATED;
                         }
 
-                        Integer[] currentRoles = roleModel.getRoleIdsByUserId(refUserId);
+                        Integer[] currentRoles = roleRepository.getRoleIdsByUserId(refUserId);
                         Integer[] requiredRoles = userData.getRoles();
 
                         List<Integer> currentRolesList = Arrays.asList(currentRoles);
@@ -125,15 +126,13 @@ public class UsecaseUpdateExistingUser extends Usecase{
                         }
 
                         if (addRoles.size() != 0) {
-                            if (!roleModel.insertUserHasRoles(refUserId,
-                                    (Integer[]) addRoles.toArray(new Integer[0]))) {
+                            if (!roleRepository.insertUserHasRoles(refUserId, addRoles.toArray(new Integer[0]))) {
                                 return RESULT_USER_NOT_UPDATED;
                             }
                         }
 
                         if (deleteRoles.size() != 0) {
-                            if (!roleModel.deleteUserHasRoles(refUserId,
-                                    (Integer[]) deleteRoles.toArray(new Integer[0]))) {
+                            if (!roleRepository.deleteUserHasRoles(refUserId, deleteRoles.toArray(new Integer[0]))) {
                                 return RESULT_USER_NOT_UPDATED;
                             }
                         }

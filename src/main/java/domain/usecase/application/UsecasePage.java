@@ -5,11 +5,11 @@ import domain.usecase.Usecase;
 import domain.entity.Role;
 import domain.entity.User;
 
-import domain.model.RoleModel;
-import domain.model.UserModel;
+import adapter.repository.RoleRepository;
+import adapter.repository.UserRepository;
 
-import domain.factory.RoleFactory;
-import domain.factory.UserFactory;
+import domain.entity.factory.RoleFactory;
+import domain.entity.factory.UserFactory;
 
 public class UsecasePage extends Usecase {
 
@@ -58,9 +58,9 @@ public class UsecasePage extends Usecase {
     }
 
     // Constructor
-    public UsecasePage(UserModel userModel, RoleModel roleModel) throws Exception {
-        userFactory = new UserFactory(userModel, roleModel);
-        roleFactory = new RoleFactory(roleModel);
+    public UsecasePage(UserRepository userRepository, RoleRepository roleRepository) throws Exception {
+        userFactory = new UserFactory(userRepository, roleRepository);
+        roleFactory = new RoleFactory(roleRepository);
     }
 
     public UsecasePage(UserFactory userFactory, RoleFactory roleFactory) {

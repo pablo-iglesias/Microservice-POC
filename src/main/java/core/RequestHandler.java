@@ -21,8 +21,8 @@ import core.entity.Cookie;
 import core.entity.HttpRequest;
 import core.entity.HttpResponse;
 import core.entity.Session;
-import core.factory.CookieFactory;
-import core.factory.RequestFactory;
+import core.entity.factory.CookieFactory;
+import core.entity.factory.RequestFactory;
 
 /**
  * Request handler
@@ -125,12 +125,10 @@ public class RequestHandler implements HttpHandler {
                     default:
                         respondInternalServerError(exchange, false);
                 }
-                return;
             }
         } 
         catch (IOException e) {
             e.printStackTrace(System.out);
-            return;
         }
     }
 
@@ -260,7 +258,7 @@ public class RequestHandler implements HttpHandler {
         if (headers.size() > 0) {
             Iterator<Entry<String, String>> it = headers.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<String, String> pair = (Map.Entry<String, String>) it.next();
+                Map.Entry<String, String> pair = it.next();
                 exchange.getResponseHeaders().set(pair.getKey(), pair.getValue());
                 it.remove();
             }

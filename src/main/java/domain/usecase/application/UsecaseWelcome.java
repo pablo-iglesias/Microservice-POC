@@ -1,15 +1,16 @@
 package domain.usecase.application;
 
+import domain.model.RoleModel;
 import domain.usecase.Usecase;
 
 import domain.entity.User;
 import domain.entity.Role;
 
-import domain.model.RoleModel;
-import domain.model.UserModel;
+import adapter.repository.RoleRepository;
+import adapter.repository.UserRepository;
 
-import domain.factory.RoleFactory;
-import domain.factory.UserFactory;
+import domain.entity.factory.RoleFactory;
+import domain.entity.factory.UserFactory;
 
 public class UsecaseWelcome extends Usecase {
 
@@ -44,14 +45,14 @@ public class UsecaseWelcome extends Usecase {
         return username;
     }
 
-    public Role[] getRoles() {
+    public RoleModel[] getRoles() {
         return roles;
     }
 
     // Constructor
-    public UsecaseWelcome(UserModel userModel, RoleModel roleModel) throws Exception {
-        userFactory = new UserFactory(userModel, roleModel);
-        roleFactory = new RoleFactory(roleModel);
+    public UsecaseWelcome(UserRepository userRepository, RoleRepository roleRepository) throws Exception {
+        userFactory = new UserFactory(userRepository, roleRepository);
+        roleFactory = new RoleFactory(roleRepository);
     }
 
     public UsecaseWelcome(UserFactory userFactory, RoleFactory roleFactory) {

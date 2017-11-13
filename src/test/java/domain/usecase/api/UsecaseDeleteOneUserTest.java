@@ -5,16 +5,16 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
-import domain.model.RoleModel;
-import domain.model.UserModel;
+import adapter.repository.RoleRepository;
+import adapter.repository.UserRepository;
 
 import domain.usecase.UsecaseTest;
 
 public class UsecaseDeleteOneUserTest extends UsecaseTest {
 
-    protected UserModel createMockedUserModelObject() throws Exception {
+    protected UserRepository createMockedUserModelObject() throws Exception {
 
-        UserModel model = super.createMockedUserModelObject();
+        UserRepository model = super.createMockedUserModelObject();
 
         when(model.deleteUser(3))
         .thenReturn(true)
@@ -29,9 +29,9 @@ public class UsecaseDeleteOneUserTest extends UsecaseTest {
         return model;
     }
 
-    protected RoleModel createMockedRoleModelObject() throws Exception {
+    protected RoleRepository createMockedRoleModelObject() throws Exception {
 
-        RoleModel model = super.createMockedRoleModelObject();
+        RoleRepository model = super.createMockedRoleModelObject();
 
         when(model.deleteUserHasRolesByUserId(3))
         .thenReturn(true)
@@ -50,8 +50,8 @@ public class UsecaseDeleteOneUserTest extends UsecaseTest {
     public void testDeleteUser_Success() {
 
         try {
-            UserModel userModel = createMockedUserModelObject();
-            RoleModel roleModel = createMockedRoleModelObject();
+            UserRepository userModel = createMockedUserModelObject();
+            RoleRepository roleModel = createMockedRoleModelObject();
 
             UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userModel, roleModel);
             usecase.setAuthUserId(1);
@@ -69,8 +69,8 @@ public class UsecaseDeleteOneUserTest extends UsecaseTest {
     public void testDeleteUser_NotAuthorised() {
 
         try {
-            UserModel userModel = createMockedUserModelObject();
-            RoleModel roleModel = createMockedRoleModelObject();
+            UserRepository userModel = createMockedUserModelObject();
+            RoleRepository roleModel = createMockedRoleModelObject();
 
             UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userModel, roleModel);
             usecase.setAuthUserId(2);
@@ -88,8 +88,8 @@ public class UsecaseDeleteOneUserTest extends UsecaseTest {
     public void testDeleteUser_UserDoesNotExist() {
 
         try {
-            UserModel userModel = createMockedUserModelObject();
-            RoleModel roleModel = createMockedRoleModelObject();
+            UserRepository userModel = createMockedUserModelObject();
+            RoleRepository roleModel = createMockedRoleModelObject();
 
             UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userModel, roleModel);
             usecase.setAuthUserId(1);
@@ -107,8 +107,8 @@ public class UsecaseDeleteOneUserTest extends UsecaseTest {
     public void testDeleteUser_BadInputData() {
 
         try {
-            UserModel userModel = createMockedUserModelObject();
-            RoleModel roleModel = createMockedRoleModelObject();
+            UserRepository userModel = createMockedUserModelObject();
+            RoleRepository roleModel = createMockedRoleModelObject();
 
             UsecaseDeleteOneUser usecase;
 
