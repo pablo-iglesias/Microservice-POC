@@ -14,8 +14,10 @@
 		*   Support for **SQLite**
 			*   File based SQLite support
 			*   In memory SQLite support
+		*   Support for **MySQL**
 		*   Possibility to add more relational databases
 		*   Possibility to add new data sources, even non-relational and NoSQL
+		*   Retrieve configuration from environment vars
 	*   Templating engine abstraction layer (package core.templating)
 		*   Basic native template parser
 		*   Support for **JTwig** templating engine
@@ -48,22 +50,24 @@
 			*   GET will retrieve the user and his/her roles
 			*   PUT will update the user resource with supplied data
 			*   DELETE will remove the user resource permanently
-	*   Model abstraction layer
-		*   There are two types of models, User model and Role model, each one has an interface
-		*   All User models must implement User interface, all Role models must implement Role interface
-		*   For each model type, there can be a number of derivative models subject to underlying data source technology
-			*   Under the package adapter.model.relational, models of type Role and User have been implemented, targeting a relational database with SQL
-		*   Other kinds of models could be developed for document based databases like MongoDB or ElasticSearch
+	*   Repositories
+		*   There are two types of repos, UserRepository and RoleRepository, each one has a an interface
+		*   All User repos must implement UserRepository interface, all Role repos must implement RoleRepository interface
+		*   For each repo type, there can be a number of derivative classes subject to underlying data source technology
+			*   Under the package adapter.repository.relational, repos of type Role and User have been implemented, targeting a relational database with SQL
+		*   Other kinds of repos could be developed for document based databases like MongoDB or ElasticSearch
 		*   Another model could use LDAP and so on...
 *   Domain (package domain)
 	*   Code under this layer is immutable, changes in underlying system, framework, data source, viewport etc.. will not affect it
-	*   Other layers can work with the objects of this layer, a good example are the controllers
+	*   Other layers can work with the objects of this layer, a good example are the controllers, that work with the use cases
 	*   On the contrary, objects of this layer are agnostic of what lies in the bottom, access to adapter/core packages is not permitted from this context
 	*   The domain layer features the following
 		*   A helper class
 			*   Objects of this layer cannot access the Core package so they need to have their own helper
-		*   User and Role entities
+		*   User and Role models
 			*   These are value objects with a constructor and getters, whose purpose is to hold the business data
+		*   User and Role entities
+			*   They have the features of the models plus they can hold enterprise-level business logic
 		*   A number of usecase classes
 			*   Each usecase represents one type of interaction between the application and the user
 			*   Each usecase leverages a number of possible results to the interaction
