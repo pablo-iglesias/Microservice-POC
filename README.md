@@ -44,6 +44,5 @@ Development never ends
 2.  Extend unit tests to cover Controllers and Models
 3.  Implement reactive programming where possible
 4.  Have the REST API to honor JSON API specification ([jsonapi.org](http://jsonapi.org/))
-5.  Add support for a NoSQL data source, like MongoDB or others
-6.  Add localization support for application templates and REST API error messages
-7.  Add by language content negotiation
+5.  Add localization support for application templates and REST API error messages
+6.  Add by language content negotiation

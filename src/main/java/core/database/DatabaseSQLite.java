@@ -1,5 +1,7 @@
 package core.database;
 
+import core.Server;
+
 import java.io.File;
 import java.sql.DriverManager;
 
@@ -12,9 +14,10 @@ public class DatabaseSQLite extends DatabaseRelational {
 
         try {
             Class.forName("org.sqlite.JDBC");
-            File f = new File("users.db");
+            String db = Server.getConfig(Server.SQLITE_DB);
+            File f = new File(db);
             boolean newDatabase = !f.exists();
-            conn = DriverManager.getConnection("jdbc:sqlite:users.db");
+            conn = DriverManager.getConnection("jdbc:sqlite:" + db);
             if (newDatabase) {
                 dump(loadResourceAsString("sql/dbdump.sql"));
             }

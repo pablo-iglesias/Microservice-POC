@@ -9,7 +9,7 @@ import adapter.repository.Repository;
 import adapter.repository.UserRepository;
 
 /**
- * User model that expects the database to be relational and SQL driven
+ * User repo that expects the database to be relational and SQL driven
  * 
  * @author Peibol
  */

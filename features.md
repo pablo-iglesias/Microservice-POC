@@ -15,8 +15,9 @@
 			*   File based SQLite support
 			*   In memory SQLite support
 		*   Support for **MySQL**
+		*   Support for **MongoDB** (NoSQL)
 		*   Possibility to add more relational databases
-		*   Possibility to add new data sources, even non-relational and NoSQL
+		*   Possibility to add new data sources, also non-relational and NoSQL
 		*   Retrieve configuration from environment vars
 	*   Templating engine abstraction layer (package core.templating)
 		*   Basic native template parser

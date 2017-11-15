@@ -1,0 +1,79 @@
+db.users.insert({
+    "id": NumberInt(1),
+    "username": "admin",
+    "password": "d033e22ae348aeb5660fc2140aec35850c4da997",
+    "roles": [
+       NumberInt(1),
+       NumberInt(2),
+       NumberInt(3),
+       NumberInt(4)
+    ]
+});
+
+db.users.insert({
+    "id":NumberInt(2),
+    "username": "user1",
+    "password": "f0578f1e7174b1a41c4ea8c6e17f7a8a3b88c92a",
+    "roles": [
+       NumberInt(2)
+    ]
+});
+
+db.users.insert({
+    "id":NumberInt(3),
+    "username": "user2",
+    "password": "8be52126a6fde450a7162a3651d589bb51e9579d",
+    "roles": [
+       NumberInt(3)
+    ]
+});
+
+db.users.insert({
+    "id":NumberInt(4),
+    "username": "user3",
+    "password": "de2a4d5751ab06dc4f987142db57c26d50925c8a",
+    "roles": [
+       NumberInt(4)
+    ]
+});
+
+db.users.insert({
+    "id":NumberInt(5),
+    "username": "user4",
+    "password": "2db4c1811f424582a90f8d7ee77995cf018d9443",
+    "roles": [
+       NumberInt(2),
+       NumberInt(3),
+       NumberInt(4)
+    ]
+});
+
+db.users.insert({
+    "id":NumberInt(6),
+    "username": "user5",
+    "password": "9e5ca6b0ffb417997ffb844c76f9c24bbc20fe88",
+    "roles": []
+});
+
+db.roles.insert({
+    "id":NumberInt(1),
+    "name": "ADMIN"
+});
+
+db.roles.insert({
+    "id":NumberInt(2),
+    "name": "PAGE_1",
+    "page": "page_1"
+});
+
+db.roles.insert({
+    "id":NumberInt(3),
+    "name": "PAGE_2",
+    "page": "page_2"
+});
+
+db.roles.insert({
+    "id":NumberInt(4),
+    "name": "PAGE_3",
+    "page": "page_3"
+});

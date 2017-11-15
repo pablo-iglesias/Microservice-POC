@@ -3,6 +3,7 @@ package core.entity.factory;
 import core.ResourceLoader;
 import core.database.Database;
 import core.database.DatabaseMySQL;
+import core.database.DatabaseMongoDB;
 import core.database.DatabaseSQLite;
 import core.database.DatabaseSQLiteMemory;
 
@@ -17,6 +18,8 @@ public class DatabaseFactory extends ResourceLoader {
                     return new DatabaseSQLiteMemory();
                 case Database.TYPE_MYSQL:
                     return new DatabaseMySQL();
+                case Database.TYPE_MONGODB:
+                    return new DatabaseMongoDB();
                 default:
                     throw new Exception("DatabaseFactory: Specified database type is not available");
             }

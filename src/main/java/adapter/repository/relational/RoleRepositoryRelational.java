@@ -11,7 +11,7 @@ import adapter.repository.Repository;
 import adapter.repository.RoleRepository;
 
 /**
- * Role model that expects the database to be relational and SQL driven
+ * Role repo that expects the database to be relational and SQL driven
  * 
  * @author Peibol
  */
@@ -42,7 +42,11 @@ public class RoleRepositoryRelational extends Repository implements RoleReposito
         if (db.select()) {
 
             while (db.next()) {
-                roles.add(new Object[] { db.getInt("role_id"), db.getString("role_name"), db.getString("role_page") });
+                roles.add(new Object[] {
+                    db.getInt("role_id"),
+                    db.getString("role_name"),
+                    db.getString("role_page")
+                });
             }
         }
 
