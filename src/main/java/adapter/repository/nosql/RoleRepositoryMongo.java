@@ -7,7 +7,6 @@ import com.mongodb.client.model.Updates;
 import core.Server;
 import core.database.DatabaseMongoDB;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
@@ -29,7 +28,7 @@ public class RoleRepositoryMongo extends Repository implements RoleRepository {
     /**
      * Takes a user id and returns the ids of the roles assigned to it
      */
-    public Vector<Object[]> getRolesByIds(Integer rids[]) throws SQLException {
+    public Vector<Object[]> getRolesByIds(Integer rids[]) {
 
         if(db.retrieveDocuments("roles", Filters.in("id", Arrays.asList(rids)))){
             Vector<Object[]> roles = new Vector<>();
@@ -50,7 +49,7 @@ public class RoleRepositoryMongo extends Repository implements RoleRepository {
     /**
      * Takes a user id and returns the ids of the roles assigned to it
      */
-    public Integer[] getRoleIdsByUserId(Integer uid) throws SQLException {
+    public Integer[] getRoleIdsByUserId(Integer uid) {
 
         if(db.retrieveDocument("users", Filters.eq("id", uid))){
             List<Object> roles = db.getArray("roles");
@@ -64,7 +63,7 @@ public class RoleRepositoryMongo extends Repository implements RoleRepository {
     /**
      * Insert rows in the table user_has_role
      */
-    public boolean insertUserHasRoles(Integer uid, Integer[] rids) throws SQLException {
+    public boolean insertUserHasRoles(Integer uid, Integer[] rids) {
 
         return db.updateDocument("users",
             Filters.eq("id", uid),
@@ -75,7 +74,7 @@ public class RoleRepositoryMongo extends Repository implements RoleRepository {
     /**
      * Delete rows from the table user_has_roles
      */
-    public boolean deleteUserHasRoles(Integer uid, Integer[] rids) throws SQLException {
+    public boolean deleteUserHasRoles(Integer uid, Integer[] rids) {
 
         return db.updateDocument("users",
                 Filters.eq("id", uid),
@@ -86,7 +85,7 @@ public class RoleRepositoryMongo extends Repository implements RoleRepository {
     /**
      * Delete rows from the table user_has_roles
      */
-    public boolean deleteUserHasRolesByUserId(Integer uid) throws SQLException {
+    public boolean deleteUserHasRolesByUserId(Integer uid) {
 
         return db.updateDocument("users",
             Filters.eq("id", uid),
