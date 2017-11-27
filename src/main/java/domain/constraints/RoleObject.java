@@ -46,8 +46,8 @@ public class RoleObject {
         RoleObject role = (RoleObject) o;
 
         if (!Objects.equals(role.getId(), id) ||
-            !Objects.equals(getName(), name) ||
-            !Objects.equals(getPage(), page)) {
+            !Objects.equals(role.getName(), name) ||
+            !Objects.equals(role.getPage(), page)) {
 
             return false;
         }
