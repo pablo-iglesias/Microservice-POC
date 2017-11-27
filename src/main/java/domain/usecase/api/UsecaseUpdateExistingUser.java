@@ -5,7 +5,6 @@ import domain.constraints.repository.IRoleRepository;
 import domain.constraints.repository.IUserRepository;
 
 import domain.entity.User;
-import domain.entity.Role;
 
 import domain.usecase.Usecase;
 import domain.service.UserService;

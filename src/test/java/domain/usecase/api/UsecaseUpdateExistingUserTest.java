@@ -3,6 +3,8 @@ package domain.usecase.api;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
+import com.google.gson.Gson;
+import domain.constraints.UserObject;
 import domain.entity.Role;
 import org.junit.Test;
 
@@ -45,7 +47,7 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
             UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userRepo, roleRepo);
             usecase.setAuthUserId(1);
             usecase.setRefUserId(3);
-            usecase.setUserData(user2);
+            usecase.setUserData(new Gson().fromJson("{username:'user2', password:'pass2', roles:[3]}", UserObject.class));
 
             assertEquals(UsecaseUpdateExistingUser.RESULT_USER_UPDATED_SUCCESSFULLY, usecase.execute());
         }
