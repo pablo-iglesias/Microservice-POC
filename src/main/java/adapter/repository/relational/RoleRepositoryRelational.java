@@ -72,34 +72,4 @@ public class RoleRepositoryRelational implements IRoleRepository {
 
         return Arrays.copyOf(roles.toArray(), roles.size(), Role[].class);
     }
-
-    /**
-     * Insert row in the table user_has_role
-     */
-    public boolean setRolesToUser(User user, Role[] roles) throws SQLException {
-
-        if(removeAllRolesFromUser(user.getId())){
-
-            for(Role role : roles) {
-                db.prepare("INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(?, ?)");
-                db.add(user.getId());
-                db.add(role.getId());
-                db.insert();
-            }
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Delete rows from the table user_has_roles
-     */
-    public boolean removeAllRolesFromUser(Integer uid) throws SQLException {
-
-        db.prepare("DELETE FROM user_has_role WHERE fk_user_id = ?");
-        db.add(uid);
-
-        return db.delete();
-    }
 }

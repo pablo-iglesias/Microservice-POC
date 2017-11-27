@@ -102,7 +102,14 @@ public class UserRepositoryRelational implements IUserRepository {
         db.add(user.getUsername());
         db.add(user.getPassword());
 
-        return db.insert();
+        Integer uid = db.insert();
+
+        if(uid != null) {
+            setRolesToUser(uid, user.getRoleIds());
+            return uid;
+        }
+
+        return null;
     }
 
     /**
@@ -115,7 +122,11 @@ public class UserRepositoryRelational implements IUserRepository {
         db.add(user.getPassword());
         db.add(user.getId());
 
-        return db.update();
+        if(db.update()){
+            return setRolesToUser(user.getId(), user.getRoleIds());
+        }
+
+        return false;
     }
 
     /**
@@ -126,7 +137,11 @@ public class UserRepositoryRelational implements IUserRepository {
         db.prepare("DELETE FROM users WHERE user_id = ?");
         db.add(uid);
 
-        return db.delete();
+        if(db.delete()){
+            return removeAllRolesFromUser(uid);
+        }
+
+        return false;
     }
 
     private Integer[] selectUserRoles(Integer uid) throws SQLException{
@@ -144,5 +159,37 @@ public class UserRepositoryRelational implements IUserRepository {
         }
 
         return Arrays.copyOf(roles.toArray(), roles.size(), Integer[].class);
+    }
+
+    /**
+     * Insert row in the table user_has_role
+     */
+    private boolean setRolesToUser(Integer uid, Integer[] rids) throws SQLException {
+
+        if(removeAllRolesFromUser(uid)){
+
+            for (Integer roleId : rids) {
+                db.prepare("INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(?, ?)");
+                db.add(uid);
+                db.add(roleId);
+                if(db.insert() == null){
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Delete rows from the table user_has_roles
+     */
+    private boolean removeAllRolesFromUser(Integer uid) throws SQLException {
+
+        db.prepare("DELETE FROM user_has_role WHERE fk_user_id = ?");
+        db.add(uid);
+
+        return db.delete();
     }
 }

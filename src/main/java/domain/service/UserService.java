@@ -6,8 +6,6 @@ import domain.constraints.repository.IUserRepository;
 import domain.entity.User;
 import domain.entity.Role;
 
-import java.util.Arrays;
-
 public class UserService {
 
     private IUserRepository userRepository;
@@ -93,43 +91,11 @@ public class UserService {
      */
     public boolean createNewUser(User user) throws Exception {
 
-        userRepository.insertUser(user);
-
-        if(user.getId() != null) {
-            if (user.getRoleIds() != null) {
-                Role[] roles = getRolesFromIds(user.getRoleIds());
-                if (!roleRepository.setRolesToUser(user, roles))
-                    return false;
-            }
+        if(userRepository.insertUser(user) != null) {
             return true;
         }
 
         return false;
-    }
-
-    /**
-     * Synchronize user to database
-     *
-     * @param user
-     * @return
-     * @throws Exception
-     */
-    public boolean updateUser(User user) throws Exception {
-        return userRepository.updateUser(user)
-            && roleRepository.setRolesToUser(user, getRolesFromIds(user.getRoleIds()));
-    }
-
-    /**
-     * Delete a user
-     *
-     * @param uid
-     * @return
-     * @throws Exception
-     */
-    public boolean deleteUser(Integer uid) throws Exception {
-
-        return (roleRepository.removeAllRolesFromUser(uid) &&
-                userRepository.deleteUser(uid));
     }
 
     /**
@@ -169,14 +135,5 @@ public class UserService {
         }
 
         return false;
-    }
-
-    /**
-     *
-     * @param roleIds
-     * @return
-     */
-    private Role[] getRolesFromIds(Integer[] roleIds){
-        return Arrays.stream(roleIds).map(id -> new Role(id)).toArray(size -> new Role[size]);
     }
 }

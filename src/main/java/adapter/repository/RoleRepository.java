@@ -30,12 +30,4 @@ public class RoleRepository extends Repository implements IRoleRepository {
     public Role[] getRolesByUser(User user) throws Exception {
         return repo.getRolesByUser(user);
     }
-
-    public boolean setRolesToUser(User user, Role[] roles) throws Exception {
-        return repo.setRolesToUser(user, roles);
-    }
-
-    public boolean removeAllRolesFromUser(Integer uid) throws Exception {
-        return repo.removeAllRolesFromUser(uid);
-    }
 }

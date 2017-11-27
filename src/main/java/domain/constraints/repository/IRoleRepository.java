@@ -12,6 +12,4 @@ public interface IRoleRepository {
 
     Role getRole(Integer rid) throws Exception;
     Role[] getRolesByUser(User user) throws Exception;
-    boolean setRolesToUser(User user, Role[] roles) throws Exception;
-    boolean removeAllRolesFromUser(Integer uid) throws Exception;
 }

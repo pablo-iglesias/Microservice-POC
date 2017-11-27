@@ -1,5 +1,6 @@
 package domain.usecase.api;
 
+import adapter.repository.UserRepository;
 import domain.service.UserService;
 import domain.usecase.Usecase;
 
@@ -14,6 +15,7 @@ public class UsecaseDeleteOneUser extends Usecase{
     public static final int RESULT_USER_NOT_DELETED = 4;
 
     private UserService service;
+    private IUserRepository userRepository;
 
     // Input data
     private Integer authUserId = null;
@@ -37,6 +39,7 @@ public class UsecaseDeleteOneUser extends Usecase{
 
     // Constructor
     public UsecaseDeleteOneUser(IUserRepository userRepository, IRoleRepository roleRepository) {
+        this.userRepository = userRepository;
         service = new UserService(userRepository, roleRepository);
     }
 
@@ -55,7 +58,7 @@ public class UsecaseDeleteOneUser extends Usecase{
         else if (!service.doesUserExist(refUserId)) {
             return RESULT_USER_DOES_NOT_EXIST;
         }
-        else if (service.deleteUser(refUserId)) {
+        else if (userRepository.deleteUser(refUserId)) {
             return RESULT_USER_DELETED_SUCCESSFULLY;
         }
         else{

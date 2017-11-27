@@ -53,7 +53,7 @@ public class UserObject {
 
         if (!Objects.equals(user.getId(), id)  ||
             !Objects.equals(user.getUsername(), username) ||
-            !Objects.equals(getPassword(), password)) {
+            !Objects.equals(user.getPassword(), password)) {
 
             return false;
         }

@@ -26,9 +26,6 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
         .thenReturn(true)
         .thenThrow(new Exception("Updating the same user twice"));
 
-        when(userRepo.updateUser(new User(2,"admin", "admin", new Integer[] { 1, 2, 3, 4 })))
-        .thenThrow(new Exception("Probable constraint violation, attempting to update username to a value already in existance"));
-
         when(userRepo.updateUser(new User(3,null, "pass2", new Integer[] { 1, 2 })))
         .thenThrow(new Exception("Handling invalid update request to user repo"));
 
@@ -36,32 +33,6 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
         .thenThrow(new Exception("Handling invalid update request to user repo"));
 
         return userRepo;
-    }
-
-    protected IRoleRepository createMockedRoleRepositoryObject() throws Exception {
-
-        IRoleRepository roleRepo = super.createMockedRoleRepositoryObject();
-
-        when(roleRepo.setRolesToUser(user2, new Role[] { role3 })).thenReturn(true)
-        .thenThrow(new Exception("Updating the roles twice to the same user"));
-
-        when(roleRepo.setRolesToUser(null, new Role[] { role1 }))
-        .thenThrow(new Exception("Handling invalid insert request to role repo"));
-
-        when(roleRepo.setRolesToUser(user2, null))
-        .thenThrow(new Exception("Handling invalid insert request to role repo"));
-
-        when(roleRepo.setRolesToUser(user3, new Role[] { role4 }))
-        .thenThrow(new Exception("Inserting the roles to a user that does not exist"));
-
-        when(roleRepo.removeAllRolesFromUser(user2.getId()))
-        .thenReturn(true)
-        .thenThrow(new Exception("Deleting the roles twice to the same user"));
-
-        when(roleRepo.removeAllRolesFromUser(null))
-        .thenThrow(new Exception("Handling invalid delete request to role repo"));
-
-        return roleRepo;
     }
 
     @Test

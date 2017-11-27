@@ -89,10 +89,10 @@ public class UsecaseUpdateExistingUser extends Usecase{
             user.setId(refUserId);
 
             User usernameHolder = userRepository.getUser(user.getUsername());
-            if (usernameHolder != null && !user.equals(usernameHolder)) {
+            if (usernameHolder != null && !user.getId().equals(usernameHolder.getId())) {
                 return RESULT_USERNAME_ALREADY_TAKEN;
             }
-            else if (!service.updateUser(user)) {
+            else if (!userRepository.updateUser(user)) {
                 return RESULT_USER_NOT_UPDATED;
             }
 

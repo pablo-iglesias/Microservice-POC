@@ -25,26 +25,6 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
         return userRepo;
     }
 
-    protected IRoleRepository createMockedRoleRepositoryObject() throws Exception {
-
-        IRoleRepository roleRepo = super.createMockedRoleRepositoryObject();
-
-        when(roleRepo.setRolesToUser(user3, new Role[] { role4 }))
-        .thenReturn(true)
-        .thenThrow(new Exception("Adding the same roles twice to the user"));
-
-        when(roleRepo.setRolesToUser(admin, new Role[] { role4 }))
-        .thenThrow(new Exception("Adding the roles to a preexisting user"));
-
-        when(roleRepo.setRolesToUser(user1, new Role[] { role4 }))
-        .thenThrow(new Exception("Adding the roles to a preexisting user"));
-
-        when(roleRepo.setRolesToUser(user2, new Role[] { role4 }))
-        .thenThrow(new Exception("Adding the roles to a preexisting user"));
-
-        return roleRepo;
-    }
-
     @Test
     public void testAddNewUser_Success() {
 

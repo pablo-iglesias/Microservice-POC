@@ -29,23 +29,6 @@ public class UsecaseDeleteOneUserTest extends UsecaseTest {
         return userRepo;
     }
 
-    protected IRoleRepository createMockedRoleRepositoryObject() throws Exception {
-
-        IRoleRepository roleRepo = super.createMockedRoleRepositoryObject();
-
-        when(roleRepo.removeAllRolesFromUser(3))
-        .thenReturn(true)
-        .thenThrow(new Exception("Deleting roles to the same user twice"));
-
-        when(roleRepo.removeAllRolesFromUser(4))
-        .thenThrow(new Exception("Attempting to delete roles to nonexistent user"));
-
-        when(roleRepo.removeAllRolesFromUser(null))
-        .thenThrow(new Exception("Handling invalid delete request to role repo"));
-
-        return roleRepo;
-    }
-
     @Test
     public void testDeleteUser_Success() {
 

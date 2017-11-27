@@ -1,11 +1,11 @@
 package adapter.repository.nosql;
 
 import domain.constraints.repository.IUserRepository;
+import domain.entity.User;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 
-import domain.entity.User;
 import org.bson.Document;
 
 import core.Server;
@@ -40,7 +40,8 @@ public class UserRepositoryMongo implements IUserRepository {
             while (db.next()) {
                 users.add(new User(
                     db.getInt("id"),
-                    db.getString("username")
+                    db.getString("username"),
+                    db.getArray("roles").stream().toArray(size -> new Integer[size])
                 ));
             }
             return Arrays.copyOf(users.toArray(), users.size(), User[].class);
@@ -57,7 +58,8 @@ public class UserRepositoryMongo implements IUserRepository {
         if(db.retrieveDocument("users", Filters.eq("id", uid))){
             return new User(
                 db.getInt("id"),
-                db.getString("username")
+                db.getString("username"),
+                db.getArray("roles").stream().toArray(size -> new Integer[size])
             );
         }
         else{
@@ -73,7 +75,8 @@ public class UserRepositoryMongo implements IUserRepository {
         if(db.retrieveDocument("users", Filters.eq("username", username))){
             return new User(
                 db.getInt("id"),
-                db.getString("username")
+                db.getString("username"),
+                db.getArray("roles").stream().toArray(size -> new Integer[size])
             );
         }
         else{
@@ -94,7 +97,8 @@ public class UserRepositoryMongo implements IUserRepository {
         )){
             return new User(
                 db.getInt("id"),
-                db.getString("username")
+                db.getString("username"),
+                db.getArray("roles").stream().toArray(size -> new Integer[size])
             );
         }
         else{
@@ -110,7 +114,7 @@ public class UserRepositoryMongo implements IUserRepository {
         Document document = new Document()
         .append("username", user.getUsername())
         .append("password", user.getPassword())
-        .append("roles", user.getRoleIds());
+        .append("roles", Arrays.asList(user.getRoleIds()));
 
         return db.insertDocument("users", document);
     }
