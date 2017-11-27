@@ -1,20 +1,28 @@
 package domain.entity;
 
-import domain.model.UserModel;
+import domain.Helper;
+import domain.constraints.UserObject;
 
-public class User extends UserModel{
+public class User extends UserObject {
 
-    public User(UserModel m){
-        id = m.getId();
-        username = m.getUsername();
-        password = m.getPassword();
-        roles = m.getRoles();
+    public User(UserObject user){
+        id = user.getId();
+        username = user.getUsername();
+        password = (user.getPassword() != null && user.getPassword().length() > 0) ? Helper.SHA1(user.getPassword()) : "";
+        roles = user.getRoleIds();
+    }
+
+    public User(User user){
+        id = user.getId();
+        username = user.getUsername();
+        password = user.getPassword();
+        roles = user.getRoleIds();
     }
 
     public User(int id, String username, String password, Integer[] roles) {
         this.id = id;
         this.username = username;
-        this.password = password;
+        this.password = (password != null && password.length() > 0) ? Helper.SHA1(password) : "";
         this.roles = roles;
     }
 
@@ -25,28 +33,14 @@ public class User extends UserModel{
         password = "";
     }
 
-    public boolean equals(Object o) {
+    public User(int id, String username) {
+        this.id = id;
+        this.username = username;
+        this.roles = new Integer[]{};
+        password = "";
+    }
 
-        if (o.getClass() != this.getClass()) {
-            return false;
-        }
-
-        User user = (User) o;
-
-        if (    user.getId() != id || 
-                !user.getUsername().equals(username) ||
-                !user.getPassword().equals(password) ||
-                user.getRoles().length != roles.length) {
-
-            return false;
-        }
-
-        for (int i = 0; i < roles.length; i++) {
-            if (!user.getRoles()[i].equals(roles[i])) {
-                return false;
-            }
-        }
-
-        return true;
+    public void setId(Integer id){
+        this.id = id;
     }
 }

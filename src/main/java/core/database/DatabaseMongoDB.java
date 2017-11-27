@@ -17,7 +17,6 @@ import org.bson.conversions.Bson;
 
 import java.util.List;
 import java.util.Iterator;
-import java.util.Vector;
 
 public class DatabaseMongoDB extends Database {
 
@@ -63,9 +62,9 @@ public class DatabaseMongoDB extends Database {
 
         try {
             // Get all the statements of the Mongo dump line by line
-            Vector<String> vector = Helper.vector(dump, "([^;]+;)");
+            List<String> statements = Helper.list(dump, "([^;]+;)");
 
-            for (String line : vector) {
+            for (String line : statements) {
                 Bson command = new Document("eval", line);
                 database.runCommand(command);
             }

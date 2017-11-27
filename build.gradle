@@ -79,17 +79,40 @@ jar {
 }
 
 // Copy templates and sqls to bin directory for debugging the app with those resources available
-task copyTemplates(type: Copy) {
-	into "$projectDir/bin/templates"
-    from "$projectDir/templates"
+task copyTemplates << {
+    copy {
+        from "$projectDir/templates"
+        into "$buildDir/classes/main/templates" // IntelliJ
+    }
+
+    copy {
+        from "$projectDir/templates"
+        into "$projectDir/bin/templates"        // Eclipse
+    }
 }
-task copySqls(type: Copy) {
-	into "$projectDir/bin/sql"
-    from "$projectDir/sql"
+
+task copySqls << {
+    copy {
+        from "$projectDir/sql"
+        into "$buildDir/classes/main/sql"       // IntelliJ
+    }
+
+    copy {
+        from "$projectDir/sql"
+        into "$projectDir/bin/sql"              // Eclipse
+    }
 }
-task copyMongos(type: Copy) {
-    into "$projectDir/bin/mongo"
-    from "$projectDir/mongo"
+
+task copyMongos << {
+    copy {
+        from "$projectDir/mongo"
+        into "$buildDir/classes/main/mongo"      // IntelliJ
+    }
+
+    copy {
+        from "$projectDir/mongo"
+        into "$projectDir/bin/mongo"             // Eclipse
+    }
 }
 
 // Copy jar file to the jar folder and all runtime dependencies to the jar/libs subfolder

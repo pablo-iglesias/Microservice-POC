@@ -3,70 +3,61 @@ package domain.usecase.api;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
+import domain.entity.Role;
 import org.junit.Test;
 
-import adapter.repository.RoleRepository;
-import adapter.repository.UserRepository;
+import domain.constraints.repository.IRoleRepository;
+import domain.constraints.repository.IUserRepository;
 
-import domain.Helper;
 import domain.entity.User;
 import domain.usecase.UsecaseTest;
 
 public class UsecaseAddNewUserTest extends UsecaseTest {
 
-    protected UserRepository createMockedUserModelObject() throws Exception {
+    protected IUserRepository createMockedUserRepositoryObject() throws Exception {
 
-        UserRepository model = super.createMockedUserModelObject();
+        IUserRepository userRepo = super.createMockedUserRepositoryObject();
 
-        when(model.insertUser("user3", Helper.SHA1("pass3")))
+        when(userRepo.insertUser(user3))
         .thenReturn(4)
-        .thenThrow(new Exception("Inserting the same user twice"));
+        .thenThrow(new Exception("Creating the same user twice"));
 
-        when(model.insertUser("admin", Helper.SHA1("admin")))
-        .thenThrow(new Exception("Probable constraint violation, attempting to insert username with a value already in existance"));
-
-        when(model.insertUser("user1", Helper.SHA1("pass1")))
-        .thenThrow(new Exception("Probable constraint violation, attempting to insert username with a value already in existance"));
-
-        when(model.insertUser("user2", Helper.SHA1("pass2")))
-        .thenThrow(new Exception("Probable constraint violation, attempting to insert username with a value already in existance"));
-
-        return model;
+        return userRepo;
     }
 
-    protected RoleRepository createMockedRoleModelObject() throws Exception {
+    protected IRoleRepository createMockedRoleRepositoryObject() throws Exception {
 
-        RoleRepository model = super.createMockedRoleModelObject();
+        IRoleRepository roleRepo = super.createMockedRoleRepositoryObject();
 
-        when(model.insertUserHasRoles(4, new Integer[] { 4 }))
+        when(roleRepo.setRolesToUser(user3, new Role[] { role4 }))
         .thenReturn(true)
         .thenThrow(new Exception("Adding the same roles twice to the user"));
 
-        when(model.insertUserHasRoles(1, new Integer[] { 4 }))
+        when(roleRepo.setRolesToUser(admin, new Role[] { role4 }))
         .thenThrow(new Exception("Adding the roles to a preexisting user"));
 
-        when(model.insertUserHasRoles(2, new Integer[] { 4 }))
+        when(roleRepo.setRolesToUser(user1, new Role[] { role4 }))
         .thenThrow(new Exception("Adding the roles to a preexisting user"));
 
-        when(model.insertUserHasRoles(3, new Integer[] { 4 }))
+        when(roleRepo.setRolesToUser(user2, new Role[] { role4 }))
         .thenThrow(new Exception("Adding the roles to a preexisting user"));
 
-        return model;
+        return roleRepo;
     }
 
     @Test
     public void testAddNewUser_Success() {
 
         try {
-            UserRepository userModel = createMockedUserModelObject();
-            RoleRepository roleModel = createMockedRoleModelObject();
+            IUserRepository userRepository = createMockedUserRepositoryObject();
+            IRoleRepository roleRepository = createMockedRoleRepositoryObject();
 
-            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userModel, roleModel);
+            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userRepository, roleRepository);
             usecase.setAuthUserId(1);
-            usecase.setUserData(new User(0, "user3", "pass3", new Integer[] { 4 }));
+            usecase.setUserData(user3);
 
             assertEquals(UsecaseAddNewUser.RESULT_USER_CREATED_SUCCESSFULLY, usecase.execute());
-        } 
+        }
         catch (Exception e) {
             e.printStackTrace(System.out);
             fail(e.getMessage());
@@ -77,15 +68,15 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
     public void testAddNewUser_NotAuthorised() {
 
         try {
-            UserRepository userModel = createMockedUserModelObject();
-            RoleRepository roleModel = createMockedRoleModelObject();
+            IUserRepository userRepository = createMockedUserRepositoryObject();
+            IRoleRepository roleRepository = createMockedRoleRepositoryObject();
 
-            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userModel, roleModel);
+            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userRepository, roleRepository);
             usecase.setAuthUserId(2);
-            usecase.setUserData(new User(0, "user3", "pass3", new Integer[] { 4 }));
+            usecase.setUserData(user3);
 
             assertEquals(UsecaseAddNewUser.RESULT_NOT_AUTHORISED, usecase.execute());
-        } 
+        }
         catch (Exception e) {
             e.printStackTrace(System.out);
             fail(e.getMessage());
@@ -96,15 +87,15 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
     public void testAddNewUser_UserAlreadyExists() {
 
         try {
-            UserRepository userModel = createMockedUserModelObject();
-            RoleRepository roleModel = createMockedRoleModelObject();
+            IUserRepository userRepository = createMockedUserRepositoryObject();
+            IRoleRepository roleRepository = createMockedRoleRepositoryObject();
 
-            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userModel, roleModel);
+            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userRepository, roleRepository);
             usecase.setAuthUserId(1);
-            usecase.setUserData(new User(0, "admin", "admin", new Integer[] { 4 }));
+            usecase.setUserData(admin);
 
             assertEquals(UsecaseAddNewUser.RESULT_USER_ALREADY_EXISTS, usecase.execute());
-        } 
+        }
         catch (Exception e) {
             e.printStackTrace(System.out);
             fail(e.getMessage());
@@ -115,10 +106,10 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
     public void testAddNewUser_BadInputData() {
 
         try {
-            UserRepository userModel = createMockedUserModelObject();
-            RoleRepository roleModel = createMockedRoleModelObject();
+            IUserRepository userRepository = createMockedUserRepositoryObject();
+            IRoleRepository roleRepository = createMockedRoleRepositoryObject();
 
-            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userModel, roleModel);
+            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userRepository, roleRepository);
 
             try {
                 usecase.setAuthUserId(null);
@@ -153,7 +144,7 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
             usecase.setUserData(new User(0, "", "", new Integer[0]));
 
             assertEquals(UsecaseAddNewUser.RESULT_BAD_INPUT_DATA, usecase.execute());
-        } 
+        }
         catch (Exception e) {
             e.printStackTrace(System.out);
             fail(e.getMessage());

@@ -1,27 +1,26 @@
 package adapter.repository.nosql;
 
-import adapter.repository.Repository;
-import adapter.repository.UserRepository;
+import domain.constraints.repository.IUserRepository;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 
+import domain.entity.User;
 import org.bson.Document;
 
 import core.Server;
 import core.database.DatabaseMongoDB;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Vector;
 
 /**
  * User repo that expects the database to be MongoDB
  * 
  * @author Peibol
  */
-public class UserRepositoryMongo extends Repository implements UserRepository {
+public class UserRepositoryMongo implements IUserRepository {
 
     private DatabaseMongoDB db;
 
@@ -34,28 +33,32 @@ public class UserRepositoryMongo extends Repository implements UserRepository {
      *
      * @return
      */
-    public Vector<Object[]> getUsers() {
+    public User[] getAllUsers() {
 
         if (db.retrieveCollection("users")) {
-            Vector<Object[]> users = new Vector<>();
+            List<User> users = new ArrayList<>();
             while (db.next()) {
-                users.add(new Object[] { db.getInt("id"), db.getString("username") });
+                users.add(new User(
+                    db.getInt("id"),
+                    db.getString("username")
+                ));
             }
-            return users;
+            return Arrays.copyOf(users.toArray(), users.size(), User[].class);
         } else {
             return null;
         }
     }
 
     /**
-     * Takes user id and returns the user name
-     * 
-     * @return
+     * Get user
      */
-    public String selectUsernameByUserId(Integer uid) {
+    public User getUser(Integer uid) {
 
         if(db.retrieveDocument("users", Filters.eq("id", uid))){
-            return db.getString("username");
+            return new User(
+                db.getInt("id"),
+                db.getString("username")
+            );
         }
         else{
             return null;
@@ -63,47 +66,15 @@ public class UserRepositoryMongo extends Repository implements UserRepository {
     }
 
     /**
-     * Return true if a user with this id already exists
-     *
+     * Get user
      */
-    public boolean selectUserExists(Integer uid) {
-        if(db.retrieveDocument("users", Filters.eq("id", uid))){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    /**
-     * Returns true if a user with this username already exists
-     * 
-     */
-    public boolean selectUserExistsByUseraname(String username) {
+    public User getUser(String username) {
 
         if(db.retrieveDocument("users", Filters.eq("username", username))){
-            return true;
-        }
-        else{
-            return false;
-        }
-    }
-
-    /**
-     * Takes user name and hashed user password and returns the corresponding
-     * user id, used for authentication
-     * 
-     * @return
-     */
-    public Integer selectUserIdByUseranameAndPassword(String username, String password) {
-
-        if(db.retrieveDocument("users",
-                Filters.and(
-                    Filters.eq("username", username),
-                    Filters.eq("password", password)
-                )
-        )){
-            return new Integer(db.getInt("id"));
+            return new User(
+                db.getInt("id"),
+                db.getString("username")
+            );
         }
         else{
             return null;
@@ -111,58 +82,35 @@ public class UserRepositoryMongo extends Repository implements UserRepository {
     }
 
     /**
-     * Takes user name and returns the corresponding user id, used for checking
-     * if the username is already taken
+     * Get user
      */
-    public Integer selectUserIdByUseraname(String username) {
+    public User getUser(String username, String password) {
 
-        if(db.retrieveDocument("users", Filters.eq("username", username))){
-            return new Integer(db.getInt("id"));
+        if(db.retrieveDocument("users",
+            Filters.and(
+                Filters.eq("username", username),
+                Filters.eq("password", password)
+            )
+        )){
+            return new User(
+                db.getInt("id"),
+                db.getString("username")
+            );
         }
         else{
             return null;
-        }
-    }
-
-    /**
-     * Return true if the user has the ADMIN role
-     * 
-     */
-    public boolean selectUserIsAdminRole(Integer uid) {
-
-        Integer adminRoleId = null;
-
-        if(db.retrieveDocument("roles", Filters.eq("name", "ADMIN"))){
-            adminRoleId = db.getInt("id");
-        }
-        else{
-            return false;
-        }
-
-        if(db.retrieveDocument("users",
-                Filters.and(
-                    Filters.eq("id", uid),
-                    Filters.eq("roles", adminRoleId)
-                )
-        )){
-            return true;
-        }
-        else{
-            return false;
         }
     }
 
     /**
      * Inserts new user
      */
-    public Integer insertUser(String username, String password) {
-
-        List<BasicDBObject> roles = new ArrayList<>();
+    public Integer insertUser(User user) {
 
         Document document = new Document()
-        .append("username", username)
-        .append("password", password)
-        .append("roles", roles);
+        .append("username", user.getUsername())
+        .append("password", user.getPassword())
+        .append("roles", user.getRoleIds());
 
         return db.insertDocument("users", document);
     }
@@ -170,13 +118,14 @@ public class UserRepositoryMongo extends Repository implements UserRepository {
     /**
      * Updates existing user
      */
-    public boolean updateUser(Integer uid, String username, String password) {
+    public boolean updateUser(User user) {
 
         return db.updateDocument("users",
-            Filters.eq("id", uid),
+            Filters.eq("id", user.getId()),
             Updates.combine(
-                Updates.set("username", username),
-                Updates.set("password", password)
+                Updates.set("username", user.getUsername()),
+                Updates.set("password", user.getPassword()),
+                Updates.set("roles", user.getRoleIds())
             )
         );
     }

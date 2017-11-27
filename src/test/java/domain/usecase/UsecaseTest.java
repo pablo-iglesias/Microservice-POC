@@ -2,15 +2,15 @@ package domain.usecase;
 
 import static org.mockito.Mockito.when;
 
+import domain.Helper;
+import domain.constraints.UserObject;
 import org.mockito.Mockito;
 
-import adapter.repository.RoleRepository;
-import adapter.repository.UserRepository;
+import domain.constraints.repository.IRoleRepository;
+import domain.constraints.repository.IUserRepository;
 
 import domain.entity.Role;
 import domain.entity.User;
-import domain.entity.factory.RoleFactory;
-import domain.entity.factory.UserFactory;
 
 /**
  * All usecases work within an initial scenario where admin, user1 and user2 already exist, and user3 does not 
@@ -21,88 +21,49 @@ import domain.entity.factory.UserFactory;
  */
 public class UsecaseTest {
 
-    protected UserFactory createMockedUserFactoryObject() throws Exception {
+    protected final User admin = new User(1, "admin", "admin", new Integer[] { 1, 2, 3, 4 });
+    protected final User user1 = new User(2, "user1", "pass1", new Integer[] { 2 });
+    protected final User user2 = new User(3, "user2", "pass2", new Integer[] { 3 });
+    protected final User user3 = new User(4, "user3", "pass3", new Integer[] { 4 } );
 
-        UserFactory factory = Mockito.mock(UserFactory.class);
+    protected final Role role1 = new Role(1, "ADMIN", "");
+    protected final Role role2 = new Role(2, "PAGE_1", "page_1");
+    protected final Role role3 = new Role(3, "PAGE_2", "page_2");
+    protected final Role role4 = new Role(4, "PAGE_3", "page_3");
 
-        when(factory.create())
-        .thenReturn(
-                new User[] { 
-                        new User(1, "admin", new Integer[] { 1, 2, 3, 4 }),
-                        new User(2, "user1", new Integer[] { 2 }), 
-                        new User(3, "user2", new Integer[] { 3 }) 
-                }
-        );
+    protected IUserRepository createMockedUserRepositoryObject() throws Exception {
 
-        when(factory.create("admin", "admin")).thenReturn(new User(1, "admin", new Integer[] { 1, 2, 3, 4 }));
-        when(factory.create("user1", "pass1")).thenReturn(new User(2, "user1", new Integer[] { 2 }));
-        when(factory.create("user2", "pass2")).thenReturn(new User(3, "user2", new Integer[] { 3 }));
-        when(factory.create("user1", "pass2")).thenReturn(null);
+        IUserRepository userRepo = Mockito.mock(IUserRepository.class);
 
-        when(factory.create(1)).thenReturn(new User(1, "admin", new Integer[] { 1, 2, 3, 4 }));
-        when(factory.create(2)).thenReturn(new User(2, "user1", new Integer[] { 2 }));
-        when(factory.create(3)).thenReturn(new User(3, "user2", new Integer[] { 3 }));
-        when(factory.create(4)).thenReturn(null);
+        when(userRepo.getAllUsers()).thenReturn(new User[] {admin, user1, user2});
 
-        return factory;
+        when(userRepo.getUser(1)).thenReturn(admin);
+        when(userRepo.getUser(2)).thenReturn(user1);
+        when(userRepo.getUser(3)).thenReturn(user2);
+
+        when(userRepo.getUser(4)).thenReturn(null);
+
+        when(userRepo.getUser("admin")).thenReturn(admin);
+        when(userRepo.getUser("user1")).thenReturn(user1);
+        when(userRepo.getUser("user2")).thenReturn(user2);
+
+        when(userRepo.getUser("user3")).thenReturn(null);
+
+        when(userRepo.getUser("admin", Helper.SHA1("admin"))).thenReturn(admin);
+        when(userRepo.getUser("user1", Helper.SHA1("pass1"))).thenReturn(user1);
+        when(userRepo.getUser("user2", Helper.SHA1("pass2"))).thenReturn(user2);
+
+        when(userRepo.getUser("user1", Helper.SHA1("pass2"))).thenReturn(null);
+
+        return userRepo;
     }
 
-    protected RoleFactory createMockedRoleFactoryObject() throws Exception {
+    protected IRoleRepository createMockedRoleRepositoryObject() throws Exception {
 
-        RoleFactory factory = Mockito.mock(RoleFactory.class);
-
-        when(factory.createByIds(new Integer[] { 1, 2, 3, 4 }))
-        .thenReturn(
-                new Role[] { 
-                        new Role(1, "ADMIN", ""),
-                        new Role(2, "PAGE_1", "page_1"), 
-                        new Role(3, "PAGE_2", "page_2"), 
-                        new Role(4, "PAGE_3", "page_3") 
-                }
-        );
-
-        when(factory.createByIds(new Integer[] { 2 })).thenReturn(new Role[] { new Role(2, "PAGE_1", "page_1") });
-        when(factory.createByIds(new Integer[] { 3 })).thenReturn(new Role[] { new Role(3, "PAGE_2", "page_2") });
-
-        return factory;
-    }
-
-    protected UserRepository createMockedUserModelObject() throws Exception {
-
-        UserRepository model = Mockito.mock(UserRepository.class);
-
-        when(model.selectUserIsAdminRole(1)).thenReturn(true);
-        when(model.selectUserIsAdminRole(2)).thenReturn(false);
-        when(model.selectUserIsAdminRole(3)).thenReturn(false);
-        when(model.selectUserIsAdminRole(4)).thenReturn(false);
-
-        when(model.selectUserExists(1)).thenReturn(true);
-        when(model.selectUserExists(2)).thenReturn(true);
-        when(model.selectUserExists(3)).thenReturn(true);
-        when(model.selectUserExists(4)).thenReturn(false);
-
-        when(model.selectUserExistsByUseraname("admin")).thenReturn(true);
-        when(model.selectUserExistsByUseraname("user1")).thenReturn(true);
-        when(model.selectUserExistsByUseraname("user2")).thenReturn(true);
-        when(model.selectUserExistsByUseraname("user3")).thenReturn(false);
-
-        when(model.selectUserIdByUseraname("admin")).thenReturn(1);
-        when(model.selectUserIdByUseraname("user1")).thenReturn(2);
-        when(model.selectUserIdByUseraname("user2")).thenReturn(3);
-        when(model.selectUserIdByUseraname("user3")).thenReturn(null);
-
-        return model;
-    }
-
-    protected RoleRepository createMockedRoleModelObject() throws Exception {
-
-        RoleRepository model = Mockito.mock(RoleRepository.class);
-
-        when(model.getRoleIdsByUserId(1)).thenReturn(new Integer[] { 1, 2, 3, 4 });
-        when(model.getRoleIdsByUserId(2)).thenReturn(new Integer[] { 2 });
-        when(model.getRoleIdsByUserId(3)).thenReturn(new Integer[] { 3 });
-        when(model.getRoleIdsByUserId(4)).thenReturn(new Integer[] {});
-
-        return model;
+        IRoleRepository roleRepo = Mockito.mock(IRoleRepository.class);
+        when(roleRepo.getRolesByUser(admin)).thenReturn(new Role[] { role1, role2, role3, role4 });
+        when(roleRepo.getRolesByUser(user1)).thenReturn(new Role[] { role2 });
+        when(roleRepo.getRolesByUser(user2)).thenReturn(new Role[] { role3 });
+        return roleRepo;
     }
 }

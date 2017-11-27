@@ -2,14 +2,8 @@ package core;
 
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
-import java.util.Map;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Scanner;
-import java.util.TimeZone;
-import java.util.Vector;
-import java.util.Map.Entry;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import com.google.code.regexp.Pattern;
 import com.google.code.regexp.Matcher;
@@ -20,7 +14,7 @@ public class Helper {
      * Return list of fixed format paired elements contained in a string, as a Map
      * The regular expression will define the extraction pattern Used for
      * parsing request query strings and other things
-     * 
+     *
      * @param string
      * @param regex
      * @return
@@ -30,7 +24,7 @@ public class Helper {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(string);
 
-        Map<String, String> matches = new HashMap<String, String>();
+        Map<String, String> matches = new HashMap<>(matcher.groupCount());
 
         while (matcher.find()) {
             matches.put(matcher.group(1).trim(), matcher.group(2).trim());
@@ -40,20 +34,20 @@ public class Helper {
     }
 
     /**
-     * Return list of fixed format single elements contained in a string, as a Vector
+     * Return list of fixed format single elements contained in a string
      * The regular expression will define the extraction pattern Used for
      * parsing lists of SQL queries in a dump file
-     * 
+     *
      * @param string
      * @param regex
      * @return
      */
-    public static Vector<String> vector(String string, String regex) {
+    public static ArrayList<String> list(String string, String regex) {
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(string);
 
-        Vector<String> matches = new Vector<String>();
+        ArrayList<String> matches = new ArrayList<>(matcher.groupCount());
 
         while (matcher.find()) {
             matches.add(matcher.group(1).trim());
@@ -65,7 +59,7 @@ public class Helper {
     /**
      * Return list of named groups of a regular expression contained in a single string, as a Map
      * Used for parsing URIs and other things
-     * 
+     *
      * @param string
      * @param regex
      * @return
@@ -77,14 +71,9 @@ public class Helper {
 
         if (matcher.find()) {
             Map<String, String> groups = matcher.namedGroups();
-            Iterator<Entry<String, String>> it = groups.entrySet().iterator();
-            while (it.hasNext()) {
-                String value = it.next().getValue();
-                if (value == null || value.isEmpty()) {
-                    it.remove();
-                }
-            }
-            return groups;
+            return groups.entrySet().stream().filter(
+                    entry -> (entry.getValue() != null && !entry.getValue().isEmpty())
+            ).collect(Collectors.toMap(p -> p.getKey(), p -> p.getValue()));
         }
 
         return null;

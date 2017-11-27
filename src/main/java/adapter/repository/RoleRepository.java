@@ -1,17 +1,41 @@
 package adapter.repository;
 
-import java.util.Vector;
+import domain.constraints.repository.IRoleRepository;
+import adapter.repository.nosql.RoleRepositoryMongo;
+import adapter.repository.relational.RoleRepositoryRelational;
 
-/**
- * All repos of the type Role must implement this
- * 
- * @author Peibol
- */
-public interface RoleRepository {
+import domain.entity.Role;
+import domain.entity.User;
 
-    Vector<Object[]> getRolesByIds(Integer rids[]) throws Exception;
-    Integer[] getRoleIdsByUserId(Integer uid) throws Exception;
-    boolean insertUserHasRoles(Integer uid, Integer[] rids) throws Exception;
-    boolean deleteUserHasRoles(Integer uid, Integer[] rids) throws Exception;
-    boolean deleteUserHasRolesByUserId(Integer uid) throws Exception;
+public class RoleRepository extends Repository implements IRoleRepository {
+
+    protected Class getRelationalClass(){
+        return RoleRepositoryRelational.class;
+    }
+
+    protected Class getMongoClass(){
+        return RoleRepositoryMongo.class;
+    }
+
+    private IRoleRepository repo;
+
+    public RoleRepository() throws Exception {
+        repo = (IRoleRepository) createRepository(this);
+    }
+
+    public Role getRole(Integer rid) throws Exception {
+        return repo.getRole(rid);
+    }
+
+    public Role[] getRolesByUser(User user) throws Exception {
+        return repo.getRolesByUser(user);
+    }
+
+    public boolean setRolesToUser(User user, Role[] roles) throws Exception {
+        return repo.setRolesToUser(user, roles);
+    }
+
+    public boolean removeAllRolesFromUser(Integer uid) throws Exception {
+        return repo.removeAllRolesFromUser(uid);
+    }
 }

@@ -1,4 +1,6 @@
-package domain.model;
+package adapter.response.model;
+
+import domain.constraints.RoleObject;
 
 import javax.xml.bind.annotation.XmlAttribute;
 
@@ -13,15 +15,9 @@ public class RoleModel {
     @XmlAttribute(name = "page")
     protected String page;
 
-    public int getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPage() {
-        return page;
+    public RoleModel(RoleObject role){
+        id = role.getId();
+        name = role.getName();
+        page = role.getPage();
     }
 }

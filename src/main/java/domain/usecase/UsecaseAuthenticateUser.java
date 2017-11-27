@@ -1,30 +1,22 @@
 package domain.usecase;
 
-import domain.entity.User;
-import domain.entity.factory.UserFactory;
-
 import adapter.repository.UserRepository;
-import adapter.repository.RoleRepository;
+import domain.Helper;
+import domain.entity.User;
+
+import domain.constraints.repository.IUserRepository;
 
 public class UsecaseAuthenticateUser extends Usecase {
 
     public static final int RESULT_USER_AUTHENTICATED_SUCCESSFULLY = 1;
     public static final int RESULT_DID_NOT_AUTHENTICATE = 2;
 
-    // Factory
-    private UserFactory factory;
+    // Repos
+    private IUserRepository userRepository;
 
     // Input data
     private String username = null;
     private String password = null;
-
-    // Output data
-    private Integer refUserId = null;
-
-    // Getter & Setter
-    public String getUsername() {
-        return username;
-    }
 
     public void setUsername(String username) {
         if (username == null) {
@@ -34,31 +26,24 @@ public class UsecaseAuthenticateUser extends Usecase {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
     public void setPassword(String password) {
         if (password == null) {
             throw new IllegalArgumentException("password cannot be null");
         }
 
-        this.password = password;
+        this.password = Helper.SHA1(password);
     }
+
+    // Output data
+    private Integer refUserId = null;
 
     public Integer getRefUserId() {
         return refUserId;
     }
 
     // Constructor
-    public UsecaseAuthenticateUser(UserRepository userRepository, RoleRepository roleRepository) throws Exception {
-
-        factory = new UserFactory(userRepository, roleRepository);
-    }
-
-    public UsecaseAuthenticateUser(UserFactory factory) {
-
-        this.factory = factory;
+    public UsecaseAuthenticateUser(IUserRepository userRepository) throws Exception {
+        this.userRepository = userRepository;
     }
 
     // Business Logic
@@ -67,18 +52,19 @@ public class UsecaseAuthenticateUser extends Usecase {
         if (username == null) {
             throw new IllegalStateException("username not provided");
         }
-
-        if (password == null) {
+        else if (password == null) {
             throw new IllegalStateException("password not provided");
         }
+        else {
+            User user = userRepository.getUser(username, password);
 
-        User user = factory.create(username, password);
-
-        if (user != null) {
-            refUserId = user.getId();
-            return RESULT_USER_AUTHENTICATED_SUCCESSFULLY;
+            if (user != null) {
+                refUserId = user.getId();
+                return RESULT_USER_AUTHENTICATED_SUCCESSFULLY;
+            }
+            else {
+                return RESULT_DID_NOT_AUTHENTICATE;
+            }
         }
-
-        return RESULT_DID_NOT_AUTHENTICATE;
     }
 }

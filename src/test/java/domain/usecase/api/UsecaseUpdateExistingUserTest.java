@@ -3,94 +3,81 @@ package domain.usecase.api;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
+import domain.entity.Role;
 import org.junit.Test;
 
-import adapter.repository.RoleRepository;
-import adapter.repository.UserRepository;
+import domain.constraints.repository.IRoleRepository;
+import domain.constraints.repository.IUserRepository;
 
-import domain.Helper;
 import domain.entity.User;
 import domain.usecase.UsecaseTest;
 
 public class UsecaseUpdateExistingUserTest extends UsecaseTest {
 
-    protected UserRepository createMockedUserModelObject() throws Exception {
+    protected IUserRepository createMockedUserRepositoryObject() throws Exception {
 
-        UserRepository model = super.createMockedUserModelObject();
+        IUserRepository userRepo = super.createMockedUserRepositoryObject();
 
-        when(model.updateUser(1, "admin", Helper.SHA1("admin")))
+        when(userRepo.updateUser(admin))
         .thenReturn(true)
         .thenThrow(new Exception("Updating the same user twice"));
 
-        when(model.updateUser(2, "user1", Helper.SHA1("pass1")))
+        when(userRepo.updateUser(user2))
         .thenReturn(true)
         .thenThrow(new Exception("Updating the same user twice"));
 
-        when(model.updateUser(3, "user2", Helper.SHA1("pass2")))
-        .thenReturn(true)
-        .thenThrow(new Exception("Updating the same user twice"));
-
-        when(model.updateUser(4, "user3", Helper.SHA1("pass3")))
-        .thenThrow(new Exception("Attempting to update an inexistant user"));
-
-        when(model.updateUser(2, "admin", Helper.SHA1("admin")))
+        when(userRepo.updateUser(new User(2,"admin", "admin", new Integer[] { 1, 2, 3, 4 })))
         .thenThrow(new Exception("Probable constraint violation, attempting to update username to a value already in existance"));
 
-        when(model.updateUser(null, "user2", Helper.SHA1("pass2")))
-        .thenThrow(new Exception("Handling invalid update request to user model"));
+        when(userRepo.updateUser(new User(3,null, "pass2", new Integer[] { 1, 2 })))
+        .thenThrow(new Exception("Handling invalid update request to user repo"));
 
-        when(model.updateUser(3, null, Helper.SHA1("pass2")))
-        .thenThrow(new Exception("Handling invalid update request to user model"));
+        when(userRepo.updateUser(new User(3,"user2", "pass2", null)))
+        .thenThrow(new Exception("Handling invalid update request to user repo"));
 
-        when(model.updateUser(3, "user2", null))
-        .thenThrow(new Exception("Handling invalid update request to user model"));
-
-        return model;
+        return userRepo;
     }
 
-    protected RoleRepository createMockedRoleModelObject() throws Exception {
+    protected IRoleRepository createMockedRoleRepositoryObject() throws Exception {
 
-        RoleRepository model = super.createMockedRoleModelObject();
+        IRoleRepository roleRepo = super.createMockedRoleRepositoryObject();
 
-        when(model.insertUserHasRoles(3, new Integer[] { 1, 2 }))
-        .thenReturn(true)
+        when(roleRepo.setRolesToUser(user2, new Role[] { role3 })).thenReturn(true)
         .thenThrow(new Exception("Updating the roles twice to the same user"));
 
-        when(model.insertUserHasRoles(null, new Integer[] { 1, 2 }))
-        .thenThrow(new Exception("Handling invalid insert request to role model"));
+        when(roleRepo.setRolesToUser(null, new Role[] { role1 }))
+        .thenThrow(new Exception("Handling invalid insert request to role repo"));
 
-        when(model.insertUserHasRoles(3, null))
-        .thenThrow(new Exception("Handling invalid insert request to role model"));
+        when(roleRepo.setRolesToUser(user2, null))
+        .thenThrow(new Exception("Handling invalid insert request to role repo"));
 
-        when(model.insertUserHasRoles(4, new Integer[] { 4 }))
+        when(roleRepo.setRolesToUser(user3, new Role[] { role4 }))
         .thenThrow(new Exception("Inserting the roles to a user that does not exist"));
 
-        when(model.deleteUserHasRoles(3, new Integer[] { 3 })).thenReturn(true)
+        when(roleRepo.removeAllRolesFromUser(user2.getId()))
+        .thenReturn(true)
         .thenThrow(new Exception("Deleting the roles twice to the same user"));
 
-        when(model.deleteUserHasRoles(null, new Integer[] { 3 }))
-        .thenThrow(new Exception("Handling invalid delete request to role model"));
+        when(roleRepo.removeAllRolesFromUser(null))
+        .thenThrow(new Exception("Handling invalid delete request to role repo"));
 
-        when(model.deleteUserHasRoles(3, null))
-        .thenThrow(new Exception("Handling invalid delete request to role model"));
-
-        return model;
+        return roleRepo;
     }
 
     @Test
     public void testUpdateUser_Success() {
 
         try {
-            UserRepository userModel = createMockedUserModelObject();
-            RoleRepository roleModel = createMockedRoleModelObject();
+            IUserRepository userRepo = createMockedUserRepositoryObject();
+            IRoleRepository roleRepo = createMockedRoleRepositoryObject();
 
-            UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
+            UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userRepo, roleRepo);
             usecase.setAuthUserId(1);
             usecase.setRefUserId(3);
-            usecase.setUserData(new User(0, "user2", "pass2", new Integer[] { 1, 2 }));
+            usecase.setUserData(user2);
 
             assertEquals(UsecaseUpdateExistingUser.RESULT_USER_UPDATED_SUCCESSFULLY, usecase.execute());
-        } 
+        }
         catch (Exception e) {
             e.printStackTrace(System.out);
             fail(e.getMessage());
@@ -101,16 +88,16 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
     public void testUpdateUser_NotAuthorised() {
 
         try {
-            UserRepository userModel = createMockedUserModelObject();
-            RoleRepository roleModel = createMockedRoleModelObject();
+            IUserRepository userRepo = createMockedUserRepositoryObject();
+            IRoleRepository roleRepo = createMockedRoleRepositoryObject();
 
-            UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
+            UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userRepo, roleRepo);
             usecase.setAuthUserId(2);
             usecase.setRefUserId(3);
-            usecase.setUserData(new User(0, "user2", "pass2", new Integer[] { 3 }));
+            usecase.setUserData(user2);
 
             assertEquals(UsecaseUpdateExistingUser.RESULT_NOT_AUTHORISED, usecase.execute());
-        } 
+        }
         catch (Exception e) {
             e.printStackTrace(System.out);
             fail(e.getMessage());
@@ -121,16 +108,16 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
     public void testUpdateUser_UserDoesNotExist() {
 
         try {
-            UserRepository userModel = createMockedUserModelObject();
-            RoleRepository roleModel = createMockedRoleModelObject();
+            IUserRepository userRepo = createMockedUserRepositoryObject();
+            IRoleRepository roleRepo = createMockedRoleRepositoryObject();
 
-            UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
+            UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userRepo, roleRepo);
             usecase.setAuthUserId(1);
             usecase.setRefUserId(4);
-            usecase.setUserData(new User(0, "user3", "pass3", new Integer[] { 4 }));
+            usecase.setUserData(user3);
 
             assertEquals(UsecaseUpdateExistingUser.RESULT_USER_DOES_NOT_EXIST, usecase.execute());
-        } 
+        }
         catch (Exception e) {
             e.printStackTrace(System.out);
             fail(e.getMessage());
@@ -141,13 +128,13 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
     public void testUpdateUser_UsernameAlreadyTaken() {
 
         try {
-            UserRepository userModel = createMockedUserModelObject();
-            RoleRepository roleModel = createMockedRoleModelObject();
+            IUserRepository userRepo = createMockedUserRepositoryObject();
+            IRoleRepository roleRepo = createMockedRoleRepositoryObject();
 
-            UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
+            UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userRepo, roleRepo);
             usecase.setAuthUserId(1);
             usecase.setRefUserId(2);
-            usecase.setUserData(new User(0, "admin", "admin", new Integer[] { 1, 2, 3, 4 }));
+            usecase.setUserData(admin);
 
             assertEquals(UsecaseUpdateExistingUser.RESULT_USERNAME_ALREADY_TAKEN, usecase.execute());
         } 
@@ -161,12 +148,12 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
     public void testUpdateUser_BadInputData() {
 
         try {
-            UserRepository userModel = createMockedUserModelObject();
-            RoleRepository roleModel = createMockedRoleModelObject();
+            IUserRepository userRepo = createMockedUserRepositoryObject();
+            IRoleRepository roleRepo = createMockedRoleRepositoryObject();
 
             UsecaseUpdateExistingUser usecase;
 
-            usecase = new UsecaseUpdateExistingUser(userModel, roleModel);
+            usecase = new UsecaseUpdateExistingUser(userRepo, roleRepo);
 
             try {
                 usecase.setAuthUserId(null);
@@ -214,15 +201,15 @@ public class UsecaseUpdateExistingUserTest extends UsecaseTest {
                 assertEquals(e.getMessage(), "userData not provided");
             }
 
-            usecase.setUserData(new User(0, null, "pass2", new Integer[] { 1, 2 }));
+            usecase.setUserData(new User(3, null, "pass2", new Integer[] { 1, 2 }));
             assertEquals(UsecaseUpdateExistingUser.RESULT_BAD_INPUT_DATA, usecase.execute());
 
-            usecase.setUserData(new User(0, "user2", null, new Integer[] { 1, 2 }));
+            usecase.setUserData(new User(3, "user2", null, new Integer[] { 1, 2 }));
             assertEquals(UsecaseUpdateExistingUser.RESULT_BAD_INPUT_DATA, usecase.execute());
 
-            usecase.setUserData(new User(0, "user2", "pass2", null));
+            usecase.setUserData(new User(3, "user2", "pass2", null));
             assertEquals(UsecaseUpdateExistingUser.RESULT_BAD_INPUT_DATA, usecase.execute());
-        } 
+        }
         catch (Exception e) {
             e.printStackTrace(System.out);
             fail(e.getMessage());

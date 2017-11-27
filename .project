@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>Schibsted</name>
-	<comment>Project Schibsted created by Buildship.</comment>
+	<name>Microservice-POC</name>
+	<comment>Project Microservice-POC created by Buildship.</comment>
 	<projects>
 	</projects>
 	<buildSpec>

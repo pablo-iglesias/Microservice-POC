@@ -5,55 +5,55 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
-import adapter.repository.RoleRepository;
-import adapter.repository.UserRepository;
+import domain.constraints.repository.IRoleRepository;
+import domain.constraints.repository.IUserRepository;
 
 import domain.usecase.UsecaseTest;
 
 public class UsecaseDeleteOneUserTest extends UsecaseTest {
 
-    protected UserRepository createMockedUserModelObject() throws Exception {
+    protected IUserRepository createMockedUserRepositoryObject() throws Exception {
 
-        UserRepository model = super.createMockedUserModelObject();
+        IUserRepository userRepo = super.createMockedUserRepositoryObject();
 
-        when(model.deleteUser(3))
+        when(userRepo.deleteUser(3))
         .thenReturn(true)
         .thenThrow(new Exception("Deleting the same user twice"));
 
-        when(model.deleteUser(4))
-        .thenThrow(new Exception("Attempting to delete unexistant user"));
+        when(userRepo.deleteUser(4))
+        .thenThrow(new Exception("Attempting to delete nonexistent user"));
 
-        when(model.deleteUser(null))
-        .thenThrow(new Exception("Handling invalid delete request to user model"));
+        when(userRepo.deleteUser(null))
+        .thenThrow(new Exception("Handling invalid delete request to user repo"));
 
-        return model;
+        return userRepo;
     }
 
-    protected RoleRepository createMockedRoleModelObject() throws Exception {
+    protected IRoleRepository createMockedRoleRepositoryObject() throws Exception {
 
-        RoleRepository model = super.createMockedRoleModelObject();
+        IRoleRepository roleRepo = super.createMockedRoleRepositoryObject();
 
-        when(model.deleteUserHasRolesByUserId(3))
+        when(roleRepo.removeAllRolesFromUser(3))
         .thenReturn(true)
         .thenThrow(new Exception("Deleting roles to the same user twice"));
 
-        when(model.deleteUserHasRolesByUserId(4))
-        .thenThrow(new Exception("Attempting to delete roles to unexistant user"));
+        when(roleRepo.removeAllRolesFromUser(4))
+        .thenThrow(new Exception("Attempting to delete roles to nonexistent user"));
 
-        when(model.deleteUserHasRolesByUserId(null))
-        .thenThrow(new Exception("Handling invalid delete request to role model"));
+        when(roleRepo.removeAllRolesFromUser(null))
+        .thenThrow(new Exception("Handling invalid delete request to role repo"));
 
-        return model;
+        return roleRepo;
     }
 
     @Test
     public void testDeleteUser_Success() {
 
         try {
-            UserRepository userModel = createMockedUserModelObject();
-            RoleRepository roleModel = createMockedRoleModelObject();
+            IUserRepository userRepo = createMockedUserRepositoryObject();
+            IRoleRepository roleRepo = createMockedRoleRepositoryObject();
 
-            UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userModel, roleModel);
+            UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userRepo, roleRepo);
             usecase.setAuthUserId(1);
             usecase.setRefUserId(3);
 
@@ -69,10 +69,10 @@ public class UsecaseDeleteOneUserTest extends UsecaseTest {
     public void testDeleteUser_NotAuthorised() {
 
         try {
-            UserRepository userModel = createMockedUserModelObject();
-            RoleRepository roleModel = createMockedRoleModelObject();
+            IUserRepository userRepo = createMockedUserRepositoryObject();
+            IRoleRepository roleRepo = createMockedRoleRepositoryObject();
 
-            UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userModel, roleModel);
+            UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userRepo, roleRepo);
             usecase.setAuthUserId(2);
             usecase.setRefUserId(3);
 
@@ -88,10 +88,10 @@ public class UsecaseDeleteOneUserTest extends UsecaseTest {
     public void testDeleteUser_UserDoesNotExist() {
 
         try {
-            UserRepository userModel = createMockedUserModelObject();
-            RoleRepository roleModel = createMockedRoleModelObject();
+            IUserRepository userRepo = createMockedUserRepositoryObject();
+            IRoleRepository roleRepo = createMockedRoleRepositoryObject();
 
-            UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userModel, roleModel);
+            UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userRepo, roleRepo);
             usecase.setAuthUserId(1);
             usecase.setRefUserId(4);
 
@@ -107,12 +107,12 @@ public class UsecaseDeleteOneUserTest extends UsecaseTest {
     public void testDeleteUser_BadInputData() {
 
         try {
-            UserRepository userModel = createMockedUserModelObject();
-            RoleRepository roleModel = createMockedRoleModelObject();
+            IUserRepository userRepo = createMockedUserRepositoryObject();
+            IRoleRepository roleRepo = createMockedRoleRepositoryObject();
 
             UsecaseDeleteOneUser usecase;
 
-            usecase = new UsecaseDeleteOneUser(userModel, roleModel);
+            usecase = new UsecaseDeleteOneUser(userRepo, roleRepo);
 
             try {
                 usecase.setAuthUserId(null);

@@ -1,19 +1,21 @@
-package adapter.response.api;
+package adapter.response.model.api;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import domain.model.RoleModel;
-import domain.model.UserModel;
+import adapter.response.model.RoleModel;
+import adapter.response.model.UserModel;
+import domain.constraints.RoleObject;
+import domain.constraints.UserObject;
 
 @XmlRootElement(name = "ApiResponse")
 public class ApiResponseUserResource extends ApiResponse {
 
     public String getXml() throws Exception {
 
-        return ApiResponse.getXml(this);
+        return getXml(this);
     }
 
     @XmlElement(name = "user")
@@ -28,9 +30,14 @@ public class ApiResponseUserResource extends ApiResponse {
         roles = null;
     }
 
-    public ApiResponseUserResource(UserModel user, RoleModel[] roles) {
-        this.setUser(user);
-        this.setRoles(roles);
+    public ApiResponseUserResource(UserObject user, RoleObject[] roles) {
+
+        this.user = new UserModel(user);
+        this.roles = new RoleModel[roles.length];
+
+        for(int i = 0; i < roles.length; i++){
+            this.roles[i] = new RoleModel(roles[i]);
+        }
     }
 
     @XmlTransient
@@ -50,5 +57,4 @@ public class ApiResponseUserResource extends ApiResponse {
     public void setRoles(RoleModel[] roles) {
         this.roles = roles;
     }
-
 }

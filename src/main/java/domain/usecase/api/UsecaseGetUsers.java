@@ -1,73 +1,65 @@
 package domain.usecase.api;
 
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
-import domain.model.RoleModel;
-import domain.model.UserModel;
+import domain.constraints.repository.IRoleRepository;
+import domain.constraints.repository.IUserRepository;
+import domain.service.UserService;
 import domain.usecase.Usecase;
 
 import domain.entity.Role;
 import domain.entity.User;
 
-import adapter.repository.RoleRepository;
-import adapter.repository.UserRepository;
-
-import domain.entity.factory.RoleFactory;
-import domain.entity.factory.UserFactory;
+import domain.constraints.RoleObject;
+import domain.constraints.UserObject;
 
 public class UsecaseGetUsers extends Usecase {
 
     public static final int RESULT_USERS_RETRIEVED_SUCCESSFULLY = 1;
     public static final int RESULT_NO_USERS_FOUND = 2;
 
-    // Factory
-    private UserFactory userFactory;
-    private RoleFactory roleFactory;
+    private UserService service;
+    private IRoleRepository roleRepository;
 
     // Output data
     private User[] users = null;
     private Role[] roles = null;
 
     // Getter & Setter
-    public UserModel[] getUsers() {
+    public UserObject[] getUsers() {
         return users;
     }
 
-    public RoleModel[] getRoles() {
+    public RoleObject[] getRoles() {
         return roles;
     }
 
     // Constructor
-    public UsecaseGetUsers(UserRepository userRepository, RoleRepository roleRepository) throws Exception {
-        userFactory = new UserFactory(userRepository, roleRepository);
-        roleFactory = new RoleFactory(roleRepository);
-    }
-
-    public UsecaseGetUsers(UserFactory userFactory, RoleFactory roleFactory) {
-        this.userFactory = userFactory;
-        this.roleFactory = roleFactory;
+    public UsecaseGetUsers(IUserRepository userRepository, IRoleRepository roleRepository) throws Exception {
+        this.roleRepository = roleRepository;
+        service = new UserService(userRepository, roleRepository);
     }
 
     // Business Logic
     public int execute() throws Exception {
 
-        users = userFactory.create();
+        users = service.getAllUsers();
 
         if (users != null) {
 
-            Vector<Integer> rolesVector = new Vector<Integer>();
-
+            List<Role> roles = new ArrayList<>();
             for (User user : users) {
-                for (int role : user.getRoles()) {
-                    if (!rolesVector.contains(role)) {
-                        rolesVector.add(role);
+                Role[] userRoles = roleRepository.getRolesByUser(user);
+                if(userRoles != null) {
+                    for (Role role : userRoles) {
+                        if (!roles.contains(role))
+                            roles.add(role);
                     }
                 }
             }
 
-            Integer[] rolesArray = (Integer[]) rolesVector.toArray(new Integer[0]);
-
-            roles = roleFactory.createByIds(rolesArray);
+            this.roles = roles.stream().toArray(size -> new Role[size]);
 
             return RESULT_USERS_RETRIEVED_SUCCESSFULLY;
         }

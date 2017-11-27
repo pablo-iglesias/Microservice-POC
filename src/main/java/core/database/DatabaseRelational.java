@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Vector;
+import java.util.List;
 
 public abstract class DatabaseRelational extends Database {
 
@@ -28,9 +28,9 @@ public abstract class DatabaseRelational extends Database {
             Statement stmt = conn.createStatement();
 
             // Get all the statements of the SQL dump line by line
-            Vector<String> vector = Helper.vector(dump, "([^;]+;)");
+            List<String> list = Helper.list(dump, "([^;]+;)");
 
-            for (String sql : vector) {
+            for (String sql : list) {
                 stmt.execute(sql);
             }
 
@@ -51,6 +51,7 @@ public abstract class DatabaseRelational extends Database {
         try {
             pstmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             pointer = 1;
+            rs = null;
             return true;
         } catch (Exception e) {
             System.out.println(e.getMessage());

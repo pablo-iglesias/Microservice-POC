@@ -2,13 +2,12 @@ package domain.usecase.api;
 
 import static org.junit.Assert.*;
 
+import domain.constraints.repository.IRoleRepository;
+import domain.constraints.repository.IUserRepository;
+import domain.entity.User;
 import org.junit.Test;
 
 import domain.entity.Role;
-import domain.entity.User;
-
-import domain.entity.factory.RoleFactory;
-import domain.entity.factory.UserFactory;
 
 import domain.usecase.UsecaseTest;
 
@@ -19,21 +18,21 @@ public class UsecaseGetOneUserTest extends UsecaseTest {
 
         try {
 
-            UserFactory userFactory = createMockedUserFactoryObject();
-            RoleFactory roleFactory = createMockedRoleFactoryObject();
+            IUserRepository userRepository = createMockedUserRepositoryObject();
+            IRoleRepository roleRepository = createMockedRoleRepositoryObject();
 
-            UsecaseGetOneUser usecase = new UsecaseGetOneUser(userFactory, roleFactory);
+            UsecaseGetOneUser usecase = new UsecaseGetOneUser(userRepository, roleRepository);
             usecase.setRefUserId(1);
 
             assertEquals(UsecaseGetOneUser.RESULT_USER_RETRIEVED_SUCCESSFULLY, usecase.execute());
 
-            assertEquals(new User(1, "admin", new Integer[] { 1, 2, 3, 4 }), usecase.getUser());
+            assertEquals(admin, usecase.getUser());
 
-            assertEquals(new Role(1, "ADMIN", ""), usecase.getRoles()[0]);
-            assertEquals(new Role(2, "PAGE_1", "page_1"), usecase.getRoles()[1]);
-            assertEquals(new Role(3, "PAGE_2", "page_2"), usecase.getRoles()[2]);
-            assertEquals(new Role(4, "PAGE_3", "page_3"), usecase.getRoles()[3]);
-        } 
+            assertEquals(role1, usecase.getRoles()[0]);
+            assertEquals(role2, usecase.getRoles()[1]);
+            assertEquals(role3, usecase.getRoles()[2]);
+            assertEquals(role4, usecase.getRoles()[3]);
+        }
         catch (Exception e) {
             e.printStackTrace(System.out);
             fail(e.getMessage());
@@ -45,10 +44,10 @@ public class UsecaseGetOneUserTest extends UsecaseTest {
 
         try {
 
-            UserFactory userFactory = createMockedUserFactoryObject();
-            RoleFactory roleFactory = createMockedRoleFactoryObject();
+            IUserRepository userRepository = createMockedUserRepositoryObject();
+            IRoleRepository roleRepository = createMockedRoleRepositoryObject();
 
-            UsecaseGetOneUser usecase = new UsecaseGetOneUser(userFactory, roleFactory);
+            UsecaseGetOneUser usecase = new UsecaseGetOneUser(userRepository, roleRepository);
             usecase.setRefUserId(4);
 
             assertEquals(UsecaseGetOneUser.RESULT_USER_NOT_FOUND, usecase.execute());

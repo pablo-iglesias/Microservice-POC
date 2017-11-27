@@ -1,23 +1,22 @@
 package adapter.repository.nosql;
 
-import adapter.repository.Repository;
-import adapter.repository.RoleRepository;
+import domain.constraints.repository.IRoleRepository;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 import core.Server;
 import core.database.DatabaseMongoDB;
+import domain.entity.Role;
+import domain.entity.User;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Arrays;
-import java.util.Vector;
 
 /**
  * Role repo that expects the database to be MongoDB
  * 
  * @author Peibol
  */
-public class RoleRepositoryMongo extends Repository implements RoleRepository {
+public class RoleRepositoryMongo implements IRoleRepository {
 
     private DatabaseMongoDB db;
 
@@ -26,66 +25,70 @@ public class RoleRepositoryMongo extends Repository implements RoleRepository {
     }
 
     /**
-     * Takes a user id and returns the ids of the roles assigned to it
+     * Get roles by ids
      */
-    public Vector<Object[]> getRolesByIds(Integer rids[]) {
+    public Role getRole(Integer rid) throws Exception {
 
-        if(db.retrieveDocuments("roles", Filters.in("id", Arrays.asList(rids)))){
-            Vector<Object[]> roles = new Vector<>();
-            while (db.next()) {
-                roles.add(new Object[] {
-                    db.getInt("id"),
-                    db.getString("name"),
-                    db.getString("page")
-                });
+        if(db.retrieveDocument("roles", Filters.eq("id", rid))) {
+            return new Role(
+                db.getInt("id"),
+                db.getString("name"),
+                db.getString("page")
+            );
+        }
+
+        return null;
+    }
+
+    /**
+     * Get roles by user id
+     */
+    public Role[] getRolesByUser(User user) throws Exception {
+
+        if(db.retrieveDocument("users", Filters.eq("id", user.getId())))
+        {
+            Integer[] roleIds = db.getArray("roles")
+                .stream().toArray(size -> new Integer[size]);
+
+            if(db.retrieveDocuments("roles", Filters.in("id", roleIds))) {
+                List<Role> roles = new ArrayList<>();
+                while(db.next()) {
+                    roles.add(
+                        new Role(
+                            db.getInt("id"),
+                            db.getString("name"),
+                            db.getString("page")
+                        )
+                    );
+                }
             }
-            return roles;
         }
-        else {
-            return null;
-        }
+
+        return new Role[]{};
     }
 
     /**
-     * Takes a user id and returns the ids of the roles assigned to it
+     * Add roles to the user upon user creation, not needed in MongoDB
      */
-    public Integer[] getRoleIdsByUserId(Integer uid) {
-
-        if(db.retrieveDocument("users", Filters.eq("id", uid))){
-            List<Object> roles = db.getArray("roles");
-            Object[] roleObjects = roles.toArray();
-            return Arrays.copyOf(roleObjects, roleObjects.length, Integer[].class);
-        }
-
-        return new Integer[]{};
+    public boolean setupUserRoles(User user, Role[] roles) {
+        return true;
     }
 
     /**
-     * Insert rows in the table user_has_role
+     * Add roles to the user
      */
-    public boolean insertUserHasRoles(Integer uid, Integer[] rids) {
+    public boolean setRolesToUser(User user, Role[] roles) {
 
         return db.updateDocument("users",
-            Filters.eq("id", uid),
-            Updates.addEachToSet("roles", Arrays.asList(rids))
+            Filters.eq("id", user.getId()),
+            Updates.set("roles", roles)
         );
     }
 
     /**
-     * Delete rows from the table user_has_roles
+     * Remove all roles from user
      */
-    public boolean deleteUserHasRoles(Integer uid, Integer[] rids) {
-
-        return db.updateDocument("users",
-                Filters.eq("id", uid),
-                Updates.pullAll("roles", Arrays.asList(rids))
-        );
-    }
-
-    /**
-     * Delete rows from the table user_has_roles
-     */
-    public boolean deleteUserHasRolesByUserId(Integer uid) {
+    public boolean removeAllRolesFromUser(Integer uid) {
 
         return db.updateDocument("users",
             Filters.eq("id", uid),

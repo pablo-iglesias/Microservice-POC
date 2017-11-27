@@ -1,37 +1,22 @@
 package domain.usecase.application;
 
+import domain.service.UserService;
 import domain.usecase.Usecase;
 
-import domain.entity.Role;
-import domain.entity.User;
-
-import adapter.repository.RoleRepository;
-import adapter.repository.UserRepository;
-
-import domain.entity.factory.RoleFactory;
-import domain.entity.factory.UserFactory;
+import domain.constraints.repository.IRoleRepository;
+import domain.constraints.repository.IUserRepository;
 
 public class UsecasePage extends Usecase {
 
     public static final int RESULT_PAGE_RETRIEVED_SUCCESSFULLY = 1;
     public static final int RESULT_PAGE_NOT_ALLOWED = 2;
-    public static final int RESULT_PAGE_NOT_FOUND = 3;
 
-    // Factory
-    private UserFactory userFactory;
-    private RoleFactory roleFactory;
+    private IUserRepository userRepository;
+    private UserService service;
 
     // Input data
     private Integer refUserId = 0;
     private Integer page = 0;
-
-    // Output data
-    private String username = null;
-
-    // Getter & Setter
-    public int getRefUserId() {
-        return refUserId;
-    }
 
     public void setRefUserId(Integer refUserId) {
         if (refUserId == null) {
@@ -39,10 +24,6 @@ public class UsecasePage extends Usecase {
         }
 
         this.refUserId = refUserId;
-    }
-
-    public Integer getPage() {
-        return page;
     }
 
     public void setPage(Integer page) {
@@ -53,19 +34,17 @@ public class UsecasePage extends Usecase {
         this.page = page;
     }
 
+    // Output data
+    private String username = null;
+
     public String getUsername() {
         return username;
     }
 
     // Constructor
-    public UsecasePage(UserRepository userRepository, RoleRepository roleRepository) throws Exception {
-        userFactory = new UserFactory(userRepository, roleRepository);
-        roleFactory = new RoleFactory(roleRepository);
-    }
-
-    public UsecasePage(UserFactory userFactory, RoleFactory roleFactory) {
-        this.userFactory = userFactory;
-        this.roleFactory = roleFactory;
+    public UsecasePage(IUserRepository userRepository, IRoleRepository roleRepository) throws Exception {
+        this.userRepository = userRepository;
+        service = new UserService(userRepository, roleRepository);
     }
 
     // Business Logic
@@ -74,33 +53,15 @@ public class UsecasePage extends Usecase {
         if (refUserId == null) {
             throw new IllegalStateException("refUserId not provided");
         }
-
-        if (page == null) {
+        else if (page == null) {
             throw new IllegalStateException("page not provided");
         }
-
-        User user = userFactory.create(refUserId);
-
-        if (user != null) {
-            username = user.getUsername();
-
-            Role[] roles = roleFactory.createByIds(user.getRoles());
-
-            boolean allowed = false;
-            for (Role role : roles) {
-                if (role.getPage() != null && role.getPage().matches("page_" + page)) {
-                    allowed = true;
-                }
-            }
-
-            if(allowed) {
-                return RESULT_PAGE_RETRIEVED_SUCCESSFULLY;
-            }
-            else{
-                return RESULT_PAGE_NOT_ALLOWED;
-            }
+        else if (service.isUserAllowedIntoPage(refUserId, page)) {
+            username = service.getUserNameByUserId(refUserId);
+            return RESULT_PAGE_RETRIEVED_SUCCESSFULLY;
         }
-
-        return RESULT_PAGE_NOT_FOUND;
+        else{
+            return RESULT_PAGE_NOT_ALLOWED;
+        }
     }
 }

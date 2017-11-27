@@ -15,7 +15,7 @@ import com.sun.net.httpserver.HttpHandler;
 
 import adapter.controller.api.ApiController;
 import adapter.controller.application.ApplicationController;
-import adapter.response.application.ApplicationResponse;
+import adapter.response.model.application.ApplicationResponse;
 
 import core.entity.Cookie;
 import core.entity.HttpRequest;
@@ -71,16 +71,16 @@ public class RequestHandler implements HttpHandler {
 
                         switch (controllerName) {
                             case "Application":
-    
+
                                 // Parse Cookie and identify Session
                                 Cookie cookie = retrieveHttpCookie(exchange);
                                 Session session = retrieveHttpSession(cookie);
-    
+
                                 // Session loss check
                                 if (session != null && session.isExpired()) {
                                     Server.removeSession(session.getSessionToken());
                                 }
-    
+
                                 // Identify appropriate controller and method
                                 controller = ApplicationController.class;
                                 method = controller.getMethod(methodName, new Class[] { HttpRequest.class, Session.class });
@@ -92,21 +92,21 @@ public class RequestHandler implements HttpHandler {
                                 // Send HTTP response
                                 propagateSession(exchange, appResponse, session);
                                 dispatchHttpResponse(exchange, createHttpResponse(exchange, appResponse));
-    
+
                                 return;
-    
+
                             case "Api":
-    
+
                                 // Identify appropriate controller and method
                                 controller = ApiController.class;
                                 method = controller.getMethod(methodName, new Class[] { HttpRequest.class });
-    
+
                                 // Run controller
                                 HttpResponse apiResponse = (HttpResponse) method.invoke(null, request);
-    
+
                                 // Send HTTP response
                                 dispatchHttpResponse(exchange, apiResponse);
-    
+
                                 return;
                             default:
                                 throw new Exception("Unknown controller " + controllerName);
@@ -114,7 +114,7 @@ public class RequestHandler implements HttpHandler {
                     }
                 }
                 respondResourceNotFound(exchange);
-            } 
+            }
             catch (Exception e) {
                 e.printStackTrace(System.out);
                 switch (controllerName) {
@@ -126,7 +126,7 @@ public class RequestHandler implements HttpHandler {
                         respondInternalServerError(exchange, false);
                 }
             }
-        } 
+        }
         catch (IOException e) {
             e.printStackTrace(System.out);
         }
@@ -156,8 +156,7 @@ public class RequestHandler implements HttpHandler {
     private Cookie retrieveHttpCookie(HttpExchange exchange) {
 
         CookieFactory factory = new CookieFactory();
-        Cookie cookie = factory.create(exchange);
-        return cookie;
+        return factory.create(exchange);
     }
 
     /**

@@ -43,6 +43,7 @@ Development never ends
 1.  Extend unit tests to cover Domain Factories
 2.  Extend unit tests to cover Controllers and Models
 3.  Implement reactive programming where possible
-4.  Have the REST API to honor JSON API specification ([jsonapi.org](http://jsonapi.org/))
-5.  Add localization support for application templates and REST API error messages
-6.  Add by language content negotiation
+4.  Convert Page to an entity, promote relation with Role from 1:1 to 1:n
+5.  Have the REST API to honor JSON API specification ([jsonapi.org](http://jsonapi.org/))
+6.  Add localization support for application templates and REST API error messages
+7.  Add by language content negotiation

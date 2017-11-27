@@ -1,21 +1,18 @@
 package adapter.controller.application;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 
+import adapter.repository.RoleRepository;
+import adapter.repository.UserRepository;
 import core.Server;
 import core.entity.HttpRequest;
 import core.entity.Session;
 
 import adapter.controller.Controller;
 
-import adapter.repository.factory.RepositoryFactory;
-import adapter.response.application.ApplicationResponse;
-
-import domain.model.RoleModel;
-
-import adapter.repository.RoleRepository;
-import adapter.repository.UserRepository;
+import adapter.response.model.application.ApplicationResponse;
 
 import domain.usecase.application.UsecasePage;
 import domain.usecase.application.UsecaseWelcome;
@@ -45,7 +42,7 @@ public class ApplicationController extends Controller {
         if (request.get("query") != null && !request.get("query").equals("")) {
             Map<String, String> segments = parseQueryString(request.get("query"));
             if (segments.containsKey("page")) {
-                Map<String, Object> data = new HashMap<String, Object>();
+                Map<String, Object> data = new HashMap<>();
                 data.put("page", segments.get("page"));
                 return new ApplicationResponse()
                     .setResponseCode(ApplicationResponse.RESPONSE_OK)
@@ -79,14 +76,10 @@ public class ApplicationController extends Controller {
                 Integer refUserId = authenticate(params.get("username"), params.get("password"));
 
                 if (refUserId != null) {
-                    session = Server.createSession(refUserId.intValue());
+                    session = Server.createSession(refUserId);
 
                     if (params.containsKey("page")) {
-                        RepositoryFactory factory = new RepositoryFactory();
-                        UserRepository userRepository = (UserRepository) factory.create("User");
-                        RoleRepository roleRepository = (RoleRepository) factory.create("Role");
-
-                        UsecasePage usecasePage = new UsecasePage(userRepository, roleRepository);
+                        UsecasePage usecasePage = new UsecasePage(new UserRepository(), new RoleRepository());
                         usecasePage.setRefUserId(refUserId);
                         usecasePage.setPage(params.get("page") == null ? null : Integer.parseInt(params.get("page")));
 
@@ -99,7 +92,6 @@ public class ApplicationController extends Controller {
                                     .setSession(session);
 
                             case UsecasePage.RESULT_PAGE_NOT_ALLOWED:
-                            case UsecasePage.RESULT_PAGE_NOT_FOUND:
                             default:
                                 break;
                         }
@@ -156,26 +148,19 @@ public class ApplicationController extends Controller {
 
         if (session != null)
         {
-            RepositoryFactory factory = new RepositoryFactory();
-            UserRepository userRepository = (UserRepository) factory.create("User");
-            RoleRepository roleRepository = (RoleRepository) factory.create("Role");
-
-            UsecaseWelcome usecase = new UsecaseWelcome(userRepository, roleRepository);
+            UsecaseWelcome usecase = new UsecaseWelcome(new UserRepository(), new RoleRepository());
             usecase.setRefUserId(session.getUserId());
 
             switch(usecase.execute())
             {
                 case UsecaseWelcome.RESULT_USER_RETRIEVED_SUCCESSFULLY:
 
-                    Map<String, Object> data = new HashMap<String, Object>();
+                    Map<String, Object> data = new HashMap<>();
                     data.put("user_name", usecase.getUsername());
 
                     if (usecase.getRoles() != null) {
-                        Map<String, String> roles = new HashMap<String, String>();
-                        for (RoleModel role : usecase.getRoles()) {
-                            roles.put(role.getName(), role.getPage());
-                        }
-
+                        Map<String, String> roles = new HashMap<>();
+                        Arrays.stream(usecase.getRoles()).forEach((role)-> roles.put(role.getName(), role.getPage()));
                         data.put("roles", roles);
                     }
 
@@ -210,18 +195,14 @@ public class ApplicationController extends Controller {
 
         if (session != null && request.contains("page")) {
 
-            RepositoryFactory factory = new RepositoryFactory();
-            UserRepository userRepository = (UserRepository) factory.create("User");
-            RoleRepository roleRepository = (RoleRepository) factory.create("Role");
-
-            UsecasePage usecase = new UsecasePage(userRepository, roleRepository);
+            UsecasePage usecase = new UsecasePage(new UserRepository(), new RoleRepository());
             usecase.setRefUserId(session.getUserId());
             usecase.setPage(request.get("page") == null ? null : Integer.parseInt(request.get("page")));
 
             switch(usecase.execute())
             {
                 case UsecasePage.RESULT_PAGE_RETRIEVED_SUCCESSFULLY:
-                    Map<String, Object> data = new HashMap<String, Object>();
+                    Map<String, Object> data = new HashMap<>();
                     data.put("page", request.get("page"));
                     data.put("user_name", usecase.getUsername());
                     return new ApplicationResponse()
@@ -230,7 +211,6 @@ public class ApplicationController extends Controller {
                         .setData(data);
 
                 case UsecasePage.RESULT_PAGE_NOT_ALLOWED:
-                case UsecasePage.RESULT_PAGE_NOT_FOUND:
                 default:
                     return new ApplicationResponse().setResponseCode(ApplicationResponse.RESPONSE_DENIED);
 

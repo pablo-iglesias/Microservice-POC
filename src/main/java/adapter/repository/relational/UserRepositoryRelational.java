@@ -1,19 +1,22 @@
 package adapter.repository.relational;
 
 import java.sql.SQLException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import core.Server;
 import core.database.DatabaseRelational;
-import adapter.repository.Repository;
-import adapter.repository.UserRepository;
+
+import domain.entity.User;
+import domain.constraints.repository.IUserRepository;
 
 /**
  * User repo that expects the database to be relational and SQL driven
  * 
  * @author Peibol
  */
-public class UserRepositoryRelational extends Repository implements UserRepository {
+public class UserRepositoryRelational implements IUserRepository {
 
     private DatabaseRelational db;
 
@@ -21,130 +24,83 @@ public class UserRepositoryRelational extends Repository implements UserReposito
         db = (DatabaseRelational) Server.getDatabase();
     }
 
-    public Vector<Object[]> getUsers() throws SQLException {
+    /**
+     * Get all users
+     */
+    public User[] getAllUsers() throws SQLException {
+
         db.prepare("SELECT user_id, user_name FROM users");
 
         if (db.select()) {
-            Vector<Object[]> users = new Vector<Object[]>();
+            List<User> users = new ArrayList<>();
             while (db.next()) {
-                users.add(new Object[] { db.getInt("user_id"), db.getString("user_name") });
+                Integer uid = db.getInt("user_id");
+                String username = db.getString("user_name");
+                users.add(new User(uid, username, selectUserRoles(uid)));
             }
-            return users;
+            return Arrays.copyOf(users.toArray(), users.size(), User[].class);
         } else {
             return null;
         }
     }
 
     /**
-     * Takes user id and returns the user name
-     * 
-     * @return
-     * @throws SQLException
+     * Get user
      */
-    public String selectUsernameByUserId(Integer uid) throws SQLException {
+    public User getUser(Integer uid) throws SQLException {
 
         db.prepare("SELECT user_name FROM users WHERE user_id = ?");
         db.add(uid);
 
         if (db.selectOne()) {
-            return db.getString("user_name");
+            String username = db.getString("user_name");
+            return new User(uid, username, selectUserRoles(uid));
         } else {
             return null;
         }
     }
 
     /**
-     * Returns true if a user with this username already exists
-     * 
+     * Get user
      */
-    public boolean selectUserExistsByUseraname(String username) throws Exception {
+    public User getUser(String username) throws SQLException {
 
-        db.prepare("SELECT 1 FROM users WHERE user_name = ?");
+        db.prepare("SELECT user_id FROM users WHERE user_name = ?");
         db.add(username);
 
         if (db.selectOne()) {
-            return true;
+            Integer uid = db.getInt("user_id");
+            return new User(uid, username, selectUserRoles(uid));
         } else {
-            return false;
+            return null;
         }
     }
 
     /**
-     * Takes user name and hashed user password and returns the corresponding
-     * user id, used for authentication
-     * 
-     * @return
-     * @throws SQLException
+     * Get user
      */
-    public Integer selectUserIdByUseranameAndPassword(String username, String password) throws SQLException {
+    public User getUser(String username, String password) throws SQLException {
 
         db.prepare("SELECT user_id FROM users WHERE user_name = ? AND user_password = ?");
         db.add(username);
         db.add(password);
 
         if (db.selectOne()) {
-            return new Integer(db.getInt("user_id"));
+            Integer uid = db.getInt("user_id");
+            return new User(uid, username, selectUserRoles(uid));
         } else {
             return null;
-        }
-    }
-
-    /**
-     * Takes user name and returns the corresponding user id, used for checking
-     * if the username is already taken
-     * 
-     */
-    public Integer selectUserIdByUseraname(String username) throws Exception {
-
-        db.prepare("SELECT user_id FROM users WHERE user_name = ?");
-        db.add(username);
-
-        if (db.selectOne()) {
-            return new Integer(db.getInt("user_id"));
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Return true if the user has the ADMIN role
-     * 
-     */
-    public boolean selectUserIsAdminRole(Integer uid) throws SQLException {
-        db.prepare(
-                "SELECT 1 FROM roles JOIN user_has_role ON role_id = fk_role_id JOIN users ON fk_user_id = user_id WHERE user_id = ? AND role_name = 'ADMIN'");
-        db.add(uid);
-
-        if (db.selectOne()) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Return true if a user with this id already exists
-     * 
-     */
-    public boolean selectUserExists(Integer uid) throws SQLException {
-        db.prepare("SELECT 1 FROM users WHERE user_id = ?");
-        db.add(uid);
-
-        if (db.selectOne()) {
-            return true;
-        } else {
-            return false;
         }
     }
 
     /**
      * Inserts new user
      */
-    public Integer insertUser(String username, String password) throws SQLException {
+    public Integer insertUser(User user) throws SQLException {
 
         db.prepare("INSERT INTO users(user_name, user_password) VALUES(?, ?)");
-        db.add(username);
-        db.add(password);
+        db.add(user.getUsername());
+        db.add(user.getPassword());
 
         return db.insert();
     }
@@ -152,12 +108,12 @@ public class UserRepositoryRelational extends Repository implements UserReposito
     /**
      * Updates existing user
      */
-    public boolean updateUser(Integer uid, String username, String password) throws SQLException {
+    public boolean updateUser(User user) throws SQLException {
 
         db.prepare("UPDATE users SET user_name = ?, user_password = ? WHERE user_id = ?");
-        db.add(username);
-        db.add(password);
-        db.add(uid);
+        db.add(user.getUsername());
+        db.add(user.getPassword());
+        db.add(user.getId());
 
         return db.update();
     }
@@ -171,5 +127,22 @@ public class UserRepositoryRelational extends Repository implements UserReposito
         db.add(uid);
 
         return db.delete();
+    }
+
+    private Integer[] selectUserRoles(Integer uid) throws SQLException{
+
+        DatabaseRelational db = (DatabaseRelational) Server.getDatabase();
+        db.prepare("SELECT fk_role_id FROM user_has_role WHERE fk_user_id = ? ORDER BY fk_role_id ASC");
+        db.add(uid);
+
+        List<Integer> roles = new ArrayList<>();
+
+        if (db.select()) {
+            while (db.next()) {
+                roles.add(db.getInt("fk_role_id"));
+            }
+        }
+
+        return Arrays.copyOf(roles.toArray(), roles.size(), Integer[].class);
     }
 }

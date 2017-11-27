@@ -78,7 +78,7 @@
 		*   User and Role factories
 			*   These factories handle entity initialization logic that is common to most usecases
 *   Unit tests
-	*   Unit tests are currently covering the usecases
-	*   Each usecase class has a test class that cover all possible usages of this usecase
-	*   User and Role factories and models are mocked by this test classes
-	*   Test classes are built with **JUnit** and **Mockito** libraries
+	*   Unit tests are currently covering only the usecase classes, inside of the domain package
+	*   Each usecase class, build with **JUnit**, has a test class that covers all possible flows
+	*   For the sake of testing, usecases an services are designed to support dependency injection
+	*   Iversion of control is leveraged in test time, User and Role repositories are mocked with **Mockito** library

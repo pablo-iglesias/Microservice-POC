@@ -1,4 +1,4 @@
-package adapter.response.api;
+package adapter.response.model.api;
 
 import java.io.StringWriter;
 

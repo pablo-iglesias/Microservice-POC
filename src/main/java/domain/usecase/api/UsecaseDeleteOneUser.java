@@ -1,9 +1,10 @@
 package domain.usecase.api;
 
+import domain.service.UserService;
 import domain.usecase.Usecase;
 
-import adapter.repository.RoleRepository;
-import adapter.repository.UserRepository;
+import domain.constraints.repository.IRoleRepository;
+import domain.constraints.repository.IUserRepository;
 
 public class UsecaseDeleteOneUser extends Usecase{
 
@@ -12,17 +13,11 @@ public class UsecaseDeleteOneUser extends Usecase{
     public static final int RESULT_USER_DOES_NOT_EXIST = 3;
     public static final int RESULT_USER_NOT_DELETED = 4;
 
-    private UserRepository userRepository;
-    private RoleRepository roleRepository;
+    private UserService service;
 
     // Input data
     private Integer authUserId = null;
     private Integer refUserId = null;
-
-    // Getter & Setter
-    public Integer getAuthUserId() {
-        return authUserId;
-    }
 
     public void setAuthUserId(Integer authUserId) {
         if (authUserId == null) {
@@ -30,10 +25,6 @@ public class UsecaseDeleteOneUser extends Usecase{
         }
 
         this.authUserId = authUserId;
-    }
-
-    public Integer getRefUserId() {
-        return refUserId;
     }
 
     public void setRefUserId(Integer refUserId) {
@@ -45,9 +36,8 @@ public class UsecaseDeleteOneUser extends Usecase{
     }
 
     // Constructor
-    public UsecaseDeleteOneUser(UserRepository userRepository, RoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
+    public UsecaseDeleteOneUser(IUserRepository userRepository, IRoleRepository roleRepository) {
+        service = new UserService(userRepository, roleRepository);
     }
 
     // Business Logic
@@ -56,26 +46,20 @@ public class UsecaseDeleteOneUser extends Usecase{
         if(authUserId == null){
             throw new IllegalStateException("authUserId not provided");
         }
-
-        if(refUserId == null){
+        else if(refUserId == null){
             throw new IllegalStateException("refUserId not provided");
         }
-
-        if (userRepository.selectUserIsAdminRole(authUserId)) {
-            if (userRepository.selectUserExists(refUserId)) {
-                if (userRepository.deleteUser(refUserId)) {
-                    if (!roleRepository.deleteUserHasRolesByUserId(refUserId)) {
-                        return RESULT_USER_NOT_DELETED;
-                    }
-                }
-
-                return RESULT_USER_DELETED_SUCCESSFULLY;
-
-            } else {
-                return RESULT_USER_DOES_NOT_EXIST;
-            }
-        } else {
+        else if (!service.isUserAnAdmin(authUserId)) {
             return RESULT_NOT_AUTHORISED;
+        }
+        else if (!service.doesUserExist(refUserId)) {
+            return RESULT_USER_DOES_NOT_EXIST;
+        }
+        else if (service.deleteUser(refUserId)) {
+            return RESULT_USER_DELETED_SUCCESSFULLY;
+        }
+        else{
+            return RESULT_USER_NOT_DELETED;
         }
     }
 }

@@ -1,39 +1,28 @@
 package domain.usecase.api;
 
+import domain.constraints.RoleObject;
+import domain.constraints.UserObject;
+
+import domain.constraints.repository.IRoleRepository;
+import domain.constraints.repository.IUserRepository;
+
+import domain.service.UserService;
 import domain.usecase.Usecase;
 
 import domain.entity.Role;
 import domain.entity.User;
-
-import domain.model.UserModel;
-import domain.model.RoleModel;
-
-import adapter.repository.RoleRepository;
-import adapter.repository.UserRepository;
-
-import domain.entity.factory.RoleFactory;
-import domain.entity.factory.UserFactory;
 
 public class UsecaseGetOneUser extends Usecase {
 
     public static final int RESULT_USER_RETRIEVED_SUCCESSFULLY = 1;
     public static final int RESULT_USER_NOT_FOUND = 2;
 
-    // Factory
-    private UserFactory userFactory;
-    private RoleFactory roleFactory;
+    private UserService service;
+    private IUserRepository userRepository;
+    private IRoleRepository roleRepository;
 
     // Input data
     private Integer refUserId = null;
-
-    // Output data
-    private User user = null;
-    private Role[] roles = null;
-
-    // Getter & Setter
-    public Integer getRefUserId() {
-        return refUserId;
-    }
 
     public void setRefUserId(Integer refUserId) {
         if (refUserId == null) {
@@ -43,23 +32,23 @@ public class UsecaseGetOneUser extends Usecase {
         this.refUserId = refUserId;
     }
 
-    public UserModel getUser() {
+    // Output data
+    private User user = null;
+    private Role[] roles = null;
+
+    public UserObject getUser() {
         return user;
     }
 
-    public RoleModel[] getRoles() {
+    public RoleObject[] getRoles() {
         return roles;
     }
 
     // Constructor
-    public UsecaseGetOneUser(UserRepository userRepository, RoleRepository roleRepository) throws Exception {
-        userFactory = new UserFactory(userRepository, roleRepository);
-        roleFactory = new RoleFactory(roleRepository);
-    }
-
-    public UsecaseGetOneUser(UserFactory userFactory, RoleFactory roleFactory) {
-        this.userFactory = userFactory;
-        this.roleFactory = roleFactory;
+    public UsecaseGetOneUser(IUserRepository userRepository, IRoleRepository roleRepository) throws Exception {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        service = new UserService(userRepository, roleRepository);
     }
 
     // Business Logic
@@ -68,14 +57,16 @@ public class UsecaseGetOneUser extends Usecase {
         if (refUserId == null) {
             throw new IllegalStateException("refUserId not provided");
         }
+        else{
+            user = userRepository.getUser(refUserId);
 
-        user = userFactory.create(refUserId);
-
-        if (user == null) {
-            return RESULT_USER_NOT_FOUND;
+            if (user == null) {
+                return RESULT_USER_NOT_FOUND;
+            }
+            else {
+                roles = roleRepository.getRolesByUser(user);
+                return RESULT_USER_RETRIEVED_SUCCESSFULLY;
+            }
         }
-
-        roles = roleFactory.createByIds(user.getRoles());
-        return RESULT_USER_RETRIEVED_SUCCESSFULLY;
     }
 }

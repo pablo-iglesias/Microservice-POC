@@ -3,6 +3,7 @@ package core;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.sun.net.httpserver.HttpServer;
 
@@ -39,8 +40,8 @@ public class Server {
     public static final String MONGO_USER = "POC_MONGO_USER";
     public static final String MONGO_PASS = "POC_MONGO_PASS";
 
-    private static Map<String, Object> config = new HashMap<String, Object>();
-    private static Map<String, Session> sessions = new HashMap<String, Session>();
+    private static Map<String, Object> config = new HashMap<>();
+    private static ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<>();
 
     public static void Initialize() {
         try {
@@ -69,7 +70,7 @@ public class Server {
         }
         catch (Exception e) {
             System.out.println("Initialization failed, aborting");
-            System.out.println(e);
+            System.out.println(e.getMessage());
             System.exit(1);
         }
     }
@@ -77,7 +78,7 @@ public class Server {
     private static void loadConfigs(){
 
         loadConfig(PORT, "8000");
-        loadConfig(DATABASE_ENGINE, Database.TYPE_MONGODB);
+        loadConfig(DATABASE_ENGINE, Database.TYPE_SQLITE_MEMORY);
         loadConfig(TEMPLATE_ENGINE, TemplateEngine.TYPE_TWIG);
 
         loadConfig(MYSQL_HOST, "localhost");
@@ -126,8 +127,7 @@ public class Server {
     }
 
     public static Session getSession(String sessionToken) {
-        Session session = sessions.get(sessionToken);
-        return session;
+        return sessions.get(sessionToken);
     }
 
     private static void setConfig(String name, String value){

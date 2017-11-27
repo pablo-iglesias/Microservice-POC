@@ -1,21 +1,23 @@
 package adapter.repository.relational;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Vector;
+import java.util.List;
 
 import core.Server;
 import core.database.DatabaseRelational;
 
-import adapter.repository.Repository;
-import adapter.repository.RoleRepository;
+import domain.entity.Role;
+import domain.constraints.repository.IRoleRepository;
+import domain.entity.User;
 
 /**
  * Role repo that expects the database to be relational and SQL driven
  * 
  * @author Peibol
  */
-public class RoleRepositoryRelational extends Repository implements RoleRepository {
+public class RoleRepositoryRelational implements IRoleRepository {
 
     private DatabaseRelational db;
 
@@ -24,98 +26,76 @@ public class RoleRepositoryRelational extends Repository implements RoleReposito
     }
 
     /**
-     * Takes a user id and returns the ids of the roles assigned to it
+     * Get role
      */
-    public Vector<Object[]> getRolesByIds(Integer rids[]) throws SQLException {
+    public Role getRole(Integer rid) throws SQLException {
 
-        String[] interrogators = new String[rids.length];
-        Arrays.fill(interrogators, "?");
+        db = (DatabaseRelational) Server.getDatabase();
+        db.prepare("SELECT role_id, role_name, role_page FROM roles WHERE role_id = ?");
+        db.add(rid);
 
-        db.prepare("SELECT role_id, role_name, role_page FROM roles WHERE role_id IN (" + String.join(", ", interrogators) + ")");
-
-        for (int rid : rids) {
-            db.add(Integer.toString(rid));
+        if (db.selectOne()) {
+            return new Role(
+                db.getInt("role_id"),
+                db.getString("role_name"),
+                db.getString("role_page")
+            );
+        } else {
+            return null;
         }
-
-        Vector<Object[]> roles = new Vector<Object[]>();
-
-        if (db.select()) {
-
-            while (db.next()) {
-                roles.add(new Object[] {
-                    db.getInt("role_id"),
-                    db.getString("role_name"),
-                    db.getString("role_page")
-                });
-            }
-        }
-
-        return roles;
     }
 
     /**
      * Takes a user id and returns the ids of the roles assigned to it
      */
-    public Integer[] getRoleIdsByUserId(Integer uid) throws SQLException {
+    public Role[] getRolesByUser(User user) throws SQLException {
 
         db.prepare(
-                "SELECT role_id FROM roles JOIN user_has_role ON role_id = fk_role_id JOIN users ON fk_user_id = user_id WHERE user_id = ? ORDER BY role_name ASC");
-        db.add(uid);
+        "SELECT role_id, role_name, role_page FROM roles JOIN user_has_role ON role_id = fk_role_id WHERE fk_user_id = ? ORDER BY role_name ASC"
+        );
+        db.add(user.getId());
 
-        Vector<Integer> roles = new Vector<Integer>();
+        List<Role> roles = new ArrayList<>();
 
         if (db.select()) {
 
             while (db.next()) {
-                roles.add(new Integer(db.getInt("role_id")));
+                roles.add(
+                    new Role(
+                        db.getInt("role_id"),
+                        db.getString("role_name"),
+                        db.getString("role_page")
+                    )
+                );
             }
         }
 
-        Object[] roleObjects = roles.toArray();
-        return Arrays.copyOf(roleObjects, roleObjects.length, Integer[].class);
+        return Arrays.copyOf(roles.toArray(), roles.size(), Role[].class);
     }
 
     /**
-     * Insert rows in the table user_has_role
+     * Insert row in the table user_has_role
      */
-    public boolean insertUserHasRoles(Integer uid, Integer[] rids) throws SQLException {
+    public boolean setRolesToUser(User user, Role[] roles) throws SQLException {
 
-        boolean success = true;
+        if(removeAllRolesFromUser(user.getId())){
 
-        for (int role : rids) {
-            db.prepare("INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(?, ?)");
-            db.add(uid);
-            db.add(role);
-            success = success && db.insert() != null;
+            for(Role role : roles) {
+                db.prepare("INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(?, ?)");
+                db.add(user.getId());
+                db.add(role.getId());
+                db.insert();
+            }
+            return true;
         }
 
-        return success;
+        return false;
     }
 
     /**
      * Delete rows from the table user_has_roles
      */
-    public boolean deleteUserHasRoles(Integer uid, Integer[] rids) throws SQLException {
-
-        String[] interrogators = new String[rids.length];
-        Arrays.fill(interrogators, "?");
-
-        db.prepare("DELETE FROM user_has_role WHERE fk_user_id = ? AND fk_role_id IN ("
-                + String.join(", ", interrogators) + ")");
-
-        db.add(uid);
-
-        for (int rid : rids) {
-            db.add(Integer.toString(rid));
-        }
-
-        return db.delete();
-    }
-
-    /**
-     * Delete rows from the table user_has_roles
-     */
-    public boolean deleteUserHasRolesByUserId(Integer uid) throws SQLException {
+    public boolean removeAllRolesFromUser(Integer uid) throws SQLException {
 
         db.prepare("DELETE FROM user_has_role WHERE fk_user_id = ?");
         db.add(uid);

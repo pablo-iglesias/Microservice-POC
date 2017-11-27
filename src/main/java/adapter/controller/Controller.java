@@ -2,11 +2,8 @@ package adapter.controller;
 
 import java.util.Map;
 
-import core.Helper;
-
-import adapter.repository.RoleRepository;
 import adapter.repository.UserRepository;
-import adapter.repository.factory.RepositoryFactory;
+import core.Helper;
 
 import domain.usecase.UsecaseAuthenticateUser;
 
@@ -23,17 +20,13 @@ public class Controller {
      */
     protected static Integer authenticate(String username, String password) throws Exception {
 
-        RepositoryFactory factory = new RepositoryFactory();
-        UserRepository userModel = (UserRepository) factory.create("User");
-        RoleRepository roleModel = (RoleRepository) factory.create("Role");
-
-        UsecaseAuthenticateUser usecase = new UsecaseAuthenticateUser(userModel, roleModel);
+        UsecaseAuthenticateUser usecase = new UsecaseAuthenticateUser(new UserRepository());
         usecase.setUsername(username);
         usecase.setPassword(password);
 
         switch(usecase.execute()) {
             case UsecaseAuthenticateUser.RESULT_USER_AUTHENTICATED_SUCCESSFULLY:
-                return new Integer(usecase.getRefUserId());
+                return usecase.getRefUserId();
 
             case UsecaseAuthenticateUser.RESULT_DID_NOT_AUTHENTICATE:
             default:

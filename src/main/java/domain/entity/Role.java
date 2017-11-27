@@ -1,13 +1,19 @@
 package domain.entity;
 
-import domain.model.RoleModel;
+import domain.constraints.RoleObject;
 
-public class Role extends RoleModel{
+import java.util.Objects;
 
-    public Role(RoleModel m){
-        id = m.getId();
-        name = m.getName();
-        page = m.getPage();
+public class Role extends RoleObject {
+
+    private static String ADMIN_ROLE_NAME = "ADMIN";
+
+    public Role(RoleObject role){
+        super(role);
+    }
+
+    public Role(int id) {
+        this.id = id;
     }
 
     public Role(int id, String name, String page) {
@@ -16,21 +22,7 @@ public class Role extends RoleModel{
         this.page = page;
     }
 
-    public boolean equals(Object o) {
-
-        if (o.getClass() != this.getClass()) {
-            return false;
-        }
-
-        Role role = (Role) o;
-
-        if (role.getId() != id ||
-            !role.getName().equals(name) ||
-            !role.getPage().equals(page)) {
-
-            return false;
-        }
-
-        return true;
+    public boolean isAdminRole(){
+        return (Objects.equals(name, ADMIN_ROLE_NAME));
     }
 }

@@ -1,4 +1,4 @@
-package adapter.response.application;
+package adapter.response.model.application;
 
 import java.util.Map;
 

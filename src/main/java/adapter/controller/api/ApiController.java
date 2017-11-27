@@ -5,6 +5,8 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import adapter.repository.RoleRepository;
+import adapter.repository.UserRepository;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -16,19 +18,13 @@ import core.entity.HttpResponse;
 
 import adapter.controller.Controller;
 
-import adapter.repository.factory.RepositoryFactory;
+import adapter.response.model.api.ApiResponse;
+import adapter.response.model.api.ApiResponseError;
+import adapter.response.model.api.ApiResponseUserCollection;
+import adapter.response.model.api.ApiResponseUserResource;
 
-import adapter.response.api.ApiResponse;
-import adapter.response.api.ApiResponseError;
-import adapter.response.api.ApiResponseUserCollection;
-import adapter.response.api.ApiResponseUserResource;
+import domain.constraints.UserObject;
 
-import domain.entity.User;
-
-import adapter.repository.RoleRepository;
-import adapter.repository.UserRepository;
-
-import domain.model.UserModel;
 import domain.usecase.api.UsecaseUpdateExistingUser;
 import domain.usecase.api.UsecaseAddNewUser;
 import domain.usecase.api.UsecaseDeleteOneUser;
@@ -208,15 +204,12 @@ public class ApiController extends Controller {
     private static HttpResponse GET(HttpRequest request) throws Exception
     {
         try {
-            RepositoryFactory factory = new RepositoryFactory();
-            UserRepository userRepository = (UserRepository) factory.create("User");
-            RoleRepository roleRepository = (RoleRepository) factory.create("Role");
-
-            UsecaseGetUsers usecase = new UsecaseGetUsers(userRepository, roleRepository);
+            UsecaseGetUsers usecase = new UsecaseGetUsers(new UserRepository(), new RoleRepository());
 
             switch(usecase.execute())
             {
                 case UsecaseGetUsers.RESULT_USERS_RETRIEVED_SUCCESSFULLY:
+
                     return getResponse(
                         request,
                         HttpURLConnection.HTTP_OK,
@@ -234,7 +227,7 @@ public class ApiController extends Controller {
                         new ApiResponseUserCollection()
                     );
             }
-        } 
+        }
         catch (Exception e) {
             e.printStackTrace(System.out);
             return getResponse(
@@ -256,11 +249,7 @@ public class ApiController extends Controller {
     private static HttpResponse GET(HttpRequest request, Integer refdUserId) throws Exception
     {
         try {
-            RepositoryFactory factory = new RepositoryFactory();
-            UserRepository userRepository = (UserRepository) factory.create("User");
-            RoleRepository roleRepository = (RoleRepository) factory.create("Role");
-
-            UsecaseGetOneUser usecase = new UsecaseGetOneUser(userRepository, roleRepository);
+            UsecaseGetOneUser usecase = new UsecaseGetOneUser(new UserRepository(), new RoleRepository());
             usecase.setRefUserId(refdUserId);
 
             switch(usecase.execute())
@@ -307,16 +296,12 @@ public class ApiController extends Controller {
     {
         try {
             Gson gson = new Gson();
-            UserModel userData = gson.fromJson(body, User.class);
+            UserObject userData = gson.fromJson(body, UserObject.class);
 
             Database db = Server.getDatabase();
             db.startTransaction();
 
-            RepositoryFactory factory = new RepositoryFactory();
-            UserRepository userRepository = (UserRepository) factory.create("User");
-            RoleRepository roleRepository = (RoleRepository) factory.create("Role");
-
-            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userRepository, roleRepository);
+            UsecaseAddNewUser usecase = new UsecaseAddNewUser(new UserRepository(), new RoleRepository());
             usecase.setAuthUserId(authUserId);
             usecase.setUserData(userData);
 
@@ -390,16 +375,12 @@ public class ApiController extends Controller {
     {
         try {
             Gson gson = new Gson();
-            UserModel user = gson.fromJson(body, User.class);
+            UserObject user = gson.fromJson(body, UserObject.class);
 
             Database db = Server.getDatabase();
             db.startTransaction();
 
-            RepositoryFactory factory = new RepositoryFactory();
-            UserRepository userRepository = (UserRepository) factory.create("User");
-            RoleRepository roleRepository = (RoleRepository) factory.create("Role");
-
-            UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(userRepository, roleRepository);
+            UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(new UserRepository(), new RoleRepository());
             usecase.setAuthUserId(authUserId);
             usecase.setRefUserId(refUserId);
             usecase.setUserData(user);
@@ -480,11 +461,7 @@ public class ApiController extends Controller {
             Database db = Server.getDatabase();
             db.startTransaction();
 
-            RepositoryFactory factory = new RepositoryFactory();
-            UserRepository userRepository = (UserRepository) factory.create("User");
-            RoleRepository roleRepository = (RoleRepository) factory.create("Role");
-
-            UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(userRepository, roleRepository);
+            UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(new UserRepository(), new RoleRepository());
             usecase.setAuthUserId(authUserId);
             usecase.setRefUserId(refUserId);
 
