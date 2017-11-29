@@ -1,10 +1,9 @@
 package domain.usecase;
 
-import adapter.repository.UserRepository;
+import domain.constraints.repository.IUserRepository;
+
 import domain.Helper;
 import domain.entity.User;
-
-import domain.constraints.repository.IUserRepository;
 
 public class UsecaseAuthenticateUser extends Usecase {
 
@@ -31,7 +30,7 @@ public class UsecaseAuthenticateUser extends Usecase {
             throw new IllegalArgumentException("password cannot be null");
         }
 
-        this.password = Helper.SHA1(password);
+        this.password = password;
     }
 
     // Output data
@@ -56,9 +55,11 @@ public class UsecaseAuthenticateUser extends Usecase {
             throw new IllegalStateException("password not provided");
         }
         else {
-            User user = userRepository.getUser(username, password);
+            User user = new User();
+            user.setUsername(username);
+            user.setPassword(password);
 
-            if (user != null) {
+            if(userRepository.findUser(user)) {
                 refUserId = user.getId();
                 return RESULT_USER_AUTHENTICATED_SUCCESSFULLY;
             }

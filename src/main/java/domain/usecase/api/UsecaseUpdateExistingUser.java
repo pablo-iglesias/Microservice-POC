@@ -1,6 +1,7 @@
 package domain.usecase.api;
 
 import domain.constraints.UserObject;
+
 import domain.constraints.repository.IRoleRepository;
 import domain.constraints.repository.IUserRepository;
 
@@ -20,7 +21,6 @@ public class UsecaseUpdateExistingUser extends Usecase{
 
     private UserService service;
     private IUserRepository userRepository;
-    private IRoleRepository roleRepository;
 
     private User user = null;
 
@@ -56,7 +56,6 @@ public class UsecaseUpdateExistingUser extends Usecase{
     // Constructor
     public UsecaseUpdateExistingUser(IUserRepository userRepository, IRoleRepository roleRepository) {
         this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
         service = new UserService(userRepository, roleRepository);
     }
 
@@ -72,26 +71,22 @@ public class UsecaseUpdateExistingUser extends Usecase{
         else if (userData == null){
             throw new IllegalStateException("userData not provided");
         }
-        else if (userData.getUsername() == null || userData.getUsername().length() == 0 ||
-                userData.getPassword() == null || userData.getPassword().length() == 0 ||
-                userData.getRoleIds() == null || userData.getRoleIds().length == 0) {
+        else if (!userData.containsValidData()) {
             return RESULT_BAD_INPUT_DATA;
         }
-        else if (!service.isUserAnAdmin(authUserId)) {
+        else if (!service.isUserAnAdmin(new User(authUserId))) {
             return RESULT_NOT_AUTHORISED;
         }
-        else if (!service.doesUserExist(refUserId)) {
+        else if (!userRepository.findUser(new User(refUserId))) {
             return RESULT_USER_DOES_NOT_EXIST;
         }
         else {
-            user = new User(userData);
-            user.setId(refUserId);
-
-            User usernameHolder = userRepository.getUser(user.getUsername());
-            if (usernameHolder != null && !user.getId().equals(usernameHolder.getId())) {
+            userData.setId(refUserId);
+            User nameHolder = new User().setUsername(userData.getUsername());
+            if (userRepository.findUser(nameHolder) && !userData.sameIdAs(nameHolder)) {
                 return RESULT_USERNAME_ALREADY_TAKEN;
             }
-            else if (!userRepository.updateUser(user)) {
+            else if (!userRepository.updateUser(userData)) {
                 return RESULT_USER_NOT_UPDATED;
             }
 

@@ -1,8 +1,10 @@
 package adapter.repository;
 
+import domain.constraints.repository.IUserRepository;
+
 import adapter.repository.nosql.UserRepositoryMongo;
 import adapter.repository.relational.UserRepositoryRelational;
-import domain.constraints.repository.IUserRepository;
+
 import domain.entity.User;
 
 public class UserRepository extends Repository implements IUserRepository {
@@ -21,23 +23,40 @@ public class UserRepository extends Repository implements IUserRepository {
         repo = (IUserRepository) createRepository(this);
     }
 
+    /**
+     * Get all users
+     *
+     * @return
+     * @throws Exception
+     */
     public User[] getAllUsers() throws Exception {
         return repo.getAllUsers();
     }
 
-    public User getUser(Integer uid) throws Exception {
-        return repo.getUser(uid);
+    /**
+     * Find user
+     *
+     * @param user
+     * @return
+     * @throws Exception
+     */
+    public boolean findUser(User user) throws Exception {
+        return repo.findUser(user);
     }
 
-    public User getUser(String username) throws Exception {
-        return repo.getUser(username);
-    }
-
-    public User getUser(String username, String password) throws Exception {
-        return repo.getUser(username, password);
-    }
-
+    /**
+     *  Insert user
+     *
+     * @param user
+     * @return
+     * @throws Exception
+     */
     public Integer insertUser(User user) throws Exception {
+
+        if(!user.containsValidData()){
+            return null;
+        }
+
         Integer uid = repo.insertUser(user);
 
         if(uid != null){
@@ -47,11 +66,35 @@ public class UserRepository extends Repository implements IUserRepository {
         return uid;
     }
 
+    /**
+     * Update user
+     *
+     * @param user
+     * @return
+     * @throws Exception
+     */
     public boolean updateUser(User user) throws Exception {
+
+        if(!user.containsValidData()){
+            return false;
+        }
+
         return repo.updateUser(user);
     }
 
-    public boolean deleteUser(Integer uid) throws Exception {
-        return repo.deleteUser(uid);
+    /**
+     *  Delete user
+     *
+     * @param user
+     * @return
+     * @throws Exception
+     */
+    public boolean deleteUser(User user) throws Exception {
+
+        if(user.getId() == null){
+            return false;
+        }
+
+        return repo.deleteUser(user);
     }
 }

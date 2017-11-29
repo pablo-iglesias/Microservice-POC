@@ -10,10 +10,8 @@ import domain.entity.User;
 public interface IUserRepository {
 
     User[] getAllUsers() throws Exception;
-    User getUser(Integer uid) throws Exception;
-    User getUser(String username) throws Exception;
-    User getUser(String username, String password) throws Exception;
+    boolean findUser(User user) throws Exception;
     Integer insertUser(User user) throws Exception;
     boolean updateUser(User user) throws Exception;
-    boolean deleteUser(Integer uid) throws Exception;
+    boolean deleteUser(User user) throws Exception;
 }

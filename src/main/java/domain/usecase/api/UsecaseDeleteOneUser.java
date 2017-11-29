@@ -1,11 +1,11 @@
 package domain.usecase.api;
 
-import adapter.repository.UserRepository;
-import domain.service.UserService;
-import domain.usecase.Usecase;
-
 import domain.constraints.repository.IRoleRepository;
 import domain.constraints.repository.IUserRepository;
+
+import domain.entity.User;
+import domain.service.UserService;
+import domain.usecase.Usecase;
 
 public class UsecaseDeleteOneUser extends Usecase{
 
@@ -16,6 +16,7 @@ public class UsecaseDeleteOneUser extends Usecase{
 
     private UserService service;
     private IUserRepository userRepository;
+    private User user;
 
     // Input data
     private Integer authUserId = null;
@@ -52,17 +53,21 @@ public class UsecaseDeleteOneUser extends Usecase{
         else if(refUserId == null){
             throw new IllegalStateException("refUserId not provided");
         }
-        else if (!service.isUserAnAdmin(authUserId)) {
+        else if (!service.isUserAnAdmin(new User(authUserId))) {
             return RESULT_NOT_AUTHORISED;
         }
-        else if (!service.doesUserExist(refUserId)) {
-            return RESULT_USER_DOES_NOT_EXIST;
-        }
-        else if (userRepository.deleteUser(refUserId)) {
-            return RESULT_USER_DELETED_SUCCESSFULLY;
-        }
-        else{
-            return RESULT_USER_NOT_DELETED;
+        else {
+            User refUser = new User(refUserId);
+
+            if (!userRepository.findUser(refUser)) {
+                return RESULT_USER_DOES_NOT_EXIST;
+            }
+            else if (userRepository.deleteUser(refUser)) {
+                return RESULT_USER_DELETED_SUCCESSFULLY;
+            }
+            else {
+                return RESULT_USER_NOT_DELETED;
+            }
         }
     }
 }

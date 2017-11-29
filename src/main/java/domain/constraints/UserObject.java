@@ -7,7 +7,7 @@ import java.util.Objects;
  */
 public class UserObject {
 
-    protected int id;
+    protected Integer id;
     protected String username = null;
     protected String password = null;
     protected Integer[] roles = null;

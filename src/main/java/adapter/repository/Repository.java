@@ -11,7 +11,7 @@ public abstract class Repository {
     protected Object createRepository(Repository repo) throws Exception{
         switch (Server.getConfig(Server.DATABASE_ENGINE)) {
             case Database.TYPE_MONGODB:
-                return this.getMongoClass().newInstance();
+                return repo.getMongoClass().newInstance();
             case Database.TYPE_SQLITE:
             case Database.TYPE_SQLITE_MEMORY:
             case Database.TYPE_MYSQL:

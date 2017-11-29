@@ -3,23 +3,23 @@ package domain.usecase.api;
 import java.util.ArrayList;
 import java.util.List;
 
+import domain.constraints.RoleObject;
+import domain.constraints.UserObject;
+
 import domain.constraints.repository.IRoleRepository;
 import domain.constraints.repository.IUserRepository;
-import domain.service.UserService;
+
 import domain.usecase.Usecase;
 
 import domain.entity.Role;
 import domain.entity.User;
-
-import domain.constraints.RoleObject;
-import domain.constraints.UserObject;
 
 public class UsecaseGetUsers extends Usecase {
 
     public static final int RESULT_USERS_RETRIEVED_SUCCESSFULLY = 1;
     public static final int RESULT_NO_USERS_FOUND = 2;
 
-    private UserService service;
+    private IUserRepository userRepository;
     private IRoleRepository roleRepository;
 
     // Output data
@@ -37,14 +37,14 @@ public class UsecaseGetUsers extends Usecase {
 
     // Constructor
     public UsecaseGetUsers(IUserRepository userRepository, IRoleRepository roleRepository) throws Exception {
+        this.userRepository = userRepository;
         this.roleRepository = roleRepository;
-        service = new UserService(userRepository, roleRepository);
     }
 
     // Business Logic
     public int execute() throws Exception {
 
-        users = service.getAllUsers();
+        users = userRepository.getAllUsers();
 
         if (users != null) {
 

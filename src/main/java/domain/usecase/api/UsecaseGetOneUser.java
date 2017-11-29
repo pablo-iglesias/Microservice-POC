@@ -58,9 +58,9 @@ public class UsecaseGetOneUser extends Usecase {
             throw new IllegalStateException("refUserId not provided");
         }
         else{
-            user = userRepository.getUser(refUserId);
+            user = new User(refUserId);
 
-            if (user == null) {
+            if (userRepository.findUser(user)) {
                 return RESULT_USER_NOT_FOUND;
             }
             else {

@@ -1,6 +1,7 @@
 package adapter.repository;
 
 import domain.constraints.repository.IRoleRepository;
+
 import adapter.repository.nosql.RoleRepositoryMongo;
 import adapter.repository.relational.RoleRepositoryRelational;
 

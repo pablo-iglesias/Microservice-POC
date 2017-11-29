@@ -1,15 +1,18 @@
 package adapter.repository.nosql;
 
+import org.bson.Document;
+
+import com.google.common.base.Strings;
+
 import domain.constraints.repository.IUserRepository;
 import domain.entity.User;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 
-import org.bson.Document;
-
 import core.Server;
 import core.database.DatabaseMongoDB;
+import org.bson.conversions.Bson;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,57 +55,31 @@ public class UserRepositoryMongo implements IUserRepository {
 
     /**
      * Get user
+     *
+     * @param user
+     * @return
      */
-    public User getUser(Integer uid) {
+    public boolean findUser(User user) {
 
-        if(db.retrieveDocument("users", Filters.eq("id", uid))){
-            return new User(
-                db.getInt("id"),
-                db.getString("username"),
-                db.getArray("roles").stream().toArray(size -> new Integer[size])
-            );
+        List<Bson> filters = new ArrayList<>();
+
+        if(user.getId() != null)
+            filters.add(Filters.eq("id", user.getId()));
+
+        if(!Strings.isNullOrEmpty(user.getUsername()))
+            filters.add(Filters.eq("username", user.getUsername()));
+
+        if(!Strings.isNullOrEmpty(user.getPassword()))
+            filters.add(Filters.eq("password", user.getPassword()));
+
+        if(filters.size() > 0 && db.retrieveDocument("users", Filters.and(filters))){
+            user.setId(db.getInt("id"));
+            user.setUsername(db.getString("username"));
+            user.setRoles(db.getArray("roles").stream().toArray(size -> new Integer[size]));
+            return true;
         }
         else{
-            return null;
-        }
-    }
-
-    /**
-     * Get user
-     */
-    public User getUser(String username) {
-
-        if(db.retrieveDocument("users", Filters.eq("username", username))){
-            return new User(
-                db.getInt("id"),
-                db.getString("username"),
-                db.getArray("roles").stream().toArray(size -> new Integer[size])
-            );
-        }
-        else{
-            return null;
-        }
-    }
-
-    /**
-     * Get user
-     */
-    public User getUser(String username, String password) {
-
-        if(db.retrieveDocument("users",
-            Filters.and(
-                Filters.eq("username", username),
-                Filters.eq("password", password)
-            )
-        )){
-            return new User(
-                db.getInt("id"),
-                db.getString("username"),
-                db.getArray("roles").stream().toArray(size -> new Integer[size])
-            );
-        }
-        else{
-            return null;
+            return false;
         }
     }
 
@@ -137,8 +114,8 @@ public class UserRepositoryMongo implements IUserRepository {
     /**
      * Removes existing user
      */
-    public boolean deleteUser(Integer uid) {
+    public boolean deleteUser(User user) {
 
-        return db.removeDocument("users", Filters.eq("id", uid));
+        return db.removeDocument("users", Filters.eq("id", user.getId()));
     }
 }

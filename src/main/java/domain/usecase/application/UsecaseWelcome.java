@@ -57,9 +57,9 @@ public class UsecaseWelcome extends Usecase {
         }
         else {
 
-            User user = userRepository.getUser(refUserId);
+            User user = new User(refUserId);
 
-            if (user != null) {
+            if (userRepository.findUser(user)) {
                 username = user.getUsername();
                 roles = roleRepository.getRolesByUser(user);
                 return RESULT_USER_RETRIEVED_SUCCESSFULLY;

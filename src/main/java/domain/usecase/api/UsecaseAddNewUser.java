@@ -1,8 +1,10 @@
 package domain.usecase.api;
 
 import domain.constraints.UserObject;
+
 import domain.constraints.repository.IRoleRepository;
 import domain.constraints.repository.IUserRepository;
+
 import domain.entity.User;
 import domain.service.UserService;
 import domain.usecase.Usecase;
@@ -16,6 +18,7 @@ public class UsecaseAddNewUser extends Usecase{
     public static final int RESULT_BAD_INPUT_DATA = 5;
 
     private UserService service;
+    private IUserRepository userRepository;
 
     // Input data
     private Integer authUserId = null;  // Authorised user id
@@ -40,6 +43,7 @@ public class UsecaseAddNewUser extends Usecase{
     // Constructor
     public UsecaseAddNewUser(IUserRepository userRepository, IRoleRepository roleRepository) {
         service = new UserService(userRepository, roleRepository);
+        this.userRepository = userRepository;
     }
 
     // Business Logic
@@ -51,15 +55,13 @@ public class UsecaseAddNewUser extends Usecase{
         else if (newUser == null) {
             throw new IllegalStateException("userData not provided");
         }
-        else if ( newUser.getUsername() == null || newUser.getUsername().length() == 0 ||
-                  newUser.getPassword() == null || newUser.getPassword().length() == 0 ||
-                  newUser.getRoleIds() == null || newUser.getRoleIds().length == 0) {
+        else if (!newUser.containsValidData()) {
             return RESULT_BAD_INPUT_DATA;
         }
-        else if (!service.isUserAnAdmin(authUserId)) {
+        else if (!service.isUserAnAdmin(new User(authUserId))) {
             return RESULT_NOT_AUTHORISED;
         }
-        else if (service.doesUserExist(newUser.getUsername())) {
+        else if (userRepository.findUser(newUser)) {
             return RESULT_USER_ALREADY_EXISTS;
         }
         else if (service.createNewUser(newUser)) {
