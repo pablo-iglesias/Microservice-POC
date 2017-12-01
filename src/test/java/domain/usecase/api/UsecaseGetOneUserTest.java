@@ -4,10 +4,7 @@ import static org.junit.Assert.*;
 
 import domain.constraints.repository.IRoleRepository;
 import domain.constraints.repository.IUserRepository;
-import domain.entity.User;
 import org.junit.Test;
-
-import domain.entity.Role;
 
 import domain.usecase.UsecaseTest;
 

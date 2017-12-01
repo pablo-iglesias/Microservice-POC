@@ -16,11 +16,11 @@ public class UsecaseDeleteOneUserTest extends UsecaseTest {
 
         IUserRepository userRepo = super.createMockedUserRepositoryObject();
 
-        when(userRepo.deleteUser(3))
+        when(userRepo.deleteUser(user2))
         .thenReturn(true)
         .thenThrow(new Exception("Deleting the same user twice"));
 
-        when(userRepo.deleteUser(4))
+        when(userRepo.deleteUser(user3))
         .thenThrow(new Exception("Attempting to delete nonexistent user"));
 
         when(userRepo.deleteUser(null))

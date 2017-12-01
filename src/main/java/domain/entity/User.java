@@ -84,7 +84,9 @@ public class User extends UserObject {
     }
 
     public User setRoles(Integer[] roles){
-        this.roles = roles;
+        if(roles != null) {
+            this.roles = roles;
+        }
         return this;
     }
 }

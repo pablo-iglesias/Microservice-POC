@@ -3,7 +3,7 @@ package domain.usecase.api;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
-import domain.entity.Role;
+import domain.constraints.UserObject;
 import org.junit.Test;
 
 import domain.constraints.repository.IRoleRepository;
@@ -11,6 +11,8 @@ import domain.constraints.repository.IUserRepository;
 
 import domain.entity.User;
 import domain.usecase.UsecaseTest;
+
+import com.google.gson.Gson;
 
 public class UsecaseAddNewUserTest extends UsecaseTest {
 
@@ -34,7 +36,11 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
 
             UsecaseAddNewUser usecase = new UsecaseAddNewUser(userRepository, roleRepository);
             usecase.setAuthUserId(1);
-            usecase.setUserData(user3);
+
+            Gson gson = new Gson();
+            UserObject user = gson.fromJson("{username: 'user3', password: 'pass3', roles: [4]}", UserObject.class);
+
+            usecase.setUserData(user);
 
             assertEquals(UsecaseAddNewUser.RESULT_USER_CREATED_SUCCESSFULLY, usecase.execute());
         }
@@ -53,7 +59,11 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
 
             UsecaseAddNewUser usecase = new UsecaseAddNewUser(userRepository, roleRepository);
             usecase.setAuthUserId(2);
-            usecase.setUserData(user3);
+
+            Gson gson = new Gson();
+            UserObject user = gson.fromJson("{username: 'user3', password: 'pass3', roles: [4]}", UserObject.class);
+
+            usecase.setUserData(user);
 
             assertEquals(UsecaseAddNewUser.RESULT_NOT_AUTHORISED, usecase.execute());
         }
@@ -72,7 +82,11 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
 
             UsecaseAddNewUser usecase = new UsecaseAddNewUser(userRepository, roleRepository);
             usecase.setAuthUserId(1);
-            usecase.setUserData(admin);
+
+            Gson gson = new Gson();
+            UserObject user = gson.fromJson("{username: 'admin', password: 'admin', roles: [1,2,3,4]}", UserObject.class);
+
+            usecase.setUserData(user);
 
             assertEquals(UsecaseAddNewUser.RESULT_USER_ALREADY_EXISTS, usecase.execute());
         }

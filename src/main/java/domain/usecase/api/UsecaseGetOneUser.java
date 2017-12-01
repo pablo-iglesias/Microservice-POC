@@ -61,11 +61,11 @@ public class UsecaseGetOneUser extends Usecase {
             user = new User(refUserId);
 
             if (userRepository.findUser(user)) {
-                return RESULT_USER_NOT_FOUND;
-            }
-            else {
                 roles = roleRepository.getRolesByUser(user);
                 return RESULT_USER_RETRIEVED_SUCCESSFULLY;
+            }
+            else {
+                return RESULT_USER_NOT_FOUND;
             }
         }
     }

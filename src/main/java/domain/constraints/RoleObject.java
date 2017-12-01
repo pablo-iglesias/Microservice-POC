@@ -33,6 +33,7 @@ public class RoleObject {
         return page;
     }
 
+    @Override
     public boolean equals(Object o) {
 
         if(o == null){

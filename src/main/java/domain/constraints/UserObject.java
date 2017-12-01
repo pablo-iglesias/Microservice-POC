@@ -17,6 +17,10 @@ public class UserObject {
     }
 
     public UserObject(UserObject user){
+        copyFrom(user);
+    }
+
+    public void copyFrom(UserObject user){
         id = user.getId();
         username = user.getUsername();
         password = user.getPassword();
@@ -39,6 +43,7 @@ public class UserObject {
         return password;
     }
 
+    @Override
     public boolean equals(Object o) {
 
         if(o == null){
@@ -59,13 +64,15 @@ public class UserObject {
         }
 
         if(user.getRoleIds() == null && roles != null ||
-           user.getRoleIds() != null && roles == null ||
-           user.getRoleIds() != null && roles != null && user.getRoleIds().length != roles.length){
+           user.getRoleIds() != null && roles == null ){
 
             return false;
         }
 
         if(user.getRoleIds() != null && roles != null) {
+            if(user.getRoleIds().length != roles.length){
+                return false;
+            }
             for (int i = 0; i < roles.length; i++) {
                 if (!Objects.equals(user.getRoleIds()[i], roles[i])) {
                     return false;
