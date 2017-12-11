@@ -53,12 +53,14 @@ public class RequestHandler implements HttpHandler {
 
         String controllerName = "";
 
-        try {
-            try {
-
+        try
+        {
+            try
+            {
                 String path = exchange.getRequestURI().getPath();
 
-                for (String[] route : routes) {
+                for (String[] route : routes)
+                {
                     if (path.matches(route[PATH])) {
                         controllerName = route[CONTROLLER];
                         String methodName = route[METHOD];
@@ -252,6 +254,13 @@ public class RequestHandler implements HttpHandler {
      */
     private void dispatchHttpResponse(HttpExchange exchange, HttpResponse response) throws IOException {
 
+        int httpCode = response.getCode();
+
+        if(Server.isDebug()){
+            String path = exchange.getRequestURI().getPath();
+            System.out.println("Client: " + exchange.getRemoteAddress() + ", Endpoint: " + path + ", Response: HTTP " + httpCode);
+        }
+
         Map<String, String> headers = response.getHeaders();
 
         if (headers.size() > 0) {
@@ -264,7 +273,6 @@ public class RequestHandler implements HttpHandler {
         }
 
         OutputStream stream = exchange.getResponseBody();
-        int httpCode = response.getCode();
         if (httpCode == HttpURLConnection.HTTP_NO_CONTENT) {
             exchange.sendResponseHeaders(httpCode, -1);
         } else {

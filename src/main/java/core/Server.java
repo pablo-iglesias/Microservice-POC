@@ -40,11 +40,19 @@ public class Server {
     public static final String MONGO_USER = "POC_MONGO_USER";
     public static final String MONGO_PASS = "POC_MONGO_PASS";
 
+    private static boolean debug = false;
     private static Map<String, Object> config = new HashMap<>();
     private static ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<>();
 
-    public static void Initialize() {
+    public static void Initialize(String[] args) {
         try {
+            // Is debug mode enabled ?
+            for(String arg : args){
+                if(arg.equals("debug")){
+                    debug = true;
+                }
+            }
+
             // Load configs from enviornment or set to defaults
             loadConfigs();
 
@@ -136,5 +144,9 @@ public class Server {
 
     public static String getConfig(String entry){
         return (String)config.get(entry);
+    }
+
+    public static boolean isDebug(){
+        return debug;
     }
 }

@@ -8,6 +8,6 @@ import core.Server;
 public class App {
 
     public static void main(String[] args) {
-        Server.Initialize();
+        Server.Initialize(args);
     }
 }
