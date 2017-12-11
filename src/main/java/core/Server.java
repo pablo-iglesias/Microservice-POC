@@ -84,7 +84,7 @@ public class Server {
             HttpServer server = HttpServer.create(socket, 0);
             server.createContext("/", handler);
             server.start();
-            System.out.println("Running in port " + getConfig(PORT) + "... \r\n");
+            System.out.println("Running at port " + getConfig(PORT) + (debug ? " in debug mode" : "") + "... \r\n");
         }
         catch (Exception e) {
             System.out.println("Initialization failed, aborting");
