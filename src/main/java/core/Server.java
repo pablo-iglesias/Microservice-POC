@@ -22,6 +22,8 @@ import core.templating.TemplateEngine;
 public class Server {
 
     // Environment vars
+    public static final String DEBUG = "POC_DEBUG";
+
     public static final String PORT = "POC_PORT";
     public static final String DATABASE_ENGINE = "POC_DATABASE_ENGINE";
     public static final String TEMPLATE_ENGINE = "POC_TEMPLATE_ENGINE";
@@ -46,8 +48,9 @@ public class Server {
 
     public static void Initialize(String[] args) {
         try {
-            // Is debug mode enabled ?
+            // Check arguments
             for(String arg : args){
+                // Is debug mode enabled ?
                 if(arg.equals("debug")){
                     debug = true;
                 }
@@ -55,6 +58,13 @@ public class Server {
 
             // Load configs from enviornment or set to defaults
             loadConfigs();
+
+            // Debug mode can also be set by environment var
+            if(!debug){
+                if(getConfig(DEBUG).equals("true")){
+                    debug = true;
+                }
+            }
 
             // Init database
             Database database = getDatabase();
@@ -85,6 +95,7 @@ public class Server {
 
     private static void loadConfigs(){
 
+        loadConfig(DEBUG, "false");
         loadConfig(PORT, "8000");
         loadConfig(DATABASE_ENGINE, Database.TYPE_SQLITE_MEMORY);
         loadConfig(TEMPLATE_ENGINE, TemplateEngine.TYPE_TWIG);
