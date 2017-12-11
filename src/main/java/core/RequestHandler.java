@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -257,8 +258,12 @@ public class RequestHandler implements HttpHandler {
         int httpCode = response.getCode();
 
         if(Server.isDebug()){
-            String path = exchange.getRequestURI().getPath();
-            System.out.println("Client: " + exchange.getRemoteAddress() + ", Endpoint: " + path + ", Response: HTTP " + httpCode);
+            System.out.println(
+                LocalDateTime.now() +
+                ", from " + exchange.getRemoteAddress() +
+                ", " + exchange.getRequestMethod() + " " + exchange.getRequestURI().getPath() +
+                ", response HTTP " + httpCode
+            );
         }
 
         Map<String, String> headers = response.getHeaders();
