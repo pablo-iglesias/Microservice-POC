@@ -15,6 +15,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import adapter.controller.api.ApiController;
+import adapter.controller.api.UserController;
 import adapter.controller.application.ApplicationController;
 import adapter.response.model.application.ApplicationResponse;
 
@@ -44,7 +45,7 @@ public class RequestHandler implements HttpHandler {
             { "/logout",                    "Application",  "logout"    }, 
             { "/welcome",                   "Application",  "welcome"   },
             { "/page_(?<page>[0-9]+)$",     "Application",  "page"      }, 
-            { "/api/users/?(?<uid>.*)$",    "Api",          "handler"   }
+            { "/api/users/?(?<id>.*)$",     "User",         "handler"   }
     };
 
     /**
@@ -52,10 +53,10 @@ public class RequestHandler implements HttpHandler {
      */
     public void handle(HttpExchange exchange) {
 
-        String controllerName = "";
-
         try
         {
+            String controllerName = "";
+
             try
             {
                 String path = exchange.getRequestURI().getPath();
@@ -89,8 +90,7 @@ public class RequestHandler implements HttpHandler {
                                 method = controller.getMethod(methodName, new Class[] { HttpRequest.class, Session.class });
     
                                 // Run controller
-                                ApplicationResponse appResponse = (ApplicationResponse) method.invoke(null, request,
-                                        session);
+                                ApplicationResponse appResponse = (ApplicationResponse) method.invoke(new ApplicationController(), request, session);
     
                                 // Send HTTP response
                                 propagateSession(exchange, appResponse, session);
@@ -98,14 +98,14 @@ public class RequestHandler implements HttpHandler {
 
                                 return;
 
-                            case "Api":
+                            case "User":
 
                                 // Identify appropriate controller and method
                                 controller = ApiController.class;
                                 method = controller.getMethod(methodName, new Class[] { HttpRequest.class });
 
                                 // Run controller
-                                HttpResponse apiResponse = (HttpResponse) method.invoke(null, request);
+                                HttpResponse apiResponse = (HttpResponse) method.invoke(new UserController(), request);
 
                                 // Send HTTP response
                                 dispatchHttpResponse(exchange, apiResponse);

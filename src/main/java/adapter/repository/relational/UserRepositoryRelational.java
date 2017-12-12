@@ -197,14 +197,11 @@ public class UserRepositoryRelational implements IUserRepository {
     private boolean setRolesToUser(Integer uid, Integer[] rids) throws SQLException {
 
         if(removeAllRolesFromUser(uid)){
-
             for (Integer roleId : rids) {
                 db.prepare("INSERT INTO user_has_role(fk_user_id, fk_role_id) VALUES(?, ?)");
                 db.add(uid);
                 db.add(roleId);
-                if(db.insert() == null){
-                    return false;
-                }
+                db.insert();
             }
             return true;
         }

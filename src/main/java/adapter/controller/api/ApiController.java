@@ -32,9 +32,9 @@ import domain.usecase.api.UsecaseGetOneUser;
 import domain.usecase.api.UsecaseGetUsers;
 
 /**
- * Controller for the REST API
+ * Base controller for the REST API
  */
-public class ApiController extends Controller {
+abstract public class ApiController extends Controller {
 
     private static final String[] SUPPORTED_MEDIA_TYPES = {
             "*/*",
@@ -50,7 +50,7 @@ public class ApiController extends Controller {
      * @return
      * @throws Exception
      */
-    private static Integer authenticate(HttpRequest request) throws Exception
+    private Integer authenticate(HttpRequest request) throws Exception
     {
         String auth = request.getHeaders().getFirst("Authorization");
 
@@ -84,7 +84,7 @@ public class ApiController extends Controller {
      * @return
      * @throws Exception
      */
-    private static HttpResponse getResponse(HttpRequest request, int httpCode, ApiResponse response) throws Exception
+    protected HttpResponse getResponse(HttpRequest request, int httpCode, ApiResponse response) throws Exception
     {
         String accept = request.getHeaders().getFirst("Accept");
 
@@ -141,7 +141,7 @@ public class ApiController extends Controller {
      * @return
      * @throws Exception
      */
-    public static HttpResponse handler(HttpRequest request) throws Exception
+    public HttpResponse handler(HttpRequest request) throws Exception
     {
         // Get id of authenticated user
         Integer authUserId = authenticate(request);
@@ -149,29 +149,30 @@ public class ApiController extends Controller {
         if (authUserId != null) {
 
             // Requests that refer an specific user id in the URI
-            if (request.contains("uid") && request.get("uid") != null) {
+            if (request.contains("id") && request.get("id") != null) {
 
-                Integer refUserId;
+                // Resource id
+                Integer resId;
 
                 // Get id of referenced user
                 try {
-                    refUserId = new Integer(request.get("uid"));
+                    resId = new Integer(request.get("id"));
                 } catch (NumberFormatException e) {
 
                     return getResponse(
                         request,
                         HttpURLConnection.HTTP_BAD_REQUEST,
-                        new ApiResponseError("Invalid user resource identifier format, integer expected")
+                        new ApiResponseError("Invalid resource identifier format, integer expected")
                     );
                 }
 
                 switch (request.getMethod()) {
                     case "GET":
-                        return GET(request, refUserId);
+                        return GET(request, resId);
                     case "PUT":
-                        return PUT(request, authUserId, refUserId, request.getBody());
+                        return PUT(request, authUserId, resId, request.getBody());
                     case "DELETE":
-                        return DELETE(request, authUserId, refUserId);
+                        return DELETE(request, authUserId, resId);
                 }
             }
             // Request that refer the entire collection of users
@@ -194,316 +195,9 @@ public class ApiController extends Controller {
         );
     }
 
-    /**
-     * Get users collection
-     *
-     * @param request
-     * @return
-     * @throws Exception
-     */
-    private static HttpResponse GET(HttpRequest request) throws Exception
-    {
-        try {
-            UsecaseGetUsers usecase = new UsecaseGetUsers(new UserRepository(), new RoleRepository());
-
-            switch(usecase.execute())
-            {
-                case UsecaseGetUsers.RESULT_USERS_RETRIEVED_SUCCESSFULLY:
-
-                    return getResponse(
-                        request,
-                        HttpURLConnection.HTTP_OK,
-                        new ApiResponseUserCollection(
-                            usecase.getUsers(),
-                            usecase.getRoles()
-                        )
-                    );
-
-                case UsecaseGetUsers.RESULT_NO_USERS_FOUND:
-                default:
-                    return getResponse(
-                        request,
-                        HttpURLConnection.HTTP_OK,
-                        new ApiResponseUserCollection()
-                    );
-            }
-        }
-        catch (Exception e) {
-            e.printStackTrace(System.out);
-            return getResponse(
-                request,
-                HttpURLConnection.HTTP_INTERNAL_ERROR,
-                new ApiResponseError(e.getMessage())
-            );
-        }
-    }
-
-    /**
-     * Get a single user resource
-     *
-     * @param request
-     * @param refdUserId - Id of the User resource
-     * @return
-     * @throws Exception
-     */
-    private static HttpResponse GET(HttpRequest request, Integer refdUserId) throws Exception
-    {
-        try {
-            UsecaseGetOneUser usecase = new UsecaseGetOneUser(new UserRepository(), new RoleRepository());
-            usecase.setRefUserId(refdUserId);
-
-            switch(usecase.execute())
-            {
-                case UsecaseGetOneUser.RESULT_USER_RETRIEVED_SUCCESSFULLY:
-                    return getResponse(
-                            request,
-                            HttpURLConnection.HTTP_OK,
-                            new ApiResponseUserResource(
-                                usecase.getUser(),
-                                usecase.getRoles()
-                            )
-                    );
-
-                case UsecaseGetOneUser.RESULT_USER_NOT_FOUND:
-                default:
-                    return getResponse(
-                        request,
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        new ApiResponseError("User with this id does not exist")
-                    );
-            }
-        } 
-        catch (Exception e) {
-            e.printStackTrace(System.out);
-            return getResponse(
-                request,
-                HttpURLConnection.HTTP_INTERNAL_ERROR,
-                new ApiResponseError(e.getMessage())
-            );
-        }
-    }
-
-    /**
-     * Create a new user
-     *
-     * @param request
-     * @param authUserId - User that is creating a new user
-     * @param body - Json
-     * @return
-     * @throws Exception
-     */
-    private static HttpResponse POST(HttpRequest request, Integer authUserId, String body) throws Exception
-    {
-        try {
-            Gson gson = new Gson();
-            UserObject userData = gson.fromJson(body, UserObject.class);
-
-            Database db = Server.getDatabase();
-            db.startTransaction();
-
-            UsecaseAddNewUser usecase = new UsecaseAddNewUser(new UserRepository(), new RoleRepository());
-            usecase.setAuthUserId(authUserId);
-            usecase.setUserData(userData);
-
-            int result = usecase.execute();
-
-            if (result == UsecaseAddNewUser.RESULT_USER_NOT_CREATED) {
-                db.rollback();
-            } else {
-                db.commit();
-            }
-
-            switch (result)
-            {
-                case UsecaseAddNewUser.RESULT_USER_CREATED_SUCCESSFULLY:
-                    return new HttpResponse(HttpURLConnection.HTTP_NO_CONTENT);
-    
-                case UsecaseAddNewUser.RESULT_NOT_AUTHORISED:
-                    return new HttpResponse(HttpURLConnection.HTTP_UNAUTHORIZED);
-    
-                case UsecaseAddNewUser.RESULT_USER_ALREADY_EXISTS:
-                    return getResponse(
-                        request,
-                        HttpURLConnection.HTTP_BAD_REQUEST,
-                        new ApiResponseError("User with this username already exists")
-                    );
-    
-                case UsecaseAddNewUser.RESULT_BAD_INPUT_DATA:
-                    return getResponse(
-                        request,
-                        HttpURLConnection.HTTP_BAD_REQUEST,
-                        new ApiResponseError("Insufficient data supplied, need username, password and at least one role")
-                    );
-
-                case UsecaseAddNewUser.RESULT_USER_NOT_CREATED:
-                default:
-                    return getResponse(
-                        request,
-                        HttpURLConnection.HTTP_INTERNAL_ERROR,
-                        new ApiResponseError("Unknown error")
-                    );
-            }
-        } 
-        catch (JsonSyntaxException e) {
-            return getResponse(
-                request,
-                HttpURLConnection.HTTP_BAD_REQUEST,
-                new ApiResponseError("Json syntax")
-            );
-        } 
-        catch (Exception e) {
-            e.printStackTrace(System.out);
-            return getResponse(
-                request,
-                HttpURLConnection.HTTP_INTERNAL_ERROR,
-                new ApiResponseError(e.getMessage())
-            );
-        }
-    }
-
-    /**
-     * Update an existing user
-     *
-     * @param request
-     * @param authUserId - User that is updating
-     * @param refUserId - Id of the User resource that is to be updated
-     * @param body - Json
-     * @return
-     * @throws Exception
-     */
-    private static HttpResponse PUT(HttpRequest request, Integer authUserId, Integer refUserId, String body) throws Exception
-    {
-        try {
-            Gson gson = new Gson();
-            UserObject user = gson.fromJson(body, UserObject.class);
-
-            Database db = Server.getDatabase();
-            db.startTransaction();
-
-            UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(new UserRepository(), new RoleRepository());
-            usecase.setAuthUserId(authUserId);
-            usecase.setRefUserId(refUserId);
-            usecase.setUserData(user);
-
-            int result = usecase.execute();
-
-            if (result == UsecaseUpdateExistingUser.RESULT_USER_NOT_UPDATED) {
-                db.rollback();
-            } else {
-                db.commit();
-            }
-
-            switch (result)
-            {
-                case UsecaseUpdateExistingUser.RESULT_USER_UPDATED_SUCCESSFULLY:
-                    return new HttpResponse(HttpURLConnection.HTTP_NO_CONTENT);
-    
-                case UsecaseUpdateExistingUser.RESULT_NOT_AUTHORISED:
-                    return new HttpResponse(HttpURLConnection.HTTP_UNAUTHORIZED);
-    
-                case UsecaseUpdateExistingUser.RESULT_USER_DOES_NOT_EXIST:
-                    return getResponse(request, HttpURLConnection.HTTP_NOT_FOUND,
-                        new ApiResponseError("User with this id does not exist")
-                    );
-    
-                case UsecaseUpdateExistingUser.RESULT_USERNAME_ALREADY_TAKEN:
-                    return getResponse(
-                        request,
-                        HttpURLConnection.HTTP_CONFLICT,
-                        new ApiResponseError("The specified username is already in use")
-                    );
-    
-                case UsecaseUpdateExistingUser.RESULT_BAD_INPUT_DATA:
-                    return getResponse(
-                        request,
-                        HttpURLConnection.HTTP_BAD_REQUEST,
-                        new ApiResponseError("Insufficient data supplied, need username, password and at least one role")
-                    );
-
-                case UsecaseUpdateExistingUser.RESULT_USER_NOT_UPDATED:
-                default:
-                    return getResponse(
-                        request,
-                        HttpURLConnection.HTTP_INTERNAL_ERROR,
-                        new ApiResponseError("Unknown error")
-                    );
-            }
-        } 
-        catch (JsonSyntaxException e) {
-            return getResponse(
-                request,
-                HttpURLConnection.HTTP_BAD_REQUEST,
-                new ApiResponseError("Json syntax")
-            );
-        }
-        catch (Exception e) {
-            e.printStackTrace(System.out);
-            return getResponse(
-                request,
-                HttpURLConnection.HTTP_INTERNAL_ERROR,
-                new ApiResponseError(e.getMessage())
-            );
-        }
-    }
-
-    /**
-     * Remove a user resource
-     *
-     * @param request
-     * @param authUserId - User that is deleting
-     * @param refUserId - Id of the User resource that is to be deleted
-     * @return
-     * @throws Exception
-     */
-    private static HttpResponse DELETE(HttpRequest request, Integer authUserId, Integer refUserId) throws Exception {
-
-        try {
-            Database db = Server.getDatabase();
-            db.startTransaction();
-
-            UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(new UserRepository(), new RoleRepository());
-            usecase.setAuthUserId(authUserId);
-            usecase.setRefUserId(refUserId);
-
-            int result = usecase.execute();
-
-            if (result == UsecaseDeleteOneUser.RESULT_USER_DELETED_SUCCESSFULLY) {
-                db.commit();
-            } else {
-                db.rollback();
-            }
-
-            switch (result)
-            {
-                case UsecaseDeleteOneUser.RESULT_USER_DELETED_SUCCESSFULLY:
-                    return new HttpResponse(HttpURLConnection.HTTP_NO_CONTENT);
-    
-                case UsecaseDeleteOneUser.RESULT_NOT_AUTHORISED:
-                    return new HttpResponse(HttpURLConnection.HTTP_UNAUTHORIZED);
-    
-                case UsecaseDeleteOneUser.RESULT_USER_DOES_NOT_EXIST:
-                    return getResponse(
-                        request,
-                        HttpURLConnection.HTTP_NOT_FOUND,
-                        new ApiResponseError("User with this id does not exist")
-                    );
-
-                case UsecaseDeleteOneUser.RESULT_USER_NOT_DELETED:
-                default:
-                    return getResponse(
-                        request,
-                        HttpURLConnection.HTTP_INTERNAL_ERROR,
-                        new ApiResponseError("Unknown error")
-                    );
-            }
-        } 
-        catch (Exception e) {
-            e.printStackTrace(System.out);
-            return getResponse(
-                request,
-                HttpURLConnection.HTTP_INTERNAL_ERROR,
-                new ApiResponseError(e.getMessage())
-            );
-        }
-    }
+    protected abstract HttpResponse GET(HttpRequest request) throws Exception;
+    protected abstract HttpResponse GET(HttpRequest request, Integer resId) throws Exception;
+    protected abstract HttpResponse POST(HttpRequest request, Integer authUserId, String body) throws Exception;
+    protected abstract HttpResponse PUT(HttpRequest request, Integer authUserId, Integer resId, String body) throws Exception;
+    protected abstract HttpResponse DELETE(HttpRequest request, Integer authUserId, Integer resId) throws Exception;
 }

@@ -29,7 +29,7 @@ public class ApplicationController extends Controller {
      * @param session
      * @return
      */
-    public static ApplicationResponse index(HttpRequest request, Session session) {
+    public ApplicationResponse index(HttpRequest request, Session session) {
         if (session != null) {
             return new ApplicationResponse()
                 .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
@@ -65,7 +65,7 @@ public class ApplicationController extends Controller {
      * @return
      * @throws Exception
      */
-    public static ApplicationResponse login(HttpRequest request, Session session) throws Exception {
+    public ApplicationResponse login(HttpRequest request, Session session) throws Exception {
 
         if (request.getMethod().matches("POST") && session == null)
         {
@@ -124,7 +124,7 @@ public class ApplicationController extends Controller {
      * @return
      * @throws Exception
      */
-    public static ApplicationResponse logout(HttpRequest request, Session session) throws Exception {
+    public ApplicationResponse logout(HttpRequest request, Session session) throws Exception {
 
         if (session != null) {
             Server.removeSession(session.getSessionToken());
@@ -144,7 +144,7 @@ public class ApplicationController extends Controller {
      * @return
      * @throws Exception
      */
-    public static ApplicationResponse welcome(HttpRequest request, Session session) throws Exception {
+    public ApplicationResponse welcome(HttpRequest request, Session session) throws Exception {
 
         if (session != null)
         {
@@ -191,7 +191,7 @@ public class ApplicationController extends Controller {
      * @param session
      * @return
      */
-    public static ApplicationResponse page(HttpRequest request, Session session) throws Exception {
+    public ApplicationResponse page(HttpRequest request, Session session) throws Exception {
 
         if (session != null && request.contains("page")) {
 

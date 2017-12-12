@@ -21,7 +21,7 @@ public class UsecaseAddNewUser extends Usecase{
     private IUserRepository userRepository;
 
     // Input data
-    private Integer authUserId = null;  // Authorised user id
+    private User authUser = null;  // Authorised user id
     private User newUser = null;        // New user
 
     public void setAuthUserId(Integer authUserId) {
@@ -29,7 +29,7 @@ public class UsecaseAddNewUser extends Usecase{
             throw new IllegalArgumentException("authUserId cannot be null");
         }
 
-        this.authUserId = authUserId;
+        authUser = new User(authUserId);
     }
 
     public void setUserData(UserObject userData) {
@@ -49,7 +49,7 @@ public class UsecaseAddNewUser extends Usecase{
     // Business Logic
     public int execute() throws Exception {
 
-        if (authUserId == null) {
+        if (authUser == null) {
             throw new IllegalStateException("authUserId not provided");
         }
         else if (newUser == null) {
@@ -58,7 +58,7 @@ public class UsecaseAddNewUser extends Usecase{
         else if (!newUser.containsValidData()) {
             return RESULT_BAD_INPUT_DATA;
         }
-        else if (!service.isUserAnAdmin(new User(authUserId))) {
+        else if (!service.isUserAnAdmin(authUser)) {
             return RESULT_NOT_AUTHORISED;
         }
         else if (userRepository.findUser(newUser)) {
