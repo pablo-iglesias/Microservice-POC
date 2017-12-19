@@ -64,18 +64,6 @@ jar {
       'Class-Path': 'libs/' + configurations.runtime.files.collect { it.name }.join(' libs/')
     )
   }
-  from('templates') {
-      include  '**/*.html'
-      into 'templates'
-  }
-  from('sql') {
-      include  '**/*.sql'
-      into 'sql'
-  }
-  from('mongo') {
-      include  '**/*.dump'
-      into 'mongo'
-  }
 }
 
 // Copy templates and sqls to bin directory for debugging the app with those resources available
@@ -125,5 +113,11 @@ task deployDependencies(type: Copy) {
     from configurations.runtime
 }
 
-jar.finalizedBy([copyTemplates, copySqls, copyMongos, deployJar, deployDependencies])
+jar.doFirst {[
+    tasks.copyTemplates.execute(),
+    tasks.copySqls.execute(),
+    tasks.copyMongos.execute()
+]}
+
+jar.finalizedBy([deployJar, deployDependencies])
 

@@ -1,26 +1,16 @@
 package adapter.repository;
 
+import adapter.repository.factory.RepositoryFactory;
 import domain.constraints.repository.IUserRepository;
-
-import adapter.repository.nosql.UserRepositoryMongo;
-import adapter.repository.relational.UserRepositoryRelational;
 
 import domain.entity.User;
 
-public class UserRepository extends Repository implements IUserRepository {
-
-    protected Class getRelationalClass(){
-        return UserRepositoryRelational.class;
-    }
-
-    protected Class getMongoClass(){
-        return UserRepositoryMongo.class;
-    }
+public class UserRepository implements IUserRepository {
 
     private IUserRepository repo;
 
     public UserRepository() throws Exception {
-        repo = (IUserRepository) createRepository(this);
+        repo = (IUserRepository) RepositoryFactory.createRepository(this.getClass());
     }
 
     /**

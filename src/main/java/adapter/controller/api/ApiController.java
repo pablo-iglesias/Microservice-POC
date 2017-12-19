@@ -5,14 +5,7 @@ import java.util.Base64;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import adapter.repository.RoleRepository;
-import adapter.repository.UserRepository;
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-
 import core.Helper;
-import core.Server;
-import core.database.Database;
 import core.entity.HttpRequest;
 import core.entity.HttpResponse;
 
@@ -20,16 +13,6 @@ import adapter.controller.Controller;
 
 import adapter.response.model.api.ApiResponse;
 import adapter.response.model.api.ApiResponseError;
-import adapter.response.model.api.ApiResponseUserCollection;
-import adapter.response.model.api.ApiResponseUserResource;
-
-import domain.constraints.UserObject;
-
-import domain.usecase.api.UsecaseUpdateExistingUser;
-import domain.usecase.api.UsecaseAddNewUser;
-import domain.usecase.api.UsecaseDeleteOneUser;
-import domain.usecase.api.UsecaseGetOneUser;
-import domain.usecase.api.UsecaseGetUsers;
 
 /**
  * Base controller for the REST API
