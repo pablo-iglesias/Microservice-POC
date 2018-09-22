@@ -12,11 +12,14 @@ import domain.entity.Role;
 import domain.constraints.repository.IRoleRepository;
 import domain.entity.User;
 
+import javax.enterprise.inject.Alternative;
+
 /**
  * Role repo that expects the database to be relational and SQL driven
  * 
  * @author Peibol
  */
+@Alternative
 public class RoleRepositoryRelational implements IRoleRepository {
 
     private DatabaseRelational db;

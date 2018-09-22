@@ -6,17 +6,21 @@ import domain.constraints.repository.IUserRepository;
 import domain.service.UserService;
 import domain.usecase.Usecase;
 
+import javax.inject.Inject;
+
 public class UsecasePage extends Usecase {
 
-    public static final int RESULT_PAGE_RETRIEVED_SUCCESSFULLY = 1;
-    public static final int RESULT_PAGE_NOT_ALLOWED = 2;
+    public enum Result{
+        PAGE_RETRIEVED_SUCCESSFULLY,
+        PAGE_NOT_ALLOWED
+    }
 
-    private IUserRepository userRepository;
-    private UserService service;
-
-    // Input data
+    private @Inject IUserRepository userRepository;
+    private @Inject IRoleRepository roleRepository;
+    private @Inject UserService service;
     private Integer refUserId = 0;
     private Integer page = 0;
+    private String username = null;
 
     public void setRefUserId(Integer refUserId) {
         if (refUserId == null) {
@@ -34,34 +38,26 @@ public class UsecasePage extends Usecase {
         this.page = page;
     }
 
-    // Output data
-    private String username = null;
-
     public String getUsername() {
         return username;
     }
 
-    // Constructor
-    public UsecasePage(IUserRepository userRepository, IRoleRepository roleRepository) throws Exception {
-        this.userRepository = userRepository;
-        service = new UserService(userRepository, roleRepository);
-    }
-
-    // Business Logic
-    public int execute() throws Exception {
+    @Override
+    public Result execute() throws Exception {
 
         if (refUserId == null) {
             throw new IllegalStateException("refUserId not provided");
         }
-        else if (page == null) {
+
+        if (page == null) {
             throw new IllegalStateException("page not provided");
         }
-        else if (service.isUserAllowedIntoPage(refUserId, page)) {
+
+        if (service.isUserAllowedIntoPage(refUserId, page)) {
             username = service.getUserNameByUserId(refUserId);
-            return RESULT_PAGE_RETRIEVED_SUCCESSFULLY;
+            return Result.PAGE_RETRIEVED_SUCCESSFULLY;
         }
-        else{
-            return RESULT_PAGE_NOT_ALLOWED;
-        }
+
+        return Result.PAGE_NOT_ALLOWED;
     }
 }

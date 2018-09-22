@@ -6,21 +6,12 @@ import domain.constraints.repository.IUserRepository;
 import domain.entity.User;
 import domain.entity.Role;
 
+import javax.inject.Inject;
+
 public class UserService {
 
-    private IUserRepository userRepository;
-    private IRoleRepository roleRepository;
-
-    /**
-     * Constructor
-     *
-     * @param userRepository
-     * @param roleRepository
-     */
-    public UserService(IUserRepository userRepository, IRoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-    }
+    @Inject private IUserRepository userRepository;
+    @Inject private IRoleRepository roleRepository;
 
     /**
      * Is user an admin

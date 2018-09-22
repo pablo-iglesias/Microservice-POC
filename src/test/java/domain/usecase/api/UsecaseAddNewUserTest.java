@@ -6,35 +6,33 @@ import static org.mockito.Mockito.when;
 import domain.constraints.UserObject;
 import org.junit.Test;
 
-import domain.constraints.repository.IRoleRepository;
-import domain.constraints.repository.IUserRepository;
-
 import domain.entity.User;
 import domain.usecase.UsecaseTest;
 
 import com.google.gson.Gson;
+import org.mockito.InjectMocks;
 
-public class UsecaseAddNewUserTest extends UsecaseTest {
+public class UsecaseAddNewUserTest<Result extends UsecaseAddNewUser.Result> extends UsecaseTest {
 
-    protected IUserRepository createMockedUserRepositoryObject() throws Exception {
+    @InjectMocks
+    UsecaseAddNewUser usecase;
 
-        IUserRepository userRepo = super.createMockedUserRepositoryObject();
+    protected void initUserServiceMock() throws Exception {
 
-        when(userRepo.insertUser(user3))
-        .thenReturn(4)
-        .thenThrow(new Exception("Creating the same user twice"));
+        super.initUserServiceMock();
 
-        return userRepo;
+        Gson gson = new Gson();
+        UserObject userData = gson.fromJson("{username: 'user3', password: 'pass3', roles: [4]}", UserObject.class);
+
+        when(service.createNewUser(new User(userData)))
+                .thenReturn(true)
+                .thenThrow(new Exception("Creating the same user twice"));
     }
 
     @Test
     public void testAddNewUser_Success() {
 
         try {
-            IUserRepository userRepository = createMockedUserRepositoryObject();
-            IRoleRepository roleRepository = createMockedRoleRepositoryObject();
-
-            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userRepository, roleRepository);
             usecase.setAuthUserId(1);
 
             Gson gson = new Gson();
@@ -42,7 +40,7 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
 
             usecase.setUserData(user);
 
-            assertEquals(UsecaseAddNewUser.RESULT_USER_CREATED_SUCCESSFULLY, usecase.execute());
+            assertEquals(Result.USER_CREATED_SUCCESSFULLY, usecase.execute());
         }
         catch (Exception e) {
             e.printStackTrace(System.out);
@@ -54,10 +52,6 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
     public void testAddNewUser_NotAuthorised() {
 
         try {
-            IUserRepository userRepository = createMockedUserRepositoryObject();
-            IRoleRepository roleRepository = createMockedRoleRepositoryObject();
-
-            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userRepository, roleRepository);
             usecase.setAuthUserId(2);
 
             Gson gson = new Gson();
@@ -65,7 +59,7 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
 
             usecase.setUserData(user);
 
-            assertEquals(UsecaseAddNewUser.RESULT_NOT_AUTHORISED, usecase.execute());
+            assertEquals(Result.NOT_AUTHORISED, usecase.execute());
         }
         catch (Exception e) {
             e.printStackTrace(System.out);
@@ -77,10 +71,6 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
     public void testAddNewUser_UserAlreadyExists() {
 
         try {
-            IUserRepository userRepository = createMockedUserRepositoryObject();
-            IRoleRepository roleRepository = createMockedRoleRepositoryObject();
-
-            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userRepository, roleRepository);
             usecase.setAuthUserId(1);
 
             Gson gson = new Gson();
@@ -88,7 +78,7 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
 
             usecase.setUserData(user);
 
-            assertEquals(UsecaseAddNewUser.RESULT_USER_ALREADY_EXISTS, usecase.execute());
+            assertEquals(Result.USER_ALREADY_EXISTS, usecase.execute());
         }
         catch (Exception e) {
             e.printStackTrace(System.out);
@@ -100,11 +90,6 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
     public void testAddNewUser_BadInputData() {
 
         try {
-            IUserRepository userRepository = createMockedUserRepositoryObject();
-            IRoleRepository roleRepository = createMockedRoleRepositoryObject();
-
-            UsecaseAddNewUser usecase = new UsecaseAddNewUser(userRepository, roleRepository);
-
             try {
                 usecase.setAuthUserId(null);
             }
@@ -137,7 +122,7 @@ public class UsecaseAddNewUserTest extends UsecaseTest {
 
             usecase.setUserData(new User(0, "", "", new Integer[0]));
 
-            assertEquals(UsecaseAddNewUser.RESULT_BAD_INPUT_DATA, usecase.execute());
+            assertEquals(Result.BAD_INPUT_DATA, usecase.execute());
         }
         catch (Exception e) {
             e.printStackTrace(System.out);

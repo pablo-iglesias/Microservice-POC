@@ -10,17 +10,20 @@ import domain.entity.Role;
 
 import domain.constraints.RoleObject;
 
+import javax.inject.Inject;
+
 public class UsecaseWelcome extends Usecase {
 
-    public static final int RESULT_USER_RETRIEVED_SUCCESSFULLY = 1;
-    public static final int RESULT_USER_NOT_FOUND = 2;
+    public enum Result {
+        USER_RETRIEVED_SUCCESSFULLY,
+        USER_NOT_FOUND
+    }
 
-    // Factory
-    private IUserRepository userRepository;
-    private IRoleRepository roleRepository;
-
-    // Input data
+    private @Inject IUserRepository userRepository;
+    private @Inject IRoleRepository roleRepository;
     private Integer refUserId = null;
+    private String username = null;
+    private Role[] roles = null;
 
     public void setRefUserId(Integer refUserId) {
         if (refUserId == null) {
@@ -30,10 +33,6 @@ public class UsecaseWelcome extends Usecase {
         this.refUserId = refUserId;
     }
 
-    // Output data
-    private String username = null;
-    private Role[] roles = null;
-
     public String getUsername() {
         return username;
     }
@@ -42,15 +41,8 @@ public class UsecaseWelcome extends Usecase {
         return roles;
     }
 
-    // Constructor
-
-    public UsecaseWelcome(IUserRepository userRepository, IRoleRepository roleRepository) throws Exception {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-    }
-
-    // Business Logic
-    public int execute() throws Exception {
+    @Override
+    public Result execute() throws Exception {
 
         if (refUserId == null) {
             throw new IllegalStateException("refUserId not provided");
@@ -62,10 +54,10 @@ public class UsecaseWelcome extends Usecase {
             if (userRepository.findUser(user)) {
                 username = user.getUsername();
                 roles = roleRepository.getRolesByUser(user);
-                return RESULT_USER_RETRIEVED_SUCCESSFULLY;
+                return Result.USER_RETRIEVED_SUCCESSFULLY;
             }
 
-            return RESULT_USER_NOT_FOUND;
+            return Result.USER_NOT_FOUND;
         }
     }
 }

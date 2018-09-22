@@ -13,11 +13,14 @@ import core.database.DatabaseRelational;
 import domain.entity.User;
 import domain.constraints.repository.IUserRepository;
 
+import javax.enterprise.inject.Alternative;
+
 /**
  * User repo that expects the database to be relational and SQL driven
  * 
  * @author Peibol
  */
+@Alternative
 public class UserRepositoryRelational implements IUserRepository {
 
     private DatabaseRelational db;

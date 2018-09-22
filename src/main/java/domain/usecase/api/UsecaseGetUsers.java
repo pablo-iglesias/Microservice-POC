@@ -14,19 +14,21 @@ import domain.usecase.Usecase;
 import domain.entity.Role;
 import domain.entity.User;
 
+import javax.inject.Inject;
+
 public class UsecaseGetUsers extends Usecase {
 
-    public static final int RESULT_USERS_RETRIEVED_SUCCESSFULLY = 1;
-    public static final int RESULT_NO_USERS_FOUND = 2;
+    public enum Result{
+        USERS_RETRIEVED_SUCCESSFULLY,
+        NO_USERS_FOUND
+    }
 
-    private IUserRepository userRepository;
-    private IRoleRepository roleRepository;
+    @Inject private IUserRepository userRepository;
+    @Inject private IRoleRepository roleRepository;
 
-    // Output data
     private User[] users = null;
     private Role[] roles = null;
 
-    // Getter & Setter
     public UserObject[] getUsers() {
         return users;
     }
@@ -35,14 +37,8 @@ public class UsecaseGetUsers extends Usecase {
         return roles;
     }
 
-    // Constructor
-    public UsecaseGetUsers(IUserRepository userRepository, IRoleRepository roleRepository) throws Exception {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-    }
-
-    // Business Logic
-    public int execute() throws Exception {
+    @Override
+    public Result execute() throws Exception {
 
         users = userRepository.getAllUsers();
 
@@ -61,9 +57,9 @@ public class UsecaseGetUsers extends Usecase {
 
             this.roles = roles.stream().toArray(size -> new Role[size]);
 
-            return RESULT_USERS_RETRIEVED_SUCCESSFULLY;
+            return Result.USERS_RETRIEVED_SUCCESSFULLY;
         }
 
-        return RESULT_NO_USERS_FOUND;
+        return Result.NO_USERS_FOUND;
     }
 }

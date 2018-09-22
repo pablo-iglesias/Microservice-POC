@@ -1,28 +1,34 @@
 package domain.usecase.application;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
-import domain.constraints.repository.IRoleRepository;
-import domain.constraints.repository.IUserRepository;
 import org.junit.Test;
 
 import domain.usecase.UsecaseTest;
+import org.mockito.InjectMocks;
 
-public class UsecasePageTest extends UsecaseTest {
+public class UsecasePageTest<Result extends UsecasePage.Result> extends UsecaseTest {
+
+    @InjectMocks
+    UsecasePage usecase;
+
+    protected void initUserServiceMock() throws Exception {
+
+        super.initUserServiceMock();
+
+        when(service.isUserAllowedIntoPage(2, 1)).thenReturn(true);
+        when(service.isUserAllowedIntoPage(3, 1)).thenReturn(false);
+    }
 
     @Test
     public void pageTest_Success() {
 
         try {
-
-            IUserRepository userRepo = createMockedUserRepositoryObject();
-            IRoleRepository roleRepo = createMockedRoleRepositoryObject();
-
-            UsecasePage usecase = new UsecasePage(userRepo, roleRepo);
             usecase.setRefUserId(2);
             usecase.setPage(1);
 
-            assertEquals(UsecasePage.RESULT_PAGE_RETRIEVED_SUCCESSFULLY, usecase.execute());
+            assertEquals(Result.PAGE_RETRIEVED_SUCCESSFULLY, usecase.execute());
             assertEquals("user1", usecase.getUsername());
         } 
         catch (Exception e) {
@@ -35,15 +41,10 @@ public class UsecasePageTest extends UsecaseTest {
     public void pageTest_NotAuthorised() {
 
         try {
-
-            IUserRepository userRepo = createMockedUserRepositoryObject();
-            IRoleRepository roleRepo = createMockedRoleRepositoryObject();
-
-            UsecasePage usecase = new UsecasePage(userRepo, roleRepo);
             usecase.setRefUserId(3);
             usecase.setPage(1);
 
-            assertEquals(UsecasePage.RESULT_PAGE_NOT_ALLOWED, usecase.execute());
+            assertEquals(Result.PAGE_NOT_ALLOWED, usecase.execute());
         } 
         catch (Exception e) {
             e.printStackTrace(System.out);

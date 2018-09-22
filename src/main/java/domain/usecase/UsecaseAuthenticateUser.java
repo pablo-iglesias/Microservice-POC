@@ -2,20 +2,21 @@ package domain.usecase;
 
 import domain.constraints.repository.IUserRepository;
 
-import domain.Helper;
 import domain.entity.User;
+
+import javax.inject.Inject;
 
 public class UsecaseAuthenticateUser extends Usecase {
 
-    public static final int RESULT_USER_AUTHENTICATED_SUCCESSFULLY = 1;
-    public static final int RESULT_DID_NOT_AUTHENTICATE = 2;
+    public enum Result {
+        USER_AUTHENTICATED_SUCCESSFULLY,
+        DID_NOT_AUTHENTICATE
+    }
 
-    // Repos
-    private IUserRepository userRepository;
-
-    // Input data
+    private @Inject IUserRepository userRepository;
     private String username = null;
     private String password = null;
+    private Integer refUserId = null;
 
     public void setUsername(String username) {
         if (username == null) {
@@ -33,20 +34,12 @@ public class UsecaseAuthenticateUser extends Usecase {
         this.password = password;
     }
 
-    // Output data
-    private Integer refUserId = null;
-
     public Integer getRefUserId() {
         return refUserId;
     }
 
-    // Constructor
-    public UsecaseAuthenticateUser(IUserRepository userRepository) throws Exception {
-        this.userRepository = userRepository;
-    }
-
-    // Business Logic
-    public int execute() throws Exception {
+    @Override
+    public Result execute() throws Exception {
 
         if (username == null) {
             throw new IllegalStateException("username not provided");
@@ -61,10 +54,10 @@ public class UsecaseAuthenticateUser extends Usecase {
 
             if(userRepository.findUser(user)) {
                 refUserId = user.getId();
-                return RESULT_USER_AUTHENTICATED_SUCCESSFULLY;
+                return Result.USER_AUTHENTICATED_SUCCESSFULLY;
             }
             else {
-                return RESULT_DID_NOT_AUTHENTICATE;
+                return Result.DID_NOT_AUTHENTICATE;
             }
         }
     }

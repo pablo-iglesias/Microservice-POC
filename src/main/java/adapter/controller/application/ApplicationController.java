@@ -4,8 +4,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
 
-import adapter.repository.RoleRepository;
-import adapter.repository.UserRepository;
 import core.Server;
 import core.entity.HttpRequest;
 import core.entity.Session;
@@ -79,19 +77,19 @@ public class ApplicationController extends Controller {
                     session = Server.createSession(refUserId);
 
                     if (params.containsKey("page")) {
-                        UsecasePage usecasePage = new UsecasePage(new UserRepository(), new RoleRepository());
+                        UsecasePage usecasePage = Server.getInstance(UsecasePage.class);
                         usecasePage.setRefUserId(refUserId);
                         usecasePage.setPage(params.get("page") == null ? null : Integer.parseInt(params.get("page")));
 
                         switch(usecasePage.execute())
                         {
-                            case UsecasePage.RESULT_PAGE_RETRIEVED_SUCCESSFULLY:
+                            case PAGE_RETRIEVED_SUCCESSFULLY:
                                 return new ApplicationResponse()
                                     .setResponseCode(ApplicationResponse.RESPONSE_REDIRECT)
                                     .setLocation("/page_" + params.get("page"))
                                     .setSession(session);
 
-                            case UsecasePage.RESULT_PAGE_NOT_ALLOWED:
+                            case PAGE_NOT_ALLOWED:
                             default:
                                 break;
                         }
@@ -148,13 +146,12 @@ public class ApplicationController extends Controller {
 
         if (session != null)
         {
-            UsecaseWelcome usecase = new UsecaseWelcome(new UserRepository(), new RoleRepository());
+            UsecaseWelcome usecase = Server.getInstance(UsecaseWelcome.class);
             usecase.setRefUserId(session.getUserId());
 
             switch(usecase.execute())
             {
-                case UsecaseWelcome.RESULT_USER_RETRIEVED_SUCCESSFULLY:
-
+                case USER_RETRIEVED_SUCCESSFULLY:
                     Map<String, Object> data = new HashMap<>();
                     data.put("user_name", usecase.getUsername());
 
@@ -169,7 +166,7 @@ public class ApplicationController extends Controller {
                         .setView(ApplicationResponse.TEMPLATE_WELCOME)
                         .setData(data);
 
-                case UsecaseWelcome.RESULT_USER_NOT_FOUND:
+                case USER_NOT_FOUND:
                 default:
                     Server.removeSession(session.getSessionToken());
                     return new ApplicationResponse()
@@ -195,13 +192,13 @@ public class ApplicationController extends Controller {
 
         if (session != null && request.contains("page")) {
 
-            UsecasePage usecase = new UsecasePage(new UserRepository(), new RoleRepository());
+            UsecasePage usecase = Server.getInstance(UsecasePage.class);
             usecase.setRefUserId(session.getUserId());
             usecase.setPage(request.get("page") == null ? null : Integer.parseInt(request.get("page")));
 
             switch(usecase.execute())
             {
-                case UsecasePage.RESULT_PAGE_RETRIEVED_SUCCESSFULLY:
+                case PAGE_RETRIEVED_SUCCESSFULLY:
                     Map<String, Object> data = new HashMap<>();
                     data.put("page", request.get("page"));
                     data.put("user_name", usecase.getUsername());
@@ -210,7 +207,7 @@ public class ApplicationController extends Controller {
                         .setView(ApplicationResponse.TEMPLATE_PAGE)
                         .setData(data);
 
-                case UsecasePage.RESULT_PAGE_NOT_ALLOWED:
+                case PAGE_NOT_ALLOWED:
                 default:
                     return new ApplicationResponse().setResponseCode(ApplicationResponse.RESPONSE_DENIED);
 

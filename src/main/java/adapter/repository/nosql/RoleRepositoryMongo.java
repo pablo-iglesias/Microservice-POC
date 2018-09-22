@@ -7,6 +7,7 @@ import core.database.DatabaseMongoDB;
 import domain.entity.Role;
 import domain.entity.User;
 
+import javax.enterprise.inject.Alternative;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
  * 
  * @author Peibol
  */
+@Alternative
 public class RoleRepositoryMongo implements IRoleRepository {
 
     private DatabaseMongoDB db;

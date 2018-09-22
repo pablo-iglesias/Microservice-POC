@@ -14,6 +14,7 @@ import core.Server;
 import core.database.DatabaseMongoDB;
 import org.bson.conversions.Bson;
 
+import javax.enterprise.inject.Alternative;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.List;
  * 
  * @author Peibol
  */
+@Alternative
 public class UserRepositoryMongo implements IUserRepository {
 
     private DatabaseMongoDB db;

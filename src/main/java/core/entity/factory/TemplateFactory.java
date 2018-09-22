@@ -9,10 +9,10 @@ public class TemplateFactory extends ResourceLoader {
 
     public TemplateEngine create(String type) {
         try {
-            switch (type) {
-                case TemplateEngine.TYPE_DEFAULT:
+            switch (TemplateEngine.Type.valueOf(type)) {
+                case DEFAULT:
                     return new TemplateParserDefault();
-                case TemplateEngine.TYPE_TWIG:
+                case TWIG:
                     return new TemplateParserTwig();
                 default:
                     throw new Exception("TemplateFactory: Specified templating engine is not available");

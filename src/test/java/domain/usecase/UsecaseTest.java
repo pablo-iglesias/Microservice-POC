@@ -3,9 +3,11 @@ package domain.usecase;
 import static org.mockito.Mockito.when;
 
 import com.google.gson.Gson;
-import domain.Helper;
 import domain.constraints.UserObject;
-import org.mockito.Mockito;
+import domain.service.UserService;
+import org.junit.Before;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
 
 import domain.constraints.repository.IRoleRepository;
 import domain.constraints.repository.IUserRepository;
@@ -13,9 +15,8 @@ import domain.constraints.repository.IUserRepository;
 import domain.entity.Role;
 import domain.entity.User;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-
-import java.util.Arrays;
 
 /**
  * All usecases work within an initial scenario where admin, user1 and user2 already exist, and user3 does not 
@@ -24,7 +25,8 @@ import java.util.Arrays;
  * 
  * @author Pablo
  */
-public class UsecaseTest {
+@RunWith(MockitoJUnitRunner.class)
+public abstract class UsecaseTest {
 
     protected final User admin = new User(1, "admin", "admin", new Integer[] { 1, 2, 3, 4 });
     protected final User user1 = new User(2, "user1", "pass1", new Integer[] { 2 });
@@ -36,11 +38,33 @@ public class UsecaseTest {
     protected final Role role3 = new Role(3, "PAGE_2", "page_2");
     protected final Role role4 = new Role(4, "PAGE_3", "page_3");
 
-    protected IUserRepository createMockedUserRepositoryObject() throws Exception {
+    @Mock protected UserService service;
+    @Mock protected IUserRepository userRepository;
+    @Mock protected IRoleRepository roleRepository;
 
-        IUserRepository userRepo = Mockito.mock(IUserRepository.class);
+    @Before
+    public void initMocks() throws Exception{
+        initUserServiceMock();
+        initUserRepositoryMock();
+        initRoleRepositoryMock();
+    }
 
-        when(userRepo.getAllUsers()).thenReturn(new User[] {admin, user1, user2});
+    protected void initUserServiceMock() throws Exception {
+
+        when(service.isUserAnAdmin(new User(1))).thenReturn(true);
+        when(service.isUserAnAdmin(new User(2))).thenReturn(false);
+        when(service.isUserAnAdmin(new User(3))).thenReturn(false);
+        when(service.isUserAnAdmin(new User(4))).thenReturn(false);
+
+        when(service.getUserNameByUserId(1)).thenReturn("admin");
+        when(service.getUserNameByUserId(2)).thenReturn("user1");
+        when(service.getUserNameByUserId(3)).thenReturn("user2");
+        when(service.getUserNameByUserId(4)).thenReturn("user3");
+    }
+
+    protected void initUserRepositoryMock() throws Exception {
+
+        when(userRepository.getAllUsers()).thenReturn(new User[] {admin, user1, user2});
 
         Answer predicate = (InvocationOnMock i) -> {
             User user = (User) i.getArguments()[0];
@@ -51,10 +75,10 @@ public class UsecaseTest {
         Gson gson = new Gson();
         UserObject newAdmin = gson.fromJson("{username: 'admin', password: 'admin', roles: [1,2,3,4]}", UserObject.class);
 
-        when(userRepo.findUser(new User(newAdmin))).then(predicate);
-        when(userRepo.findUser(new User(1))).then(predicate);
+        when(userRepository.findUser(new User(newAdmin))).then(predicate);
+        when(userRepository.findUser(new User(1))).then(predicate);
 
-        when(userRepo.findUser(new User(2)))
+        when(userRepository.findUser(new User(2)))
             .then( (InvocationOnMock i) -> {
                 User user = (User) i.getArguments()[0];
                 user.copyFrom(user1);
@@ -62,7 +86,7 @@ public class UsecaseTest {
             }
         );
 
-        when(userRepo.findUser(new User(3)))
+        when(userRepository.findUser(new User(3)))
             .then( (InvocationOnMock i) -> {
                 User user = (User) i.getArguments()[0];
                 user.copyFrom(user2);
@@ -70,9 +94,9 @@ public class UsecaseTest {
             }
         );
 
-        when(userRepo.findUser(new User(4))).thenReturn(false);
+        when(userRepository.findUser(new User(4))).thenReturn(false);
 
-        when(userRepo.findUser(new User().setUsername("admin")))
+        when(userRepository.findUser(new User().setUsername("admin")))
             .then( (InvocationOnMock i) -> {
                 User user = (User) i.getArguments()[0];
                 user.copyFrom(admin);
@@ -80,7 +104,7 @@ public class UsecaseTest {
             }
         );
 
-        when(userRepo.findUser(new User().setUsername("user1")))
+        when(userRepository.findUser(new User().setUsername("user1")))
             .then( (InvocationOnMock i) -> {
                 User user = (User) i.getArguments()[0];
                 user.copyFrom(user1);
@@ -88,7 +112,7 @@ public class UsecaseTest {
             }
         );
 
-        when(userRepo.findUser(new User().setUsername("user2")))
+        when(userRepository.findUser(new User().setUsername("user2")))
             .then( (InvocationOnMock i) -> {
                 User user = (User) i.getArguments()[0];
                 user.copyFrom(user2);
@@ -96,9 +120,9 @@ public class UsecaseTest {
             }
         );
 
-        when(userRepo.findUser(new User().setUsername("user3"))).thenReturn(false);
+        when(userRepository.findUser(new User().setUsername("user3"))).thenReturn(false);
 
-        when(userRepo.findUser(new User().setUsername("admin").setPassword("admin")))
+        when(userRepository.findUser(new User().setUsername("admin").setPassword("admin")))
             .then( (InvocationOnMock i) -> {
                 User user = (User) i.getArguments()[0];
                 user.copyFrom(admin);
@@ -106,7 +130,7 @@ public class UsecaseTest {
             }
         );
 
-        when(userRepo.findUser(new User().setUsername("user1").setPassword("pass1")))
+        when(userRepository.findUser(new User().setUsername("user1").setPassword("pass1")))
             .then( (InvocationOnMock i) -> {
                 User user = (User) i.getArguments()[0];
                 user.copyFrom(user1);
@@ -114,7 +138,7 @@ public class UsecaseTest {
             }
         );
 
-        when(userRepo.findUser(new User().setUsername("user2").setPassword("pass2")))
+        when(userRepository.findUser(new User().setUsername("user2").setPassword("pass2")))
             .then( (InvocationOnMock i) -> {
                 User user = (User) i.getArguments()[0];
                 user.copyFrom(user2);
@@ -122,18 +146,14 @@ public class UsecaseTest {
             }
         );
 
-        when(userRepo.findUser(new User().setUsername("user1").setPassword("pass2"))).thenReturn(false);
-
-        return userRepo;
+        when(userRepository.findUser(new User().setUsername("user1").setPassword("pass2"))).thenReturn(false);
     }
 
-    protected IRoleRepository createMockedRoleRepositoryObject() throws Exception {
+    protected void initRoleRepositoryMock() throws Exception {
 
-        IRoleRepository roleRepo = Mockito.mock(IRoleRepository.class);
-        when(roleRepo.getRolesByUser(admin)).thenReturn(new Role[] { role1, role2, role3, role4 });
-        when(roleRepo.getRolesByUser(new User(1))).thenReturn(new Role[] { role1, role2, role3, role4 });
-        when(roleRepo.getRolesByUser(new User(2))).thenReturn(new Role[] { role2 });
-        when(roleRepo.getRolesByUser(new User(3))).thenReturn(new Role[] { role3 });
-        return roleRepo;
+        when(roleRepository.getRolesByUser(admin)).thenReturn(new Role[] { role1, role2, role3, role4 });
+        when(roleRepository.getRolesByUser(new User(1))).thenReturn(new Role[] { role1, role2, role3, role4 });
+        when(roleRepository.getRolesByUser(new User(2))).thenReturn(new Role[] { role2 });
+        when(roleRepository.getRolesByUser(new User(3))).thenReturn(new Role[] { role3 });
     }
 }

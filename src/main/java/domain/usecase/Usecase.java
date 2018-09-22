@@ -1,6 +1,6 @@
 package domain.usecase;
 
-public abstract class Usecase {
+public abstract class Usecase<R extends Enum<R>> {
 
-    public abstract int execute() throws Exception;
+    public abstract R execute() throws Exception;
 }

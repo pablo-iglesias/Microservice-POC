@@ -52,6 +52,11 @@ dependencies {
     
     // Library for working with named regular expression groups
     compile "com.github.tony19:named-regexp:0.2.4"
+
+    // Contexts and Dependency Injection
+    compile 'javax.inject:javax.inject:1'
+    compile 'javax.enterprise:cdi-api:2.0.SP1'
+    runtime "org.jboss.weld.se:weld-se-shaded:3.0.1.Final"
 }
 
 // Define the main class for the application
@@ -64,6 +69,7 @@ jar {
       'Class-Path': 'libs/' + configurations.runtime.files.collect { it.name }.join(' libs/')
     )
   }
+  metaInf { from "$projectDir/beans" }
 }
 
 // Copy templates and sqls to bin directory for debugging the app with those resources available

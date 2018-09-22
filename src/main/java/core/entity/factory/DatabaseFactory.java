@@ -11,19 +11,19 @@ public class DatabaseFactory extends ResourceLoader {
 
     public Database create(String type) {
         try {
-            switch (type) {
-                case Database.TYPE_SQLITE:
+            switch (Database.Type.valueOf(type)) {
+                case SQLITE:
                     return new DatabaseSQLite();
-                case Database.TYPE_SQLITE_MEMORY:
+                case SQLITE_MEMORY:
                     return new DatabaseSQLiteMemory();
-                case Database.TYPE_MYSQL:
+                case MYSQL:
                     return new DatabaseMySQL();
-                case Database.TYPE_MONGODB:
+                case MONGODB:
                     return new DatabaseMongoDB();
                 default:
                     throw new Exception("DatabaseFactory: Specified database type is not available");
             }
-        } 
+        }
         catch (Exception e) {
             System.out.println(e.getMessage());
             return null;

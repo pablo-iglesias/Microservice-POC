@@ -1,8 +1,6 @@
 package adapter.controller.api;
 
 
-import adapter.repository.RoleRepository;
-import adapter.repository.UserRepository;
 import adapter.response.model.api.ApiResponseError;
 import adapter.response.model.api.ApiResponseUserCollection;
 import adapter.response.model.api.ApiResponseUserResource;
@@ -32,11 +30,12 @@ public class UserController extends ApiController{
     protected HttpResponse GET(HttpRequest request) throws Exception
     {
         try {
-            UsecaseGetUsers usecase = new UsecaseGetUsers(new UserRepository(), new RoleRepository());
+
+            UsecaseGetUsers usecase = Server.getInstance(UsecaseGetUsers.class);
 
             switch(usecase.execute())
             {
-                case UsecaseGetUsers.RESULT_USERS_RETRIEVED_SUCCESSFULLY:
+                case USERS_RETRIEVED_SUCCESSFULLY:
 
                     return getResponse(
                             request,
@@ -47,7 +46,7 @@ public class UserController extends ApiController{
                             )
                     );
 
-                case UsecaseGetUsers.RESULT_NO_USERS_FOUND:
+                case NO_USERS_FOUND:
                 default:
                     return getResponse(
                             request,
@@ -71,18 +70,18 @@ public class UserController extends ApiController{
      *
      * @param request
      * @param refdUserId - Id of the User resource
-     * @return
+     * @return HttpResponse
      * @throws Exception
      */
     protected HttpResponse GET(HttpRequest request, Integer refdUserId) throws Exception
     {
         try {
-            UsecaseGetOneUser usecase = new UsecaseGetOneUser(new UserRepository(), new RoleRepository());
+            UsecaseGetOneUser usecase = Server.getInstance(UsecaseGetOneUser.class);
             usecase.setRefUserId(refdUserId);
 
             switch(usecase.execute())
             {
-                case UsecaseGetOneUser.RESULT_USER_RETRIEVED_SUCCESSFULLY:
+                case USER_RETRIEVED_SUCCESSFULLY:
                     return getResponse(
                             request,
                             HttpURLConnection.HTTP_OK,
@@ -92,7 +91,7 @@ public class UserController extends ApiController{
                             )
                     );
 
-                case UsecaseGetOneUser.RESULT_USER_NOT_FOUND:
+                case USER_NOT_FOUND:
                 default:
                     return getResponse(
                             request,
@@ -129,42 +128,36 @@ public class UserController extends ApiController{
             Database db = Server.getDatabase();
             db.startTransaction();
 
-            UsecaseAddNewUser usecase = new UsecaseAddNewUser(new UserRepository(), new RoleRepository());
+            UsecaseAddNewUser usecase = new UsecaseAddNewUser();
             usecase.setAuthUserId(authUserId);
             usecase.setUserData(userData);
 
-            int result = usecase.execute();
-
-            if (result == UsecaseAddNewUser.RESULT_USER_NOT_CREATED) {
-                db.rollback();
-            } else {
-                db.commit();
-            }
-
-            switch (result)
+            switch (usecase.execute())
             {
-                case UsecaseAddNewUser.RESULT_USER_CREATED_SUCCESSFULLY:
+                case USER_CREATED_SUCCESSFULLY:
+                    db.commit();
                     return new HttpResponse(HttpURLConnection.HTTP_NO_CONTENT);
 
-                case UsecaseAddNewUser.RESULT_NOT_AUTHORISED:
+                case NOT_AUTHORISED:
                     return new HttpResponse(HttpURLConnection.HTTP_UNAUTHORIZED);
 
-                case UsecaseAddNewUser.RESULT_USER_ALREADY_EXISTS:
+                case USER_ALREADY_EXISTS:
                     return getResponse(
                             request,
                             HttpURLConnection.HTTP_BAD_REQUEST,
                             new ApiResponseError("User with this username already exists")
                     );
 
-                case UsecaseAddNewUser.RESULT_BAD_INPUT_DATA:
+                case BAD_INPUT_DATA:
                     return getResponse(
                             request,
                             HttpURLConnection.HTTP_BAD_REQUEST,
                             new ApiResponseError("Insufficient data supplied, need username, password and at least one role")
                     );
 
-                case UsecaseAddNewUser.RESULT_USER_NOT_CREATED:
+                case USER_NOT_CREATED:
                 default:
+                    db.rollback();
                     return getResponse(
                             request,
                             HttpURLConnection.HTTP_INTERNAL_ERROR,
@@ -208,48 +201,42 @@ public class UserController extends ApiController{
             Database db = Server.getDatabase();
             db.startTransaction();
 
-            UsecaseUpdateExistingUser usecase = new UsecaseUpdateExistingUser(new UserRepository(), new RoleRepository());
+            UsecaseUpdateExistingUser usecase = Server.getInstance(UsecaseUpdateExistingUser.class);
             usecase.setAuthUserId(authUserId);
             usecase.setRefUserId(refUserId);
             usecase.setUserData(user);
 
-            int result = usecase.execute();
-
-            if (result == UsecaseUpdateExistingUser.RESULT_USER_NOT_UPDATED) {
-                db.rollback();
-            } else {
-                db.commit();
-            }
-
-            switch (result)
+            switch (usecase.execute())
             {
-                case UsecaseUpdateExistingUser.RESULT_USER_UPDATED_SUCCESSFULLY:
+                case USER_UPDATED_SUCCESSFULLY:
+                    db.commit();
                     return new HttpResponse(HttpURLConnection.HTTP_NO_CONTENT);
 
-                case UsecaseUpdateExistingUser.RESULT_NOT_AUTHORISED:
+                case NOT_AUTHORISED:
                     return new HttpResponse(HttpURLConnection.HTTP_UNAUTHORIZED);
 
-                case UsecaseUpdateExistingUser.RESULT_USER_DOES_NOT_EXIST:
+                case USER_DOES_NOT_EXIST:
                     return getResponse(request, HttpURLConnection.HTTP_NOT_FOUND,
                             new ApiResponseError("User with this id does not exist")
                     );
 
-                case UsecaseUpdateExistingUser.RESULT_USERNAME_ALREADY_TAKEN:
+                case USERNAME_ALREADY_TAKEN:
                     return getResponse(
                             request,
                             HttpURLConnection.HTTP_CONFLICT,
                             new ApiResponseError("The specified username is already in use")
                     );
 
-                case UsecaseUpdateExistingUser.RESULT_BAD_INPUT_DATA:
+                case BAD_INPUT_DATA:
                     return getResponse(
                             request,
                             HttpURLConnection.HTTP_BAD_REQUEST,
                             new ApiResponseError("Insufficient data supplied, need username, password and at least one role")
                     );
 
-                case UsecaseUpdateExistingUser.RESULT_USER_NOT_UPDATED:
+                case USER_NOT_UPDATED:
                 default:
+                    db.rollback();
                     return getResponse(
                             request,
                             HttpURLConnection.HTTP_INTERNAL_ERROR,
@@ -289,35 +276,29 @@ public class UserController extends ApiController{
             Database db = Server.getDatabase();
             db.startTransaction();
 
-            UsecaseDeleteOneUser usecase = new UsecaseDeleteOneUser(new UserRepository(), new RoleRepository());
+            UsecaseDeleteOneUser usecase = Server.getInstance(UsecaseDeleteOneUser.class);
             usecase.setAuthUserId(authUserId);
             usecase.setRefUserId(refUserId);
 
-            int result = usecase.execute();
-
-            if (result == UsecaseDeleteOneUser.RESULT_USER_DELETED_SUCCESSFULLY) {
-                db.commit();
-            } else {
-                db.rollback();
-            }
-
-            switch (result)
+            switch (usecase.execute())
             {
-                case UsecaseDeleteOneUser.RESULT_USER_DELETED_SUCCESSFULLY:
+                case USER_DELETED_SUCCESSFULLY:
+                    db.commit();
                     return new HttpResponse(HttpURLConnection.HTTP_NO_CONTENT);
 
-                case UsecaseDeleteOneUser.RESULT_NOT_AUTHORISED:
+                case NOT_AUTHORISED:
                     return new HttpResponse(HttpURLConnection.HTTP_UNAUTHORIZED);
 
-                case UsecaseDeleteOneUser.RESULT_USER_DOES_NOT_EXIST:
+                case USER_DOES_NOT_EXIST:
                     return getResponse(
                             request,
                             HttpURLConnection.HTTP_NOT_FOUND,
                             new ApiResponseError("User with this id does not exist")
                     );
 
-                case UsecaseDeleteOneUser.RESULT_USER_NOT_DELETED:
+                case USER_NOT_DELETED:
                 default:
+                    db.rollback();
                     return getResponse(
                             request,
                             HttpURLConnection.HTTP_INTERNAL_ERROR,

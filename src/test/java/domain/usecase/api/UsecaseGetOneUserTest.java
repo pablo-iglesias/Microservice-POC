@@ -2,26 +2,23 @@ package domain.usecase.api;
 
 import static org.junit.Assert.*;
 
-import domain.constraints.repository.IRoleRepository;
-import domain.constraints.repository.IUserRepository;
 import org.junit.Test;
 
 import domain.usecase.UsecaseTest;
+import org.mockito.InjectMocks;
 
-public class UsecaseGetOneUserTest extends UsecaseTest {
+public class UsecaseGetOneUserTest<Result extends UsecaseGetOneUser.Result> extends UsecaseTest {
+
+    @InjectMocks
+    UsecaseGetOneUser usecase;
 
     @Test
     public void testGetOneUser_Success() {
 
         try {
-
-            IUserRepository userRepository = createMockedUserRepositoryObject();
-            IRoleRepository roleRepository = createMockedRoleRepositoryObject();
-
-            UsecaseGetOneUser usecase = new UsecaseGetOneUser(userRepository, roleRepository);
             usecase.setRefUserId(1);
 
-            assertEquals(UsecaseGetOneUser.RESULT_USER_RETRIEVED_SUCCESSFULLY, usecase.execute());
+            assertEquals(Result.USER_RETRIEVED_SUCCESSFULLY, usecase.execute());
 
             assertEquals(admin, usecase.getUser());
 
@@ -40,14 +37,9 @@ public class UsecaseGetOneUserTest extends UsecaseTest {
     public void testGetOneUser_Inexistant() {
 
         try {
-
-            IUserRepository userRepository = createMockedUserRepositoryObject();
-            IRoleRepository roleRepository = createMockedRoleRepositoryObject();
-
-            UsecaseGetOneUser usecase = new UsecaseGetOneUser(userRepository, roleRepository);
             usecase.setRefUserId(4);
 
-            assertEquals(UsecaseGetOneUser.RESULT_USER_NOT_FOUND, usecase.execute());
+            assertEquals(Result.USER_NOT_FOUND, usecase.execute());
         } 
         catch (Exception e) {
             e.printStackTrace(System.out);

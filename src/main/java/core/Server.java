@@ -1,18 +1,19 @@
 package core;
 
-import java.net.InetSocketAddress;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
-
 import com.sun.net.httpserver.HttpServer;
-
 import core.database.Database;
 import core.entity.Session;
 import core.entity.factory.DatabaseFactory;
 import core.entity.factory.SessionFactory;
 import core.entity.factory.TemplateFactory;
 import core.templating.TemplateEngine;
+
+import javax.enterprise.inject.se.SeContainer;
+import javax.enterprise.inject.se.SeContainerInitializer;
+import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Server class
@@ -45,6 +46,7 @@ public class Server {
     private static boolean debug = false;
     private static Map<String, Object> config = new HashMap<>();
     private static ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<>();
+    private static SeContainer injector;
 
     public static void Initialize(String[] args) {
         try {
@@ -55,6 +57,8 @@ public class Server {
                     debug = true;
                 }
             }
+
+            injector = SeContainerInitializer.newInstance().initialize();
 
             // Load configs from enviornment or set to defaults
             loadConfigs();
@@ -97,8 +101,8 @@ public class Server {
 
         loadConfig(DEBUG, "false");
         loadConfig(PORT, "8000");
-        loadConfig(DATABASE_ENGINE, Database.TYPE_SQLITE_MEMORY);
-        loadConfig(TEMPLATE_ENGINE, TemplateEngine.TYPE_TWIG);
+        loadConfig(DATABASE_ENGINE, Database.Type.SQLITE_MEMORY.name());
+        loadConfig(TEMPLATE_ENGINE, TemplateEngine.Type.TWIG.name());
 
         loadConfig(MYSQL_HOST, "localhost");
         loadConfig(MYSQL_PORT, "3306");
@@ -121,6 +125,10 @@ public class Server {
             value = defaultValue;
         }
         setConfig(name, value);
+    }
+
+    public static <O extends Object> O getInstance(Class<O> a){
+        return injector.select(a).get();
     }
 
     public static Database getDatabase() {

@@ -7,18 +7,21 @@ import domain.entity.User;
 import domain.service.UserService;
 import domain.usecase.Usecase;
 
+import javax.inject.Inject;
+
 public class UsecaseDeleteOneUser extends Usecase{
 
-    public static final int RESULT_USER_DELETED_SUCCESSFULLY = 1;
-    public static final int RESULT_NOT_AUTHORISED = 2;
-    public static final int RESULT_USER_DOES_NOT_EXIST = 3;
-    public static final int RESULT_USER_NOT_DELETED = 4;
+    public enum Result {
+        USER_DELETED_SUCCESSFULLY,
+        NOT_AUTHORISED,
+        USER_DOES_NOT_EXIST,
+        USER_NOT_DELETED
+    }
 
-    private UserService service;
-    private IUserRepository userRepository;
+    private @Inject UserService service;
+    private @Inject IUserRepository userRepository;
+    private @Inject IRoleRepository roleRepository;
     private User user;
-
-    // Input data
     private Integer authUserId = null;
     private Integer refUserId = null;
 
@@ -38,35 +41,31 @@ public class UsecaseDeleteOneUser extends Usecase{
         this.refUserId = refUserId;
     }
 
-    // Constructor
-    public UsecaseDeleteOneUser(IUserRepository userRepository, IRoleRepository roleRepository) {
-        this.userRepository = userRepository;
-        service = new UserService(userRepository, roleRepository);
-    }
-
-    // Business Logic
-    public int execute() throws Exception {
+    @Override
+    public Result execute() throws Exception {
 
         if(authUserId == null){
             throw new IllegalStateException("authUserId not provided");
         }
-        else if(refUserId == null){
+
+        if(refUserId == null){
             throw new IllegalStateException("refUserId not provided");
         }
-        else if (!service.isUserAnAdmin(new User(authUserId))) {
-            return RESULT_NOT_AUTHORISED;
+
+        if (!service.isUserAnAdmin(new User(authUserId))) {
+            return Result.NOT_AUTHORISED;
         }
         else {
             User refUser = new User(refUserId);
 
             if (!userRepository.findUser(refUser)) {
-                return RESULT_USER_DOES_NOT_EXIST;
+                return Result.USER_DOES_NOT_EXIST;
             }
             else if (userRepository.deleteUser(refUser)) {
-                return RESULT_USER_DELETED_SUCCESSFULLY;
+                return Result.USER_DELETED_SUCCESSFULLY;
             }
             else {
-                return RESULT_USER_NOT_DELETED;
+                return Result.USER_NOT_DELETED;
             }
         }
     }

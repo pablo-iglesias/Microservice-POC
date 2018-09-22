@@ -9,20 +9,23 @@ import domain.entity.User;
 import domain.service.UserService;
 import domain.usecase.Usecase;
 
-public class UsecaseAddNewUser extends Usecase{
+import javax.inject.Inject;
 
-    public static final int RESULT_USER_CREATED_SUCCESSFULLY = 1;
-    public static final int RESULT_NOT_AUTHORISED = 2;
-    public static final int RESULT_USER_ALREADY_EXISTS = 3;
-    public static final int RESULT_USER_NOT_CREATED = 4;
-    public static final int RESULT_BAD_INPUT_DATA = 5;
+public class UsecaseAddNewUser extends Usecase {
 
-    private UserService service;
-    private IUserRepository userRepository;
+    public enum Result {
+        USER_CREATED_SUCCESSFULLY,
+        NOT_AUTHORISED,
+        USER_ALREADY_EXISTS,
+        USER_NOT_CREATED,
+        BAD_INPUT_DATA
+    }
 
-    // Input data
-    private User authUser = null;  // Authorised user id
-    private User newUser = null;        // New user
+    private @Inject UserService service;
+    private @Inject IUserRepository userRepository;
+    private @Inject IRoleRepository roleRepository;
+    private User authUser = null;
+    private User newUser = null;
 
     public void setAuthUserId(Integer authUserId) {
         if (authUserId == null) {
@@ -40,35 +43,33 @@ public class UsecaseAddNewUser extends Usecase{
         newUser = new User(userData);
     }
 
-    // Constructor
-    public UsecaseAddNewUser(IUserRepository userRepository, IRoleRepository roleRepository) {
-        service = new UserService(userRepository, roleRepository);
-        this.userRepository = userRepository;
-    }
-
-    // Business Logic
-    public int execute() throws Exception {
+    @Override
+    public Result execute() throws Exception {
 
         if (authUser == null) {
             throw new IllegalStateException("authUserId not provided");
         }
-        else if (newUser == null) {
+
+        if (newUser == null) {
             throw new IllegalStateException("userData not provided");
         }
-        else if (!newUser.containsValidData()) {
-            return RESULT_BAD_INPUT_DATA;
+
+        if (!newUser.containsValidData()) {
+            return Result.BAD_INPUT_DATA;
         }
-        else if (!service.isUserAnAdmin(authUser)) {
-            return RESULT_NOT_AUTHORISED;
+
+        if (!service.isUserAnAdmin(authUser)) {
+            return Result.NOT_AUTHORISED;
         }
-        else if (userRepository.findUser(newUser)) {
-            return RESULT_USER_ALREADY_EXISTS;
+
+        if (userRepository.findUser(newUser)) {
+            return Result.USER_ALREADY_EXISTS;
         }
-        else if (service.createNewUser(newUser)) {
-            return RESULT_USER_CREATED_SUCCESSFULLY;
+
+        if (service.createNewUser(newUser)) {
+            return Result.USER_CREATED_SUCCESSFULLY;
         }
-        else {
-            return RESULT_USER_NOT_CREATED;
-        }
+
+        return Result.USER_NOT_CREATED;
     }
 }

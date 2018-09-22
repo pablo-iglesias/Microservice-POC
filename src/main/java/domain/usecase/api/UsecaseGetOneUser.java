@@ -6,23 +6,25 @@ import domain.constraints.UserObject;
 import domain.constraints.repository.IRoleRepository;
 import domain.constraints.repository.IUserRepository;
 
-import domain.service.UserService;
 import domain.usecase.Usecase;
 
 import domain.entity.Role;
 import domain.entity.User;
 
+import javax.inject.Inject;
+
 public class UsecaseGetOneUser extends Usecase {
 
-    public static final int RESULT_USER_RETRIEVED_SUCCESSFULLY = 1;
-    public static final int RESULT_USER_NOT_FOUND = 2;
+    public enum Result {
+        USER_RETRIEVED_SUCCESSFULLY,
+        USER_NOT_FOUND
+    }
 
-    private UserService service;
-    private IUserRepository userRepository;
-    private IRoleRepository roleRepository;
-
-    // Input data
+    private @Inject IUserRepository userRepository;
+    private @Inject IRoleRepository roleRepository;
     private Integer refUserId = null;
+    private User user = null;
+    private Role[] roles = null;
 
     public void setRefUserId(Integer refUserId) {
         if (refUserId == null) {
@@ -32,10 +34,6 @@ public class UsecaseGetOneUser extends Usecase {
         this.refUserId = refUserId;
     }
 
-    // Output data
-    private User user = null;
-    private Role[] roles = null;
-
     public UserObject getUser() {
         return user;
     }
@@ -44,15 +42,8 @@ public class UsecaseGetOneUser extends Usecase {
         return roles;
     }
 
-    // Constructor
-    public UsecaseGetOneUser(IUserRepository userRepository, IRoleRepository roleRepository) throws Exception {
-        this.userRepository = userRepository;
-        this.roleRepository = roleRepository;
-        service = new UserService(userRepository, roleRepository);
-    }
-
-    // Business Logic
-    public int execute() throws Exception {
+    @Override
+    public Result execute() throws Exception {
 
         if (refUserId == null) {
             throw new IllegalStateException("refUserId not provided");
@@ -62,10 +53,10 @@ public class UsecaseGetOneUser extends Usecase {
 
             if (userRepository.findUser(user)) {
                 roles = roleRepository.getRolesByUser(user);
-                return RESULT_USER_RETRIEVED_SUCCESSFULLY;
+                return Result.USER_RETRIEVED_SUCCESSFULLY;
             }
             else {
-                return RESULT_USER_NOT_FOUND;
+                return Result.USER_NOT_FOUND;
             }
         }
     }
