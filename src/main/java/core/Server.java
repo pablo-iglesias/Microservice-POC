@@ -2,8 +2,8 @@ package core;
 
 import com.sun.net.httpserver.HttpServer;
 import core.database.Database;
+import core.database.DatabaseRelational;
 import core.entity.Session;
-import core.entity.factory.DatabaseFactory;
 import core.entity.factory.SessionFactory;
 import core.entity.factory.TemplateFactory;
 import core.templating.TemplateEngine;
@@ -131,9 +131,12 @@ public class Server {
         return injector.select(a).get();
     }
 
-    public static Database getDatabase() {
-        DatabaseFactory factory = new DatabaseFactory();
-        return factory.create(getConfig(DATABASE_ENGINE));
+    public static DatabaseRelational getDatabase(){
+        return getInstance(DatabaseRelational.class);
+    }
+
+    public static Database.Type getDatabaseType(){
+        return Database.Type.valueOf(getConfig(DATABASE_ENGINE));
     }
 
     public static TemplateEngine getTemplateParser() {

@@ -10,15 +10,15 @@ import domain.entity.User;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Updates;
 
-import core.Server;
 import core.database.DatabaseMongoDB;
 import org.bson.conversions.Bson;
 
-import javax.enterprise.inject.Alternative;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Inject;
+import javax.enterprise.inject.Alternative;
 /**
  * User repo that expects the database to be MongoDB
  * 
@@ -27,10 +27,11 @@ import java.util.List;
 @Alternative
 public class UserRepositoryMongo implements IUserRepository {
 
+    @Inject
     private DatabaseMongoDB db;
 
-    public UserRepositoryMongo() throws Exception {
-        db = (DatabaseMongoDB) Server.getDatabase();
+    public UserRepositoryMongo(DatabaseMongoDB db) throws Exception {
+        this.db = db;
     }
 
     /**

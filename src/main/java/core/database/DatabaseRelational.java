@@ -8,6 +8,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import javax.enterprise.inject.Alternative;
+
+@Alternative
 public abstract class DatabaseRelational extends Database {
 
     protected static Connection conn = null;

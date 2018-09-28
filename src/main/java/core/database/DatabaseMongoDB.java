@@ -18,6 +18,9 @@ import org.bson.conversions.Bson;
 import java.util.List;
 import java.util.Iterator;
 
+import javax.enterprise.inject.Alternative;
+
+@Alternative
 public class DatabaseMongoDB extends Database {
 
     protected static MongoClient conn = null;

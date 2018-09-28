@@ -1,11 +1,10 @@
 package core.entity.factory;
 
-import core.ResourceLoader;
 import core.templating.TemplateEngine;
 import core.templating.TemplateParserDefault;
 import core.templating.TemplateParserTwig;
 
-public class TemplateFactory extends ResourceLoader {
+public class TemplateFactory {
 
     public TemplateEngine create(String type) {
         try {

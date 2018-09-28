@@ -3,6 +3,9 @@ package core.database;
 import core.Server;
 import java.sql.DriverManager;
 
+import javax.enterprise.inject.Alternative;
+
+@Alternative
 public class DatabaseMySQL extends DatabaseRelational {
 
     public boolean connect() {

@@ -5,6 +5,9 @@ import core.Server;
 import java.io.File;
 import java.sql.DriverManager;
 
+import javax.enterprise.inject.Alternative;
+
+@Alternative
 public class DatabaseSQLite extends DatabaseRelational {
 
     public boolean connect() {

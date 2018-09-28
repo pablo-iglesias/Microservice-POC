@@ -3,10 +3,9 @@ package core.entity.factory;
 import com.sun.net.httpserver.HttpExchange;
 
 import core.Helper;
-import core.ResourceLoader;
 import core.entity.HttpRequest;
 
-public class RequestFactory extends ResourceLoader {
+public class RequestFactory {
 
     public HttpRequest create(HttpExchange exchange) {
         String body = Helper.convertInputStreamToString(exchange.getRequestBody());

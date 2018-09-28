@@ -2,6 +2,9 @@ package core.database;
 
 import java.sql.DriverManager;
 
+import javax.enterprise.inject.Alternative;
+
+@Alternative
 public class DatabaseSQLiteMemory extends DatabaseSQLite {
 
     public boolean connect() {

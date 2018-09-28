@@ -13,6 +13,7 @@ import domain.constraints.repository.IRoleRepository;
 import domain.entity.User;
 
 import javax.enterprise.inject.Alternative;
+import javax.inject.Inject;
 
 /**
  * Role repo that expects the database to be relational and SQL driven
@@ -22,10 +23,11 @@ import javax.enterprise.inject.Alternative;
 @Alternative
 public class RoleRepositoryRelational implements IRoleRepository {
 
+    @Inject
     private DatabaseRelational db;
 
-    public RoleRepositoryRelational() throws Exception {
-        db = (DatabaseRelational) Server.getDatabase();
+    public RoleRepositoryRelational(DatabaseRelational db) throws Exception {
+        this.db = db;
     }
 
     /**

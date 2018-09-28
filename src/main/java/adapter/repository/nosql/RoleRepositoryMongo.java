@@ -2,15 +2,16 @@ package adapter.repository.nosql;
 
 import domain.constraints.repository.IRoleRepository;
 import com.mongodb.client.model.Filters;
-import core.Server;
 import core.database.DatabaseMongoDB;
 import domain.entity.Role;
 import domain.entity.User;
 
-import javax.enterprise.inject.Alternative;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import javax.enterprise.inject.Alternative;
+import javax.inject.Inject;
 
 /**
  * Role repo that expects the database to be MongoDB
@@ -20,10 +21,11 @@ import java.util.List;
 @Alternative
 public class RoleRepositoryMongo implements IRoleRepository {
 
+    @Inject
     private DatabaseMongoDB db;
 
-    public RoleRepositoryMongo() throws Exception {
-        db = (DatabaseMongoDB) Server.getDatabase();
+    public RoleRepositoryMongo(DatabaseMongoDB db) throws Exception {
+        this.db = db;
     }
 
     /**

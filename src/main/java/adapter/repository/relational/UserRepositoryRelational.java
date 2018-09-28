@@ -13,6 +13,7 @@ import core.database.DatabaseRelational;
 import domain.entity.User;
 import domain.constraints.repository.IUserRepository;
 
+import javax.inject.Inject;
 import javax.enterprise.inject.Alternative;
 
 /**
@@ -23,10 +24,11 @@ import javax.enterprise.inject.Alternative;
 @Alternative
 public class UserRepositoryRelational implements IUserRepository {
 
+    @Inject
     private DatabaseRelational db;
 
-    public UserRepositoryRelational() throws Exception {
-        db = (DatabaseRelational) Server.getDatabase();
+    public UserRepositoryRelational(DatabaseRelational db) throws Exception {
+        this.db = db;
     }
 
     /**

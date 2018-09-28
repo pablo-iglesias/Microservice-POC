@@ -2,8 +2,6 @@ package core;
 
 import java.io.InputStream;
 
-import core.templating.TemplateParserDefault;
-
 public class ResourceLoader {
 
     /**

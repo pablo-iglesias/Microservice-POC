@@ -128,7 +128,7 @@ public class UserController extends ApiController{
             Database db = Server.getDatabase();
             db.startTransaction();
 
-            UsecaseAddNewUser usecase = new UsecaseAddNewUser();
+            UsecaseAddNewUser usecase = Server.getInstance(UsecaseAddNewUser.class);
             usecase.setAuthUserId(authUserId);
             usecase.setUserData(userData);
 
