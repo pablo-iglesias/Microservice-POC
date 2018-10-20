@@ -3,58 +3,38 @@ package adapter.response.model.api;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 import adapter.response.model.RoleModel;
 import adapter.response.model.UserModel;
-import domain.constraints.RoleObject;
-import domain.constraints.UserObject;
+import domain.contract.entity.RoleObject;
+import domain.contract.entity.UserObject;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @XmlRootElement(name = "ApiResponse")
 public class ApiResponseUserResource extends ApiResponse {
 
-    public String getXml() throws Exception {
-
-        return getXml(this);
-    }
-
     @XmlElement(name = "user")
-    private UserModel user;
+    private UserModel user = null;
 
     @XmlElementWrapper(name = "roles")
     @XmlElement(name = "role")
-    private RoleModel[] roles;
+    private List<RoleModel> roles = new ArrayList<>();
 
-    public ApiResponseUserResource() {
-        user = null;
-        roles = null;
+    public ApiResponseUserResource(){
+
     }
 
     public ApiResponseUserResource(UserObject user, RoleObject[] roles) {
 
-        this.user = new UserModel(user);
-        this.roles = new RoleModel[roles.length];
-
-        for(int i = 0; i < roles.length; i++){
-            this.roles[i] = new RoleModel(roles[i]);
+        if (user != null) {
+            this.user = new UserModel(user);
         }
-    }
 
-    @XmlTransient
-    public UserModel getUser() {
-        return user;
-    }
-
-    public void setUser(UserModel user) {
-        this.user = user;
-    }
-
-    @XmlTransient
-    public RoleModel[] getRoles() {
-        return roles;
-    }
-
-    public void setRoles(RoleModel[] roles) {
-        this.roles = roles;
+        if (roles != null && roles.length > 0 ) {
+            Arrays.stream(roles).forEach((role) -> this.roles.add(new RoleModel(role)));
+        }
     }
 }

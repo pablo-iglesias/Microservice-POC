@@ -7,9 +7,7 @@ import javax.xml.bind.Marshaller;
 
 import com.google.gson.Gson;
 
-public abstract class ApiResponse {
-
-    public abstract String getXml() throws Exception;
+public class ApiResponse {
 
     /**
      * Convert this class or a derived one to Json
@@ -21,22 +19,20 @@ public abstract class ApiResponse {
     }
 
     /**
-     * Convert the object passed in (actually an object of a derived class) to
-     * XML
-     * 
-     * @param object
+     * Convert this class or a derived one to XML
+     *
      * @return
      * @throws Exception
      */
-    public static String getXml(Object object) throws Exception {
+    public String getXml() throws Exception {
 
-        JAXBContext context = JAXBContext.newInstance(object.getClass());
+        JAXBContext context = JAXBContext.newInstance(this.getClass());
         Marshaller m = context.createMarshaller();
 
         m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
         StringWriter sw = new StringWriter();
-        m.marshal(object, sw);
+        m.marshal(this, sw);
         return sw.toString();
     }
 }

@@ -5,11 +5,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "ApiResponse")
 public class ApiResponseError extends ApiResponse {
 
-    public String getXml() throws Exception {
-
-        return getXml(this);
-    }
-
     private String error;
 
     public ApiResponseError(String error) {

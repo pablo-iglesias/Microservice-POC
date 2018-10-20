@@ -1,10 +1,10 @@
 package domain.usecase.api;
 
-import domain.constraints.RoleObject;
-import domain.constraints.UserObject;
+import domain.contract.entity.RoleObject;
+import domain.contract.entity.UserObject;
 
-import domain.constraints.repository.IRoleRepository;
-import domain.constraints.repository.IUserRepository;
+import domain.contract.repository.IRoleRepository;
+import domain.contract.repository.IUserRepository;
 
 import domain.usecase.Usecase;
 

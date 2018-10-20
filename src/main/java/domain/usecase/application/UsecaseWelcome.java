@@ -1,14 +1,14 @@
 package domain.usecase.application;
 
-import domain.constraints.repository.IRoleRepository;
-import domain.constraints.repository.IUserRepository;
+import domain.contract.repository.IRoleRepository;
+import domain.contract.repository.IUserRepository;
 
 import domain.usecase.Usecase;
 
 import domain.entity.User;
 import domain.entity.Role;
 
-import domain.constraints.RoleObject;
+import domain.contract.entity.RoleObject;
 
 import javax.inject.Inject;
 

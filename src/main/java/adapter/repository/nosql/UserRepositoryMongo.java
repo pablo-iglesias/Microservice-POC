@@ -4,7 +4,7 @@ import org.bson.Document;
 
 import com.google.common.base.Strings;
 
-import domain.constraints.repository.IUserRepository;
+import domain.contract.repository.IUserRepository;
 import domain.entity.User;
 
 import com.mongodb.client.model.Filters;

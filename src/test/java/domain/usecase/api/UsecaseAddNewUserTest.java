@@ -3,7 +3,7 @@ package domain.usecase.api;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
-import domain.constraints.UserObject;
+import domain.contract.entity.UserObject;
 import org.junit.Test;
 
 import domain.entity.User;
@@ -22,7 +22,7 @@ public class UsecaseAddNewUserTest<Result extends UsecaseAddNewUser.Result> exte
         super.initUserServiceMock();
 
         Gson gson = new Gson();
-        UserObject userData = gson.fromJson("{username: 'user3', password: 'pass3', roles: [4]}", UserObject.class);
+        UserObject userData = gson.fromJson("{username: 'user3', password: 'pass3', roles: [4]}", UsecaseTest.UserObject.class);
 
         when(service.createNewUser(new User(userData)))
                 .thenReturn(true)
@@ -36,7 +36,7 @@ public class UsecaseAddNewUserTest<Result extends UsecaseAddNewUser.Result> exte
             usecase.setAuthUserId(1);
 
             Gson gson = new Gson();
-            UserObject user = gson.fromJson("{username: 'user3', password: 'pass3', roles: [4]}", UserObject.class);
+            UserObject user = gson.fromJson("{username: 'user3', password: 'pass3', roles: [4]}", UsecaseTest.UserObject.class);
 
             usecase.setUserData(user);
 
@@ -55,7 +55,7 @@ public class UsecaseAddNewUserTest<Result extends UsecaseAddNewUser.Result> exte
             usecase.setAuthUserId(2);
 
             Gson gson = new Gson();
-            UserObject user = gson.fromJson("{username: 'user3', password: 'pass3', roles: [4]}", UserObject.class);
+            UserObject user = gson.fromJson("{username: 'user3', password: 'pass3', roles: [4]}", UsecaseTest.UserObject.class);
 
             usecase.setUserData(user);
 
@@ -74,7 +74,7 @@ public class UsecaseAddNewUserTest<Result extends UsecaseAddNewUser.Result> exte
             usecase.setAuthUserId(1);
 
             Gson gson = new Gson();
-            UserObject user = gson.fromJson("{username: 'admin', password: 'admin', roles: [1,2,3,4]}", UserObject.class);
+            UserObject user = gson.fromJson("{username: 'admin', password: 'admin', roles: [1,2,3,4]}", UsecaseTest.UserObject.class);
 
             usecase.setUserData(user);
 

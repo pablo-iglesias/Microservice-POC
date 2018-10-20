@@ -3,26 +3,26 @@ package domain.usecase;
 import static org.mockito.Mockito.when;
 
 import com.google.gson.Gson;
-import domain.constraints.UserObject;
-import domain.service.UserService;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 
-import domain.constraints.repository.IRoleRepository;
-import domain.constraints.repository.IUserRepository;
-
+import domain.service.UserService;
+import domain.contract.entity.UserObject;
+import domain.contract.repository.IRoleRepository;
+import domain.contract.repository.IUserRepository;
 import domain.entity.Role;
 import domain.entity.User;
+
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 /**
- * All usecases work within an initial scenario where admin, user1 and user2 already exist, and user3 does not 
+ * All usecases work within an initial scenario where admin, user1 and user2 already exist, and user3 does not
  * Roles 1 to 4 do already exist, the application does not provide means to edit them, so they are immutable
  * Admin retains roles 1 to 4, user1 and user2 retain roles 2 and 3 respectively
- * 
+ *
  * @author Pablo
  */
 @RunWith(MockitoJUnitRunner.class)
@@ -49,6 +49,19 @@ public abstract class UsecaseTest {
         initRoleRepositoryMock();
     }
 
+    public class UserObject implements domain.contract.entity.UserObject {
+
+        private Integer id;
+        private String username;
+        private String password;
+        private Integer[] roles;
+
+        public Integer getId() { return id; }
+        public String getUsername() { return username; }
+        public Integer[] getRoleIds() { return roles; }
+        public String getPassword() { return password; }
+    }
+
     protected void initUserServiceMock() throws Exception {
 
         when(service.isUserAnAdmin(new User(1))).thenReturn(true);
@@ -61,6 +74,7 @@ public abstract class UsecaseTest {
         when(service.getUserNameByUserId(3)).thenReturn("user2");
         when(service.getUserNameByUserId(4)).thenReturn("user3");
     }
+
 
     protected void initUserRepositoryMock() throws Exception {
 

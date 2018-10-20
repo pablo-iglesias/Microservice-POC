@@ -2,20 +2,34 @@ package domain.entity;
 
 import com.google.common.base.Strings;
 import domain.Helper;
-import domain.constraints.UserObject;
+import domain.contract.entity.UserObject;
 
 import java.util.Objects;
 
-public class User extends UserObject {
+public class User implements UserObject {
 
-    public User(UserObject user){
-        id = user.getId();
-        username = user.getUsername();
-        password = (!Strings.isNullOrEmpty(user.getPassword())) ? Helper.SHA1(user.getPassword()) : "";
-        roles = user.getRoleIds();
+    protected Integer id;
+    protected String username;
+    protected String password;
+    protected Integer[] roles;
+
+    public User(){
+        this.id = null;
+        this.username = "";
+        this.roles = new Integer[]{};
+        password = "";
     }
 
     public User(User user){
+        copyFrom(user);
+    }
+
+    public User(UserObject user){
+        copyFrom(user);
+        password = (!Strings.isNullOrEmpty(user.getPassword())) ? Helper.SHA1(user.getPassword()) : "";
+    }
+
+    public void copyFrom(UserObject user){
         id = user.getId();
         username = user.getUsername();
         password = user.getPassword();
@@ -30,31 +44,37 @@ public class User extends UserObject {
     }
 
     public User(int id, String username, Integer[] roles) {
+        this();
         this.id = id;
         this.username = username;
         this.roles = roles;
-        password = "";
     }
 
     public User(int id, String username) {
+        this();
         this.id = id;
         this.username = username;
-        this.roles = new Integer[]{};
-        password = "";
     }
 
     public User(int id) {
+        this();
         this.id = id;
-        this.username = "";
-        this.roles = new Integer[]{};
-        password = "";
     }
 
-    public User() {
-        this.id = null;
-        this.username = "";
-        this.roles = new Integer[]{};
-        password = "";
+    public Integer getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public Integer[] getRoleIds() {
+        return roles;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public boolean containsValidData(){
@@ -65,7 +85,7 @@ public class User extends UserObject {
 
     public boolean sameIdAs(User user){
 
-        return Objects.equals(id, user.getId());
+        return id.equals(user.getId());
     }
 
     public User setId(Integer id){
@@ -88,5 +108,45 @@ public class User extends UserObject {
             this.roles = roles;
         }
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if(o == null){
+            return false;
+        }
+
+        if (o.getClass() != this.getClass()) {
+            return false;
+        }
+
+        UserObject user = (UserObject) o;
+
+        if (!Objects.equals(user.getId(), id)  ||
+                !Objects.equals(user.getUsername(), username) ||
+                !Objects.equals(user.getPassword(), password)) {
+
+            return false;
+        }
+
+        if(user.getRoleIds() == null && roles != null ||
+                user.getRoleIds() != null && roles == null ){
+
+            return false;
+        }
+
+        if(user.getRoleIds() != null && roles != null) {
+            if(user.getRoleIds().length != roles.length){
+                return false;
+            }
+            for (int i = 0; i < roles.length; i++) {
+                if (!Objects.equals(user.getRoleIds()[i], roles[i])) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

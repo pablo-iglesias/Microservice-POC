@@ -1,6 +1,6 @@
 package domain.usecase;
 
-import domain.constraints.repository.IUserRepository;
+import domain.contract.repository.IUserRepository;
 
 import domain.entity.User;
 

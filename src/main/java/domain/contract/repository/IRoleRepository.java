@@ -1,4 +1,4 @@
-package domain.constraints.repository;
+package domain.contract.repository;
 
 import domain.entity.Role;
 import domain.entity.User;

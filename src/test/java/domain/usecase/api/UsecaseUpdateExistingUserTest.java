@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import com.google.gson.Gson;
-import domain.constraints.UserObject;
+import domain.contract.entity.UserObject;
 import org.junit.Test;
 
 import domain.entity.User;
@@ -41,7 +41,7 @@ public class UsecaseUpdateExistingUserTest<Result extends UsecaseUpdateExistingU
         try {
             usecase.setAuthUserId(1);
             usecase.setRefUserId(3);
-            usecase.setUserData(new Gson().fromJson("{username:'user2', password:'pass2', roles:[3]}", UserObject.class));
+            usecase.setUserData(new Gson().fromJson("{username:'user2', password:'pass2', roles:[3]}", UsecaseTest.UserObject.class));
 
             assertEquals(Result.USER_UPDATED_SUCCESSFULLY, usecase.execute());
         }

@@ -1,7 +1,7 @@
 package domain.service;
 
-import domain.constraints.repository.IRoleRepository;
-import domain.constraints.repository.IUserRepository;
+import domain.contract.repository.IRoleRepository;
+import domain.contract.repository.IUserRepository;
 
 import domain.entity.User;
 import domain.entity.Role;

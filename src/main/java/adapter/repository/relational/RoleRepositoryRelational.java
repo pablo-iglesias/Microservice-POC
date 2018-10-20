@@ -9,7 +9,7 @@ import core.Server;
 import core.database.DatabaseRelational;
 
 import domain.entity.Role;
-import domain.constraints.repository.IRoleRepository;
+import domain.contract.repository.IRoleRepository;
 import domain.entity.User;
 
 import javax.enterprise.inject.Alternative;

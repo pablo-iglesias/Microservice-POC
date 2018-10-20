@@ -2,7 +2,7 @@ package adapter.repository.factory;
 
 import adapter.repository.nosql.UserRepositoryMongo;
 import adapter.repository.relational.UserRepositoryRelational;
-import domain.constraints.repository.IUserRepository;
+import domain.contract.repository.IUserRepository;
 
 import core.Server;
 import core.database.factory.DatabaseFactory;

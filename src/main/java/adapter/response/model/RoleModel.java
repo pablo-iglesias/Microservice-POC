@@ -1,6 +1,6 @@
 package adapter.response.model;
 
-import domain.constraints.RoleObject;
+import domain.contract.entity.RoleObject;
 
 import javax.xml.bind.annotation.XmlAttribute;
 

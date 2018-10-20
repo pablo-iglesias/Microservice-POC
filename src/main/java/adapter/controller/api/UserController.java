@@ -1,6 +1,6 @@
 package adapter.controller.api;
 
-
+import adapter.response.model.UserModel;
 import adapter.response.model.api.ApiResponseError;
 import adapter.response.model.api.ApiResponseUserCollection;
 import adapter.response.model.api.ApiResponseUserResource;
@@ -10,7 +10,6 @@ import core.Server;
 import core.database.Database;
 import core.entity.HttpRequest;
 import core.entity.HttpResponse;
-import domain.constraints.UserObject;
 import domain.usecase.api.*;
 
 import java.net.HttpURLConnection;
@@ -123,7 +122,7 @@ public class UserController extends ApiController{
     {
         try {
             Gson gson = new Gson();
-            UserObject userData = gson.fromJson(body, UserObject.class);
+            UserModel userData = gson.fromJson(body, UserModel.class);
 
             Database db = Server.getDatabase();
             db.startTransaction();
@@ -196,7 +195,7 @@ public class UserController extends ApiController{
     {
         try {
             Gson gson = new Gson();
-            UserObject user = gson.fromJson(body, UserObject.class);
+            UserModel user = gson.fromJson(body, UserModel.class);
 
             Database db = Server.getDatabase();
             db.startTransaction();

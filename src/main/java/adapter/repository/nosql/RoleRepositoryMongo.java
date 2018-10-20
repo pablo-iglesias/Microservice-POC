@@ -1,6 +1,6 @@
 package adapter.repository.nosql;
 
-import domain.constraints.repository.IRoleRepository;
+import domain.contract.repository.IRoleRepository;
 import com.mongodb.client.model.Filters;
 import core.database.DatabaseMongoDB;
 import domain.entity.Role;

@@ -3,55 +3,39 @@ package adapter.response.model.api;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 import adapter.response.model.RoleModel;
 import adapter.response.model.UserModel;
-import domain.constraints.RoleObject;
-import domain.constraints.UserObject;
+import domain.contract.entity.RoleObject;
+import domain.contract.entity.UserObject;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @XmlRootElement(name = "ApiResponse")
 public class ApiResponseUserCollection extends ApiResponse {
 
-    public String getXml() throws Exception {
-
-        return getXml(this);
-    }
-
     @XmlElementWrapper(name = "users")
     @XmlElement(name = "user")
-    private UserModel[] users;
+    private List<UserModel> users = new ArrayList<>();
 
     @XmlElementWrapper(name = "roles")
     @XmlElement(name = "role")
-    private RoleModel[] roles;
+    private List<RoleModel> roles = new ArrayList<>();
 
-    public ApiResponseUserCollection() {
-        users = new UserModel[0];
-        roles = new RoleModel[0];
+    public ApiResponseUserCollection(){
+
     }
 
     public ApiResponseUserCollection(UserObject[] users, RoleObject[] roles) {
 
-        this.users = new UserModel[users.length];
-        this.roles = new RoleModel[roles.length];
-
-        for(int i = 0; i < users.length; i++){
-            this.users[i] = new UserModel(users[i]);
+        if (users != null && users.length > 0) {
+            Arrays.stream(users).forEach((user) -> this.users.add(new UserModel(user)));
         }
 
-        for(int i = 0; i < roles.length; i++){
-            this.roles[i] = new RoleModel(roles[i]);
+        if (roles != null && roles.length > 0 ) {
+            Arrays.stream(roles).forEach((role) -> this.roles.add(new RoleModel(role)));
         }
-    }
-
-    @XmlTransient
-    public UserModel[] getUsers() {
-        return users;
-    }
-
-    @XmlTransient
-    public RoleModel[] getRoles() {
-        return roles;
     }
 }

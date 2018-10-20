@@ -11,7 +11,7 @@ import core.Server;
 import core.database.DatabaseRelational;
 
 import domain.entity.User;
-import domain.constraints.repository.IUserRepository;
+import domain.contract.repository.IUserRepository;
 
 import javax.inject.Inject;
 import javax.enterprise.inject.Alternative;
