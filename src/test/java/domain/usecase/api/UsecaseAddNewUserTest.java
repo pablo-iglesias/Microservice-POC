@@ -3,7 +3,6 @@ package domain.usecase.api;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
-import domain.contract.entity.UserObject;
 import org.junit.Test;
 
 import domain.entity.User;

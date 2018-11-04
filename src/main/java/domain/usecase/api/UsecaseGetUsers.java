@@ -1,8 +1,5 @@
 package domain.usecase.api;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import domain.contract.entity.RoleObject;
 import domain.contract.entity.UserObject;
 
@@ -43,20 +40,7 @@ public class UsecaseGetUsers extends Usecase {
         users = userRepository.getAllUsers();
 
         if (users != null) {
-
-            List<Role> roles = new ArrayList<>();
-            for (User user : users) {
-                Role[] userRoles = roleRepository.getRolesByUser(user);
-                if(userRoles != null) {
-                    for (Role role : userRoles) {
-                        if (!roles.contains(role))
-                            roles.add(role);
-                    }
-                }
-            }
-
-            this.roles = roles.stream().toArray(size -> new Role[size]);
-
+            this.roles = roleRepository.getRolesByUsers(users);
             return Result.USERS_RETRIEVED_SUCCESSFULLY;
         }
 

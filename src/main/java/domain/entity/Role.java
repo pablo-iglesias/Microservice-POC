@@ -10,7 +10,7 @@ public class Role implements RoleObject {
     protected String name;
     protected String page;
 
-    private static String ADMIN_ROLE_NAME = "ADMIN";
+    private static final String ADMIN_ROLE_NAME = "ADMIN";
 
     public Role(int id, String name, String page) {
         this.id = id;
@@ -47,13 +47,8 @@ public class Role implements RoleObject {
 
         RoleObject role = (RoleObject) o;
 
-        if (!Objects.equals(role.getId(), id) ||
-                !Objects.equals(role.getName(), name) ||
-                !Objects.equals(role.getPage(), page)) {
-
-            return false;
-        }
-
-        return true;
+        return  Objects.equals(role.getId(), id) &&
+                Objects.equals(role.getName(), name) &&
+                Objects.equals(role.getPage(), page);
     }
 }

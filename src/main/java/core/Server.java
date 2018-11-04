@@ -2,7 +2,7 @@ package core;
 
 import com.sun.net.httpserver.HttpServer;
 import core.database.Database;
-import core.database.DatabaseRelational;
+import core.database.factory.DatabaseFactory;
 import core.entity.Session;
 import core.entity.factory.SessionFactory;
 import core.entity.factory.TemplateFactory;
@@ -10,6 +10,7 @@ import core.templating.TemplateEngine;
 
 import javax.enterprise.inject.se.SeContainer;
 import javax.enterprise.inject.se.SeContainerInitializer;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,31 +23,36 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class Server {
 
-    // Environment vars
-    public static final String DEBUG = "POC_DEBUG";
+    private static final String ENVIRONMENT_VARIABLE_PREFIX = "POC_";
 
-    public static final String PORT = "POC_PORT";
-    public static final String DATABASE_ENGINE = "POC_DATABASE_ENGINE";
-    public static final String TEMPLATE_ENGINE = "POC_TEMPLATE_ENGINE";
+    // Dependency injector
+    public final static class Injector {
+        private static final SeContainer injector = SeContainerInitializer.newInstance().initialize();
+        public static <O extends Object> O getInstance(Class<O> a){
+            return injector.select(a).get();
+        }
+    }
 
-    public static final String MYSQL_HOST = "POC_MYSQL_HOST";
-    public static final String MYSQL_PORT = "POC_MYSQL_PORT";
-    public static final String MYSQL_DB = "POC_MYSQL_DB";
-    public static final String MYSQL_USER = "POC_MYSQL_USER";
-    public static final String MYSQL_PASS = "POC_MYSQL_PASS";
-
-    public static final String SQLITE_DB = "POC_SQLITE_DB";
-
-    public static final String MONGO_HOST = "POC_MONGO_HOST";
-    public static final String MONGO_PORT = "POC_MONGO_PORT";
-    public static final String MONGO_DB = "POC_MONGO_DB";
-    public static final String MONGO_USER = "POC_MONGO_USER";
-    public static final String MONGO_PASS = "POC_MONGO_PASS";
+    public enum Config{
+        PORT,
+        DATABASE_ENGINE,
+        TEMPLATE_ENGINE,
+        MYSQL_HOST,
+        MYSQL_PORT,
+        MYSQL_DB,
+        MYSQL_USER,
+        MYSQL_PASS,
+        SQLITE_DB,
+        MONGO_HOST,
+        MONGO_PORT,
+        MONGO_DB,
+        MONGO_USER,
+        MONGO_PASS
+    }
 
     private static boolean debug = false;
-    private static Map<String, Object> config = new HashMap<>();
-    private static ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<>();
-    private static SeContainer injector;
+    private static final Map<Config, String> config = new HashMap<>();
+    private static final ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<>();
 
     public static void Initialize(String[] args) {
         try {
@@ -58,97 +64,77 @@ public class Server {
                 }
             }
 
-            injector = SeContainerInitializer.newInstance().initialize();
-
-            // Load configs from enviornment or set to defaults
-            loadConfigs();
-
-            // Debug mode can also be set by environment var
-            if(!debug){
-                if(getConfig(DEBUG).equals("true")){
-                    debug = true;
-                }
+            // Load configs from environment var or set default values from properties file
+            for(Config entry : Config.values()){
+                loadConfig(entry);
             }
 
             // Init database
             Database database = getDatabase();
-            if (!database.connect()) {
-                throw new Exception("Database Initialization failed");
-            }
-
-            // Init templating engine
-            TemplateEngine templateParser = getTemplateParser();
-            if (templateParser == null) {
-                throw new Exception("Templating Engine Initialization failed");
+            if (database != null && !database.connect()) {
+                throw new Exception("Database connection refused");
             }
 
             // Init HTTP server
-            InetSocketAddress socket = new InetSocketAddress(Integer.valueOf(getConfig(PORT)));
+            InetSocketAddress socket = new InetSocketAddress(Integer.valueOf(getConfig(Config.PORT)));
             RequestHandler handler = new RequestHandler();
             HttpServer server = HttpServer.create(socket, 0);
             server.createContext("/", handler);
             server.start();
-            System.out.println("Running at port " + getConfig(PORT) + (debug ? " in debug mode" : "") + "... \r\n");
+            System.out.println("Running at port " + getConfig(Config.PORT) + (debug ? " in debug mode" : "") + "... \r\n");
         }
         catch (Exception e) {
-            System.out.println("Initialization failed, aborting");
             System.out.println(e.getMessage());
+            System.out.println("Initialization failed, aborting");
             System.exit(1);
         }
     }
 
-    private static void loadConfigs(){
-
-        loadConfig(DEBUG, "false");
-        loadConfig(PORT, "8000");
-        loadConfig(DATABASE_ENGINE, Database.Type.SQLITE_MEMORY.name());
-        loadConfig(TEMPLATE_ENGINE, TemplateEngine.Type.TWIG.name());
-
-        loadConfig(MYSQL_HOST, "localhost");
-        loadConfig(MYSQL_PORT, "3306");
-        loadConfig(MYSQL_DB, "poc");
-        loadConfig(MYSQL_USER, "user");
-        loadConfig(MYSQL_PASS, "pass");
-
-        loadConfig(SQLITE_DB, "users.db");
-
-        loadConfig(MONGO_HOST, "localhost");
-        loadConfig(MONGO_PORT, "27017");
-        loadConfig(MONGO_DB, "poc");
-        loadConfig(MONGO_USER, "user");
-        loadConfig(MONGO_PASS, "pass");
-    }
-
-    private static void loadConfig(String name, String defaultValue){
-        String value = System.getenv(name);
-        if(value == null){
-            value = defaultValue;
-        }
-        setConfig(name, value);
-    }
-
     public static <O extends Object> O getInstance(Class<O> a){
-        return injector.select(a).get();
+        return Injector.getInstance(a);
     }
 
-    public static DatabaseRelational getDatabase(){
-        return getInstance(DatabaseRelational.class);
+    public static Database getDatabase() throws Exception {
+        return DatabaseFactory.getDatabase();
     }
 
     public static Database.Type getDatabaseType(){
-        return Database.Type.valueOf(getConfig(DATABASE_ENGINE));
+        try {
+            return Database.Type.valueOf(
+                getConfig(Config.DATABASE_ENGINE)
+            );
+        }
+        catch(IllegalArgumentException e){
+            return Database.Type.UNKNOWN;
+        }
     }
 
-    public static TemplateEngine getTemplateParser() {
-        TemplateFactory factory = new TemplateFactory();
-        return factory.create(getConfig(TEMPLATE_ENGINE));
+    public static TemplateEngine getTemplateParser() throws Exception {
+        return TemplateFactory.getTemplateParser();
+    }
+
+    public static TemplateEngine.Type getTemplateEngineType() {
+        try {
+            return TemplateEngine.Type.valueOf(
+                    getConfig(Config.TEMPLATE_ENGINE)
+            );
+        }
+        catch(IllegalArgumentException e){
+            return TemplateEngine.Type.UNKNOWN;
+        }
+    }
+
+    private static void loadConfig(Config config) throws IOException{
+        String value = System.getenv(ENVIRONMENT_VARIABLE_PREFIX + config.name());
+        if(value == null){
+            value = AppProperties.get(config.name());
+        }
+        setConfig(config, value);
     }
 
     public static Session createSession(int uid) {
-        SessionFactory factory = new SessionFactory();
-        Session session = factory.create(uid);
-        String sessionToken = session.getSessionToken();
-        sessions.put(sessionToken, session);
+        Session session = SessionFactory.create(uid);
+        sessions.put(session.getSessionToken(), session);
         return session;
     }
 
@@ -160,12 +146,12 @@ public class Server {
         return sessions.get(sessionToken);
     }
 
-    private static void setConfig(String name, String value){
+    private static void setConfig(Config name, String value){
         config.put(name, value);
     }
 
-    public static String getConfig(String entry){
-        return (String)config.get(entry);
+    public static String getConfig(Config entry){
+        return config.get(entry);
     }
 
     public static boolean isDebug(){

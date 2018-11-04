@@ -8,7 +8,8 @@ public abstract class Database extends ResourceLoader {
         SQLITE,
         SQLITE_MEMORY,
         MYSQL,
-        MONGODB
+        MONGODB,
+        UNKNOWN
     }
 
     public abstract boolean connect();

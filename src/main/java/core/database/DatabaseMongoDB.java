@@ -2,6 +2,7 @@ package core.database;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import core.Helper;
@@ -16,7 +17,6 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.util.List;
-import java.util.Iterator;
 
 import javax.enterprise.inject.Alternative;
 
@@ -26,8 +26,8 @@ public class DatabaseMongoDB extends Database {
     protected static MongoClient conn = null;
     protected static MongoCredential credential = null;
     protected static MongoDatabase database = null;
-    protected Iterator it = null;
-    protected Document doc = null;
+    protected MongoCursor<Document> it = null;
+    protected Document document = null;
 
     public boolean connect(){
         if (conn != null) {
@@ -35,11 +35,11 @@ public class DatabaseMongoDB extends Database {
         }
 
         try {
-            String host = Server.getConfig(Server.MONGO_HOST);
-            String port = Server.getConfig(Server.MONGO_PORT);
-            String db = Server.getConfig(Server.MONGO_DB);
-            String user = Server.getConfig(Server.MONGO_USER);
-            String pass = Server.getConfig(Server.MONGO_PASS);
+            String host = Server.getConfig(Server.Config.MONGO_HOST);
+            String port = Server.getConfig(Server.Config.MONGO_PORT);
+            String db   = Server.getConfig(Server.Config.MONGO_DB);
+            String user = Server.getConfig(Server.Config.MONGO_USER);
+            String pass = Server.getConfig(Server.Config.MONGO_PASS);
 
             conn = new MongoClient(host ,Integer.valueOf(port));
             credential = MongoCredential.createCredential(user, db, pass.toCharArray());
@@ -59,7 +59,7 @@ public class DatabaseMongoDB extends Database {
     }
 
     public boolean dump(String dump) {
-        if (!aware()) {
+        if (unaware()) {
             return false;
         }
 
@@ -91,16 +91,12 @@ public class DatabaseMongoDB extends Database {
         return true;
     }
 
-    private boolean aware(){
-        if (conn == null || credential == null || database == null) {
-            return false;
-        }
-
-        return true;
+    private boolean unaware(){
+        return conn == null || credential == null || database == null;
     }
 
     public boolean retrieveCollection(String collectionName) {
-        if (!aware()) {
+        if (unaware()) {
             return false;
         }
 
@@ -108,10 +104,7 @@ public class DatabaseMongoDB extends Database {
             MongoCollection<Document> collection = database.getCollection(collectionName);
             FindIterable<Document> iterDoc = collection.find();
             it = iterDoc.iterator();
-            if(it.hasNext()) {
-                return true;
-            }
-            return false;
+            return it.hasNext();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return false;
@@ -119,7 +112,7 @@ public class DatabaseMongoDB extends Database {
     }
 
     public boolean retrieveDocuments(String collectionName, Bson filter) {
-        if (!aware()) {
+        if (unaware()) {
             return false;
         }
 
@@ -127,10 +120,7 @@ public class DatabaseMongoDB extends Database {
             MongoCollection<Document> collection = database.getCollection(collectionName);
             FindIterable<Document> iterDoc = collection.find(filter);
             it = iterDoc.iterator();
-            if(it.hasNext()) {
-                return true;
-            }
-            return false;
+            return it.hasNext();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return false;
@@ -139,7 +129,7 @@ public class DatabaseMongoDB extends Database {
 
     public boolean retrieveDocument(String collectionName, Bson filter) {
         if(retrieveDocuments(collectionName, filter)){
-            doc = (Document)it.next();
+            document = it.next();
             it = null;
             return true;
         }
@@ -154,7 +144,7 @@ public class DatabaseMongoDB extends Database {
 
         try {
             if(it.hasNext()) {
-                doc = (Document)it.next();
+                document = it.next();
                 return true;
             }
             return false;
@@ -165,28 +155,28 @@ public class DatabaseMongoDB extends Database {
     }
 
     public String getString(String paramName) {
-        if (doc != null) {
-            return doc.getString(paramName);
+        if (document != null) {
+            return document.getString(paramName);
         }
         return "";
     }
 
     public int getInt(String paramName) {
-        if (doc != null) {
-            return doc.getInteger(paramName);
+        if (document != null) {
+            return document.getInteger(paramName);
         }
         return 0;
     }
 
     public List<Object> getArray(String paramName) {
-        if (doc != null) {
-            return (List) doc.get(paramName);
+        if (document != null) {
+            return document.get(paramName, List.class);
         }
         return null;
     }
 
     public Integer insertDocument(String collectionName, Document document) {
-        if (!aware()) {
+        if (unaware()) {
             return null;
         }
 
@@ -204,17 +194,14 @@ public class DatabaseMongoDB extends Database {
     }
 
     public boolean updateDocument(String collectionName, Bson filter, Bson update) {
-        if (!aware()) {
+        if (unaware()) {
             return false;
         }
 
         try {
             MongoCollection<Document> collection = database.getCollection(collectionName);
             UpdateResult result = collection.updateOne(filter, update);
-            if(!result.wasAcknowledged()){
-                return false;
-            }
-            return true;
+            return result.wasAcknowledged();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return false;
@@ -222,17 +209,14 @@ public class DatabaseMongoDB extends Database {
     }
 
     public boolean removeDocument(String collectionName, Bson filter) {
-        if (!aware()) {
+        if (unaware()) {
             return false;
         }
 
         try {
             MongoCollection<Document> collection = database.getCollection(collectionName);
             DeleteResult result = collection.deleteOne(filter);
-            if(!result.wasAcknowledged()){
-                return false;
-            }
-            return true;
+            return result.wasAcknowledged();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return false;

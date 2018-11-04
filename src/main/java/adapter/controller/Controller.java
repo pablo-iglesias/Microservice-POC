@@ -7,7 +7,7 @@ import core.Helper;
 import core.Server;
 import domain.usecase.UsecaseAuthenticateUser;
 
-public class Controller {
+abstract public class Controller {
 
     /**
      * The authenticate method, rather than being itself a page or rest endpoint

@@ -1,5 +1,6 @@
 package adapter.repository.nosql;
 
+import core.Server;
 import org.bson.Document;
 
 import com.google.common.base.Strings;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.enterprise.inject.Alternative;
 /**
  * User repo that expects the database to be MongoDB
@@ -27,11 +27,10 @@ import javax.enterprise.inject.Alternative;
 @Alternative
 public class UserRepositoryMongo implements IUserRepository {
 
-    @Inject
     private DatabaseMongoDB db;
 
-    public UserRepositoryMongo(DatabaseMongoDB db) throws Exception {
-        this.db = db;
+    public UserRepositoryMongo() {
+        db = Server.getInstance(DatabaseMongoDB.class);
     }
 
     /**
@@ -76,9 +75,9 @@ public class UserRepositoryMongo implements IUserRepository {
             filters.add(Filters.eq("password", user.getPassword()));
 
         if(filters.size() > 0 && db.retrieveDocument("users", Filters.and(filters))){
-            user.setId(db.getInt("id"));
-            user.setUsername(db.getString("username"));
-            user.setRoles(db.getArray("roles").stream().toArray(size -> new Integer[size]));
+            user.setId(db.getInt("id"))
+                .setUsername(db.getString("username"))
+                .setRoles(db.getArray("roles").stream().toArray(size -> new Integer[size]));
             return true;
         }
         else{

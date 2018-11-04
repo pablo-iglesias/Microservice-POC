@@ -87,7 +87,7 @@ public class RequestHandler implements HttpHandler {
 
                                 // Identify appropriate controller and method
                                 controller = ApplicationController.class;
-                                method = controller.getMethod(methodName, new Class[] { HttpRequest.class, Session.class });
+                                method = controller.getMethod(methodName, HttpRequest.class, Session.class);
     
                                 // Run controller
                                 ApplicationResponse appResponse = (ApplicationResponse) method.invoke(new ApplicationController(), request, session);
@@ -102,7 +102,7 @@ public class RequestHandler implements HttpHandler {
 
                                 // Identify appropriate controller and method
                                 controller = ApiController.class;
-                                method = controller.getMethod(methodName, new Class[] { HttpRequest.class });
+                                method = controller.getMethod(methodName, HttpRequest.class);
 
                                 // Run controller
                                 HttpResponse apiResponse = (HttpResponse) method.invoke(new UserController(), request);
@@ -158,8 +158,7 @@ public class RequestHandler implements HttpHandler {
      */
     private Cookie retrieveHttpCookie(HttpExchange exchange) {
 
-        CookieFactory factory = new CookieFactory();
-        return factory.create(exchange);
+        return CookieFactory.create(exchange);
     }
 
     /**
@@ -172,8 +171,7 @@ public class RequestHandler implements HttpHandler {
      */
     private HttpRequest createHttpRequest(HttpExchange exchange, Map<String, String> uriSegments) {
 
-        RequestFactory factory = new RequestFactory();
-        HttpRequest request = factory.create(exchange);
+        HttpRequest request = RequestFactory.create(exchange);
         request.set((HashMap<String, String>) uriSegments);
         request.set("query", exchange.getRequestURI().getQuery());
         return request;
@@ -200,14 +198,21 @@ public class RequestHandler implements HttpHandler {
             Date sessionExpiration = session.getExpiryTime();
 
             // Add session cookie to the response
-            String sessionCookie = "sessionToken=" + session.getSessionToken() + ";";
-            sessionCookie += " Expires=" + Helper.getGMTDateNotation(sessionExpiration) + ";";
+            String sessionCookie =
+                String.format(
+                    "sessionToken=%s; Expires=%s;",
+                    session.getSessionToken(),
+                    Helper.getGMTDateNotation(sessionExpiration)
+                );
             exchange.getResponseHeaders().set("Set-Cookie", sessionCookie);
         } else {
             // Add session cookie to the response in order to remove session
             // cookie
-            String sessionCookie = "sessionToken=;";
-            sessionCookie += " Expires=" + Helper.getGMTDateNotation(new Date()) + ";";
+            String sessionCookie =
+                String.format(
+                    "sessionToken=; Expires=%s;",
+                    Helper.getGMTDateNotation(new Date())
+                );
             exchange.getResponseHeaders().set("Set-Cookie", sessionCookie);
         }
     }
@@ -220,8 +225,7 @@ public class RequestHandler implements HttpHandler {
      * @return
      * @throws Exception
      */
-    private HttpResponse createHttpResponse(HttpExchange exchange, ApplicationResponse appResponse)
-            throws Exception {
+    private HttpResponse createHttpResponse(HttpExchange exchange, ApplicationResponse appResponse) throws Exception {
 
         // If the application specified a view and context data, use the
         // template parser to generate response body
@@ -235,10 +239,8 @@ public class RequestHandler implements HttpHandler {
         switch (appResponse.getResponseCode()) {
             case ApplicationResponse.RESPONSE_OK:
                 return new HttpResponse(HttpURLConnection.HTTP_OK, body);
-    
             case ApplicationResponse.RESPONSE_DENIED:
                 return new HttpResponse(HttpURLConnection.HTTP_FORBIDDEN, "<head><meta charset=\"UTF-8\"></head><body><h1>403 Forbidden (~_^)</h1></body>");
-    
             case ApplicationResponse.RESPONSE_REDIRECT:
             default:
                 exchange.getResponseHeaders().set("Location", appResponse.getLocation());
@@ -259,10 +261,14 @@ public class RequestHandler implements HttpHandler {
 
         if(Server.isDebug()){
             System.out.println(
-                LocalDateTime.now() +
-                ", from " + exchange.getRemoteAddress() +
-                ", " + exchange.getRequestMethod() + " " + exchange.getRequestURI().getPath() +
-                ", response HTTP " + httpCode
+                String.format(
+                    "%s, from %s, %s %s, response HTTP %s",
+                    LocalDateTime.now(),
+                    exchange.getRemoteAddress(),
+                    exchange.getRequestMethod(),
+                    exchange.getRequestURI().getPath(),
+                    httpCode
+                )
             );
         }
 

@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 import com.google.gson.Gson;
-import domain.contract.entity.UserObject;
 import org.junit.Test;
 
 import domain.entity.User;

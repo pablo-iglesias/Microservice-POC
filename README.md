@@ -36,12 +36,15 @@
 	*   Windows run "gradlew test"
 4.  Find tests report in build/reports/tests/test/index.html
 
+## Debugging the application
+
+Because of an issue with the dependency injector, you cannot debug the main class, please generate the jar and run your debug sessions on the jar file
+
 ## TODO list
 
 Development never ends
 
 1.  Extend unit tests to cover Adapter package
-2.  Convert Page to an entity, promote relation with Role from 1:1 to 1:n
-3.  Have the REST API to honor JSON API specification ([jsonapi.org](http://jsonapi.org/))
-4.  Add localization support for application templates and REST API error messages
-5.  Add by language content negotiation
+2.  Have the REST API to honor JSON API specification ([jsonapi.org](http://jsonapi.org/))
+3.  Add localization support for application templates and REST API error messages
+4.  Add by language content negotiation

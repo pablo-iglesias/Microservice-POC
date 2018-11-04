@@ -39,7 +39,7 @@ public abstract class DatabaseRelational extends Database {
 
             commit();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             rollback();
             System.out.println(e.getMessage());
             return false;
@@ -56,7 +56,7 @@ public abstract class DatabaseRelational extends Database {
             pointer = 1;
             rs = null;
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -71,7 +71,7 @@ public abstract class DatabaseRelational extends Database {
             pstmt.setString(pointer, param);
             pointer++;
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -86,7 +86,7 @@ public abstract class DatabaseRelational extends Database {
             pstmt.setInt(pointer, param);
             pointer++;
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -100,7 +100,7 @@ public abstract class DatabaseRelational extends Database {
         try {
             conn.setAutoCommit(false);
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -114,7 +114,7 @@ public abstract class DatabaseRelational extends Database {
         try {
             conn.rollback();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -128,7 +128,7 @@ public abstract class DatabaseRelational extends Database {
         try {
             conn.setAutoCommit(true);
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -142,7 +142,7 @@ public abstract class DatabaseRelational extends Database {
         try {
             rs = pstmt.executeQuery();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -155,12 +155,8 @@ public abstract class DatabaseRelational extends Database {
 
         try {
             rs = pstmt.executeQuery();
-            if (next()) {
-                return true;
-            } else {
-                return false;
-            }
-        } catch (Exception e) {
+            return next();
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -180,7 +176,7 @@ public abstract class DatabaseRelational extends Database {
             }
 
             return null;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             return null;
         }
@@ -194,7 +190,7 @@ public abstract class DatabaseRelational extends Database {
         try {
             pstmt.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             return false;
         }
@@ -208,44 +204,62 @@ public abstract class DatabaseRelational extends Database {
         try {
             pstmt.executeUpdate();
             return true;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e.getMessage());
             return false;
         }
     }
 
-    public String getString(String paramName) throws SQLException {
-        if (rs != null) {
-            return rs.getString(paramName);
+    public String getString(String paramName) {
+        try {
+            if (rs != null) {
+                return rs.getString(paramName);
+            }
+            return "";
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return "";
         }
-        return "";
     }
 
-    public int getInt(String paramName) throws SQLException {
-        if (rs != null) {
-            return rs.getInt(paramName);
+    public int getInt(String paramName) {
+        try {
+            if (rs != null) {
+                return rs.getInt(paramName);
+            }
+            return 0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return 0;
         }
-        return 0;
     }
 
-    public boolean next() throws SQLException {
-        if (!rs.next()) {
-            rs = null;
+    public boolean next() {
+        try {
+            if (!rs.next()) {
+                rs = null;
+                return false;
+            }
+            return true;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
             return false;
         }
-
-        return true;
     }
 
-    public int count() throws SQLException {
-        int current = rs.getRow();
-        if (rs.last()) {
-            int rows = rs.getRow();
-            rs.absolute(current);
-            return rows;
+    public int count() {
+        try {
+            int current = rs.getRow();
+            if (rs.last()) {
+                int rows = rs.getRow();
+                rs.absolute(current);
+                return rows;
+            }
+            return 0;
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return 0;
         }
-
-        return 0;
     }
 
     public int pointer() {

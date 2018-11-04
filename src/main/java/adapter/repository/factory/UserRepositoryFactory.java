@@ -5,27 +5,22 @@ import adapter.repository.relational.UserRepositoryRelational;
 import domain.contract.repository.IUserRepository;
 
 import core.Server;
-import core.database.factory.DatabaseFactory;
 
 import javax.enterprise.inject.Produces;
 
 public class UserRepositoryFactory {
 
     @Produces
-    public IUserRepository createRepository() throws Exception{
+    public IUserRepository createRepository() {
 
         switch (Server.getDatabaseType()) {
             case MONGODB:
-                return new UserRepositoryMongo(
-                        DatabaseFactory.createDatabaseMongoDB()
-                );
+                return new UserRepositoryMongo();
             case SQLITE:
             case SQLITE_MEMORY:
             case MYSQL:
             default:
-                return new UserRepositoryRelational(
-                        DatabaseFactory.createDatabaseRelational()
-                );
+                return new UserRepositoryRelational();
         }
     }
 }

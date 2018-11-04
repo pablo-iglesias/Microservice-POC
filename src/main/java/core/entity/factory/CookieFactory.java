@@ -13,7 +13,7 @@ public class CookieFactory {
      * @param exchange
      * @return
      */
-    public Cookie create(HttpExchange exchange) {
+    public static Cookie create(HttpExchange exchange) {
         if (exchange.getRequestHeaders().containsKey("Cookie")) {
             String cookie = exchange.getRequestHeaders().getFirst("Cookie");
             return new Cookie(Helper.map(cookie, ";*([^=]*)=([^;]*)"));

@@ -9,9 +9,9 @@ import domain.entity.User;
  */
 public interface IUserRepository {
 
-    User[] getAllUsers() throws Exception;
-    boolean findUser(User user) throws Exception;
-    Integer insertUser(User user) throws Exception;
-    boolean updateUser(User user) throws Exception;
-    boolean deleteUser(User user) throws Exception;
+    User[] getAllUsers();
+    boolean findUser(User user);
+    Integer insertUser(User user);
+    boolean updateUser(User user);
+    boolean deleteUser(User user);
 }

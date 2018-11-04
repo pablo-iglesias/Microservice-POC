@@ -12,13 +12,13 @@ public class HttpResponse {
     public HttpResponse(int code) {
         this.code = code;
         body = "";
-        headers = new HashMap<String, String>();
+        headers = new HashMap<>();
     }
 
     public HttpResponse(int code, String body) {
         this.code = code;
         this.body = body;
-        headers = new HashMap<String, String>();
+        headers = new HashMap<>();
     }
 
     public int getCode() {

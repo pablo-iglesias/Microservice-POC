@@ -69,46 +69,7 @@ jar {
       'Class-Path': 'libs/' + configurations.runtime.files.collect { it.name }.join(' libs/')
     )
   }
-  metaInf { from "$projectDir/beans" }
 }
-
-// Copy templates and sqls to bin directory for debugging the app with those resources available
-task copyTemplates << {
-    copy {
-        from "$projectDir/templates"
-        into "$buildDir/classes/main/templates" // IntelliJ
-    }
-
-    copy {
-        from "$projectDir/templates"
-        into "$projectDir/bin/templates"        // Eclipse
-    }
-}
-
-task copySqls << {
-    copy {
-        from "$projectDir/sql"
-        into "$buildDir/classes/main/sql"       // IntelliJ
-    }
-
-    copy {
-        from "$projectDir/sql"
-        into "$projectDir/bin/sql"              // Eclipse
-    }
-}
-
-task copyMongos << {
-    copy {
-        from "$projectDir/mongo"
-        into "$buildDir/classes/main/mongo"      // IntelliJ
-    }
-
-    copy {
-        from "$projectDir/mongo"
-        into "$projectDir/bin/mongo"             // Eclipse
-    }
-}
-
 // Copy jar file to the jar folder and all runtime dependencies to the jar/libs subfolder
 task deployJar(type: Copy) {
 	into "$buildDir/jar"
@@ -118,12 +79,6 @@ task deployDependencies(type: Copy) {
     into "$buildDir/jar/libs"
     from configurations.runtime
 }
-
-jar.doFirst {[
-    tasks.copyTemplates.execute(),
-    tasks.copySqls.execute(),
-    tasks.copyMongos.execute()
-]}
 
 jar.finalizedBy([deployJar, deployDependencies])
 

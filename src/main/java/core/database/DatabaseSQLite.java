@@ -17,7 +17,7 @@ public class DatabaseSQLite extends DatabaseRelational {
 
         try {
             Class.forName("org.sqlite.JDBC");
-            String db = Server.getConfig(Server.SQLITE_DB);
+            String db = Server.getConfig(Server.Config.SQLITE_DB);
             File f = new File(db);
             boolean newDatabase = !f.exists();
             conn = DriverManager.getConnection("jdbc:sqlite:" + db);

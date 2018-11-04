@@ -10,6 +10,6 @@ import domain.entity.User;
  */
 public interface IRoleRepository {
 
-    Role getRole(Integer rid) throws Exception;
-    Role[] getRolesByUser(User user) throws Exception;
+    Role[] getRolesByUser(User user);
+    Role[] getRolesByUsers(User[] users);
 }

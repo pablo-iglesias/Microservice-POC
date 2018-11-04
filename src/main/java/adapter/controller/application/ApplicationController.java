@@ -122,7 +122,7 @@ public class ApplicationController extends Controller {
      * @return
      * @throws Exception
      */
-    public ApplicationResponse logout(HttpRequest request, Session session) throws Exception {
+    public ApplicationResponse logout(HttpRequest request, Session session) {
 
         if (session != null) {
             Server.removeSession(session.getSessionToken());

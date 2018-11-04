@@ -7,7 +7,7 @@ import core.entity.HttpRequest;
 
 public class RequestFactory {
 
-    public HttpRequest create(HttpExchange exchange) {
+    public static HttpRequest create(HttpExchange exchange) {
         String body = Helper.convertInputStreamToString(exchange.getRequestBody());
         String requestedURL = "http://" + exchange.getRequestHeaders().getFirst("Host") + exchange.getRequestURI();
         return new HttpRequest(

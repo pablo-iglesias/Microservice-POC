@@ -13,7 +13,7 @@ public class SessionFactory {
      * @param uid
      * @return
      */
-    public Session create(int uid) {
+    public static Session create(int uid) {
 
         String sessionToken;
 

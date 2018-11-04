@@ -8,7 +8,7 @@ public class DataContainer {
     protected Map<String, String> data;
 
     public DataContainer() {
-        data = new HashMap<String, String>();
+        data = new HashMap<>();
     }
 
     public void set(HashMap<String, String> data) {

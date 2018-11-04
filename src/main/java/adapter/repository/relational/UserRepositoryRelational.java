@@ -1,6 +1,5 @@
 package adapter.repository.relational;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -13,7 +12,6 @@ import core.database.DatabaseRelational;
 import domain.entity.User;
 import domain.contract.repository.IUserRepository;
 
-import javax.inject.Inject;
 import javax.enterprise.inject.Alternative;
 
 /**
@@ -24,26 +22,30 @@ import javax.enterprise.inject.Alternative;
 @Alternative
 public class UserRepositoryRelational implements IUserRepository {
 
-    @Inject
     private DatabaseRelational db;
 
-    public UserRepositoryRelational(DatabaseRelational db) throws Exception {
-        this.db = db;
+    public UserRepositoryRelational() {
+        db = Server.getInstance(DatabaseRelational.class);
     }
 
     /**
      * Get all users
      */
-    public User[] getAllUsers() throws SQLException {
+    public User[] getAllUsers() {
 
         db.prepare("SELECT user_id, user_name FROM users");
 
         if (db.select()) {
             List<User> users = new ArrayList<>();
             while (db.next()) {
-                Integer uid = db.getInt("user_id");
-                String username = db.getString("user_name");
-                users.add(new User(uid, username, selectUserRoles(uid)));
+                users.add(
+                    new User()
+                        .setId(db.getInt("user_id"))
+                        .setUsername(db.getString("user_name"))
+                );
+            }
+            for(User user : users){
+                user.setRoles(selectUserRoles(user.getId()));
             }
             return Arrays.copyOf(users.toArray(), users.size(), User[].class);
         } else {
@@ -57,17 +59,20 @@ public class UserRepositoryRelational implements IUserRepository {
      * @param user
      * @return
      */
-    public boolean findUser(User user) throws SQLException {
+    public boolean findUser(User user) {
 
-        if(user.getId() != null){
+        if(user.getId() != null) {
             return findUserById(user);
         }
-        else if(!Strings.isNullOrEmpty(user.getUsername())) {
-
-            if(Strings.isNullOrEmpty(user.getPassword()))
-                return findUserByName(user);
-            else
-                return findUserByNamePass(user);
+        else {
+            if(!Strings.isNullOrEmpty(user.getUsername())) {
+                if(Strings.isNullOrEmpty(user.getPassword())) {
+                    return findUserByName(user);
+                }
+                else {
+                    return findUserByNamePass(user);
+                }
+            }
         }
 
         return false;
@@ -76,15 +81,14 @@ public class UserRepositoryRelational implements IUserRepository {
     /**
      * Get user
      */
-    private boolean findUserById(User user) throws SQLException {
+    private boolean findUserById(User user) {
 
         db.prepare("SELECT user_name FROM users WHERE user_id = ?");
         db.add(user.getId());
 
         if (db.selectOne()) {
-            String username = db.getString("user_name");
-            user.setUsername(username);
-            user.setRoles(selectUserRoles(user.getId()));
+            user.setUsername(db.getString("user_name"))
+                .setRoles(selectUserRoles(user.getId()));
             return true;
         } else {
             return false;
@@ -94,15 +98,15 @@ public class UserRepositoryRelational implements IUserRepository {
     /**
      * Get user
      */
-    private boolean findUserByName(User user) throws SQLException {
+    private boolean findUserByName(User user) {
 
         db.prepare("SELECT user_id FROM users WHERE user_name = ?");
         db.add(user.getUsername());
 
         if (db.selectOne()) {
             Integer uid = db.getInt("user_id");
-            user.setId(uid);
-            user.setRoles(selectUserRoles(uid));
+            user.setId(uid)
+                .setRoles(selectUserRoles(uid));
             return true;
         } else {
             return false;
@@ -112,7 +116,7 @@ public class UserRepositoryRelational implements IUserRepository {
     /**
      * Get user
      */
-    private boolean findUserByNamePass(User user) throws SQLException {
+    private boolean findUserByNamePass(User user) {
 
         db.prepare("SELECT user_id FROM users WHERE user_name = ? AND user_password = ?");
         db.add(user.getUsername());
@@ -120,8 +124,8 @@ public class UserRepositoryRelational implements IUserRepository {
 
         if (db.selectOne()) {
             Integer uid = db.getInt("user_id");
-            user.setId(uid);
-            user.setRoles(selectUserRoles(uid));
+            user.setId(uid)
+                .setRoles(selectUserRoles(uid));
             return true;
         } else {
             return false;
@@ -131,7 +135,7 @@ public class UserRepositoryRelational implements IUserRepository {
     /**
      * Inserts new user
      */
-    public Integer insertUser(User user) throws SQLException {
+    public Integer insertUser(User user) {
 
         db.prepare("INSERT INTO users(user_name, user_password) VALUES(?, ?)");
         db.add(user.getUsername());
@@ -150,7 +154,7 @@ public class UserRepositoryRelational implements IUserRepository {
     /**
      * Updates existing user
      */
-    public boolean updateUser(User user) throws SQLException {
+    public boolean updateUser(User user) {
 
         db.prepare("UPDATE users SET user_name = ?, user_password = ? WHERE user_id = ?");
         db.add(user.getUsername());
@@ -167,7 +171,7 @@ public class UserRepositoryRelational implements IUserRepository {
     /**
      * Removes existing user
      */
-    public boolean deleteUser(User user) throws SQLException {
+    public boolean deleteUser(User user) {
 
         db.prepare("DELETE FROM users WHERE user_id = ?");
         db.add(user.getId());
@@ -179,9 +183,8 @@ public class UserRepositoryRelational implements IUserRepository {
         return false;
     }
 
-    private Integer[] selectUserRoles(Integer uid) throws SQLException{
+    private Integer[] selectUserRoles(Integer uid) {
 
-        DatabaseRelational db = (DatabaseRelational) Server.getDatabase();
         db.prepare("SELECT fk_role_id FROM user_has_role WHERE fk_user_id = ? ORDER BY fk_role_id ASC");
         db.add(uid);
 
@@ -199,7 +202,7 @@ public class UserRepositoryRelational implements IUserRepository {
     /**
      * Insert row in the table user_has_role
      */
-    private boolean setRolesToUser(Integer uid, Integer[] rids) throws SQLException {
+    private boolean setRolesToUser(Integer uid, Integer[] rids) {
 
         if(removeAllRolesFromUser(uid)){
             for (Integer roleId : rids) {
@@ -217,7 +220,7 @@ public class UserRepositoryRelational implements IUserRepository {
     /**
      * Delete rows from the table user_has_roles
      */
-    private boolean removeAllRolesFromUser(Integer uid) throws SQLException {
+    private boolean removeAllRolesFromUser(Integer uid) {
 
         db.prepare("DELETE FROM user_has_role WHERE fk_user_id = ?");
         db.add(uid);

@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 
 public class TemplateParserDefault extends TemplateEngine {
 
-    public String parseTemplate(String view, Map<String, Object> params) throws Exception {
+    public String parseTemplate(String view, Map<String, Object> params) {
 
         String template = loadResourceAsString(view);
 
@@ -14,7 +14,7 @@ public class TemplateParserDefault extends TemplateEngine {
             if (params != null) {
                 Iterator<Entry<String, Object>> it = params.entrySet().iterator();
                 while (it.hasNext()) {
-                    Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
+                    Map.Entry<String, Object> pair = it.next();
                     template = template.replaceAll("\\{\\{" + pair.getKey() + "\\}\\}", (String) pair.getValue());
                     it.remove();
                 }

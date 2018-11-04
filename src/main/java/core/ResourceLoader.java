@@ -2,7 +2,7 @@ package core;
 
 import java.io.InputStream;
 
-public class ResourceLoader {
+public abstract class ResourceLoader {
 
     /**
      * Load a file from the filesystem as an input stream
@@ -10,7 +10,7 @@ public class ResourceLoader {
      * @param path
      * @return
      */
-    protected InputStream loadResourceAsInputStream(String path) {
+    protected static InputStream loadResourceAsInputStream(String path) {
 
         try {
             InputStream resource = ResourceLoader.class.getClassLoader().getResourceAsStream(path);
@@ -27,7 +27,7 @@ public class ResourceLoader {
      * @param path
      * @return
      */
-    protected String loadResourceAsString(String path) {
+    protected static String loadResourceAsString(String path) {
 
         InputStream resource = loadResourceAsInputStream(path);
 

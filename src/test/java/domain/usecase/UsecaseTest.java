@@ -8,7 +8,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 
 import domain.service.UserService;
-import domain.contract.entity.UserObject;
 import domain.contract.repository.IRoleRepository;
 import domain.contract.repository.IUserRepository;
 import domain.entity.Role;
@@ -163,11 +162,12 @@ public abstract class UsecaseTest {
         when(userRepository.findUser(new User().setUsername("user1").setPassword("pass2"))).thenReturn(false);
     }
 
-    protected void initRoleRepositoryMock() throws Exception {
+    protected void initRoleRepositoryMock() {
 
         when(roleRepository.getRolesByUser(admin)).thenReturn(new Role[] { role1, role2, role3, role4 });
         when(roleRepository.getRolesByUser(new User(1))).thenReturn(new Role[] { role1, role2, role3, role4 });
         when(roleRepository.getRolesByUser(new User(2))).thenReturn(new Role[] { role2 });
         when(roleRepository.getRolesByUser(new User(3))).thenReturn(new Role[] { role3 });
+        when(roleRepository.getRolesByUsers(new User[] {admin, user1, user2})).thenReturn(new Role[] { role1, role2, role3, role4 });
     }
 }

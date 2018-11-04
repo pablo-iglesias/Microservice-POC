@@ -15,11 +15,12 @@ public class DatabaseMySQL extends DatabaseRelational {
 
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            String host = Server.getConfig(Server.MYSQL_HOST);
-            String port = Server.getConfig(Server.MYSQL_PORT);
-            String db = Server.getConfig(Server.MYSQL_DB);
-            String user = Server.getConfig(Server.MYSQL_USER);
-            String pass = Server.getConfig(Server.MYSQL_PASS);
+            String host = Server.getConfig(Server.Config.MYSQL_HOST);
+            String port = Server.getConfig(Server.Config.MYSQL_PORT);
+            String db   = Server.getConfig(Server.Config.MYSQL_DB);
+            String user = Server.getConfig(Server.Config.MYSQL_USER);
+            String pass = Server.getConfig(Server.Config.MYSQL_PASS);
+
             String connectionString = "jdbc:mysql://" + host + ":" + port + "/" + db;
             conn = DriverManager.getConnection(connectionString, user, pass);
 

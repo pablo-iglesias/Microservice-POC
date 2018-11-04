@@ -11,7 +11,7 @@ import org.jtwig.JtwigTemplate;
 
 public class TemplateParserTwig extends TemplateEngine {
 
-    public String parseTemplate(String view, Map<String, Object> params) throws Exception {
+    public String parseTemplate(String view, Map<String, Object> params) {
 
         JtwigTemplate template = JtwigTemplate.classpathTemplate(view);
         JtwigModel model = JtwigModel.newModel();
@@ -19,7 +19,7 @@ public class TemplateParserTwig extends TemplateEngine {
         if (params != null) {
             Iterator<Entry<String, Object>> it = params.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
+                Map.Entry<String, Object> pair = it.next();
                 model.with(pair.getKey(), pair.getValue());
                 it.remove();
             }

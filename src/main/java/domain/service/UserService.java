@@ -20,7 +20,7 @@ public class UserService {
      * @return
      * @throws Exception
      */
-    public boolean isUserAnAdmin(User user) throws Exception {
+    public boolean isUserAnAdmin(User user) {
 
         Role[] roles = roleRepository.getRolesByUser(user);
 
@@ -40,13 +40,9 @@ public class UserService {
      * @return
      * @throws Exception
      */
-    public boolean createNewUser(User user) throws Exception {
+    public boolean createNewUser(User user) {
 
-        if(userRepository.insertUser(user) != null) {
-            return true;
-        }
-
-        return false;
+        return userRepository.insertUser(user) != null;
     }
 
     /**
@@ -56,7 +52,7 @@ public class UserService {
      * @return
      * @throws Exception
      */
-    public String getUserNameByUserId(Integer uid) throws Exception {
+    public String getUserNameByUserId(Integer uid) {
 
         User user = new User(uid);
         if(userRepository.findUser(user)){
@@ -73,7 +69,7 @@ public class UserService {
      * @return
      * @throws Exception
      */
-    public boolean isUserAllowedIntoPage(Integer uid, Integer page) throws Exception {
+    public boolean isUserAllowedIntoPage(Integer uid, Integer page) {
 
         User user = new User(uid);
         Role[] roles = roleRepository.getRolesByUser(user);

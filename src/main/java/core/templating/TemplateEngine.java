@@ -8,8 +8,9 @@ public abstract class TemplateEngine extends ResourceLoader {
 
     public enum Type{
         DEFAULT,
-        TWIG
+        TWIG,
+        UNKNOWN
     }
 
-    public abstract String parseTemplate(String view, Map<String, Object> params) throws Exception;
+    public abstract String parseTemplate(String view, Map<String, Object> params);
 }
