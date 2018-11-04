@@ -37,29 +37,29 @@ public class UserController extends ApiController{
                 case USERS_RETRIEVED_SUCCESSFULLY:
 
                     return getResponse(
-                            request,
-                            HttpURLConnection.HTTP_OK,
-                            new ApiResponseUserCollection(
-                                    usecase.getUsers(),
-                                    usecase.getRoles()
-                            )
+                        request,
+                        HttpURLConnection.HTTP_OK,
+                        new ApiResponseUserCollection(
+                            usecase.getUsers(),
+                            usecase.getRoles()
+                        )
                     );
 
                 case NO_USERS_FOUND:
                 default:
                     return getResponse(
-                            request,
-                            HttpURLConnection.HTTP_OK,
-                            new ApiResponseUserCollection()
+                        request,
+                        HttpURLConnection.HTTP_OK,
+                        new ApiResponseUserCollection()
                     );
             }
         }
         catch (Exception e) {
             e.printStackTrace(System.out);
             return getResponse(
-                    request,
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    new ApiResponseError(e.getMessage())
+                request,
+                HttpURLConnection.HTTP_INTERNAL_ERROR,
+                new ApiResponseError(e.getMessage())
             );
         }
     }
@@ -82,29 +82,29 @@ public class UserController extends ApiController{
             {
                 case USER_RETRIEVED_SUCCESSFULLY:
                     return getResponse(
-                            request,
-                            HttpURLConnection.HTTP_OK,
-                            new ApiResponseUserResource(
-                                    usecase.getUser(),
-                                    usecase.getRoles()
-                            )
+                        request,
+                        HttpURLConnection.HTTP_OK,
+                        new ApiResponseUserResource(
+                                usecase.getUser(),
+                                usecase.getRoles()
+                        )
                     );
 
                 case USER_NOT_FOUND:
                 default:
                     return getResponse(
-                            request,
-                            HttpURLConnection.HTTP_NOT_FOUND,
-                            new ApiResponseError("User with this id does not exist")
+                        request,
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        new ApiResponseError("User with this id does not exist")
                     );
             }
         }
         catch (Exception e) {
             e.printStackTrace(System.out);
             return getResponse(
-                    request,
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    new ApiResponseError(e.getMessage())
+                request,
+                HttpURLConnection.HTTP_INTERNAL_ERROR,
+                new ApiResponseError(e.getMessage())
             );
         }
     }
@@ -142,41 +142,41 @@ public class UserController extends ApiController{
 
                 case USER_ALREADY_EXISTS:
                     return getResponse(
-                            request,
-                            HttpURLConnection.HTTP_BAD_REQUEST,
-                            new ApiResponseError("User with this username already exists")
+                        request,
+                        HttpURLConnection.HTTP_BAD_REQUEST,
+                        new ApiResponseError("User with this username already exists")
                     );
 
                 case BAD_INPUT_DATA:
                     return getResponse(
-                            request,
-                            HttpURLConnection.HTTP_BAD_REQUEST,
-                            new ApiResponseError("Insufficient data supplied, need username, password and at least one role")
+                        request,
+                        HttpURLConnection.HTTP_BAD_REQUEST,
+                        new ApiResponseError("Insufficient data supplied, need username, password and at least one role")
                     );
 
                 case USER_NOT_CREATED:
                 default:
                     db.rollback();
                     return getResponse(
-                            request,
-                            HttpURLConnection.HTTP_INTERNAL_ERROR,
-                            new ApiResponseError("Unknown error")
+                        request,
+                        HttpURLConnection.HTTP_INTERNAL_ERROR,
+                        new ApiResponseError("Unknown error")
                     );
             }
         }
         catch (JsonSyntaxException e) {
             return getResponse(
-                    request,
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    new ApiResponseError("Json syntax")
+                request,
+                HttpURLConnection.HTTP_BAD_REQUEST,
+                new ApiResponseError("Json syntax")
             );
         }
         catch (Exception e) {
             e.printStackTrace(System.out);
             return getResponse(
-                    request,
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    new ApiResponseError(e.getMessage())
+                request,
+                HttpURLConnection.HTTP_INTERNAL_ERROR,
+                new ApiResponseError(e.getMessage())
             );
         }
     }
@@ -216,46 +216,46 @@ public class UserController extends ApiController{
 
                 case USER_DOES_NOT_EXIST:
                     return getResponse(request, HttpURLConnection.HTTP_NOT_FOUND,
-                            new ApiResponseError("User with this id does not exist")
+                        new ApiResponseError("User with this id does not exist")
                     );
 
                 case USERNAME_ALREADY_TAKEN:
                     return getResponse(
-                            request,
-                            HttpURLConnection.HTTP_CONFLICT,
-                            new ApiResponseError("The specified username is already in use")
+                        request,
+                        HttpURLConnection.HTTP_CONFLICT,
+                        new ApiResponseError("The specified username is already in use")
                     );
 
                 case BAD_INPUT_DATA:
                     return getResponse(
-                            request,
-                            HttpURLConnection.HTTP_BAD_REQUEST,
-                            new ApiResponseError("Insufficient data supplied, need username, password and at least one role")
+                        request,
+                        HttpURLConnection.HTTP_BAD_REQUEST,
+                        new ApiResponseError("Insufficient data supplied, need username, password and at least one role")
                     );
 
                 case USER_NOT_UPDATED:
                 default:
                     db.rollback();
                     return getResponse(
-                            request,
-                            HttpURLConnection.HTTP_INTERNAL_ERROR,
-                            new ApiResponseError("Unknown error")
+                        request,
+                        HttpURLConnection.HTTP_INTERNAL_ERROR,
+                        new ApiResponseError("Unknown error")
                     );
             }
         }
         catch (JsonSyntaxException e) {
             return getResponse(
-                    request,
-                    HttpURLConnection.HTTP_BAD_REQUEST,
-                    new ApiResponseError("Json syntax")
+                request,
+                HttpURLConnection.HTTP_BAD_REQUEST,
+                new ApiResponseError("Json syntax")
             );
         }
         catch (Exception e) {
             e.printStackTrace(System.out);
             return getResponse(
-                    request,
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    new ApiResponseError(e.getMessage())
+                request,
+                HttpURLConnection.HTTP_INTERNAL_ERROR,
+                new ApiResponseError(e.getMessage())
             );
         }
     }
@@ -290,27 +290,27 @@ public class UserController extends ApiController{
 
                 case USER_DOES_NOT_EXIST:
                     return getResponse(
-                            request,
-                            HttpURLConnection.HTTP_NOT_FOUND,
-                            new ApiResponseError("User with this id does not exist")
+                        request,
+                        HttpURLConnection.HTTP_NOT_FOUND,
+                        new ApiResponseError("User with this id does not exist")
                     );
 
                 case USER_NOT_DELETED:
                 default:
                     db.rollback();
                     return getResponse(
-                            request,
-                            HttpURLConnection.HTTP_INTERNAL_ERROR,
-                            new ApiResponseError("Unknown error")
+                        request,
+                        HttpURLConnection.HTTP_INTERNAL_ERROR,
+                        new ApiResponseError("Unknown error")
                     );
             }
         }
         catch (Exception e) {
             e.printStackTrace(System.out);
             return getResponse(
-                    request,
-                    HttpURLConnection.HTTP_INTERNAL_ERROR,
-                    new ApiResponseError(e.getMessage())
+                request,
+                HttpURLConnection.HTTP_INTERNAL_ERROR,
+                new ApiResponseError(e.getMessage())
             );
         }
     }

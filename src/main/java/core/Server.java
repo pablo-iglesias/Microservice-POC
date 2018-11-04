@@ -26,7 +26,7 @@ public class Server {
     private static final String ENVIRONMENT_VARIABLE_PREFIX = "POC_";
 
     // Dependency injector
-    public final static class Injector {
+    private final static class Injector {
         private static final SeContainer injector = SeContainerInitializer.newInstance().initialize();
         public static <O extends Object> O getInstance(Class<O> a){
             return injector.select(a).get();

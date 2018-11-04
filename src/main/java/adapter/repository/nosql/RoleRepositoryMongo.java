@@ -72,11 +72,11 @@ public class RoleRepositoryMongo implements IRoleRepository {
             if(db.retrieveDocuments("roles", Filters.in("id", roleIds))) {
                 while(db.next()) {
                     roles.add(
-                            new Role(
-                                    db.getInt("id"),
-                                    db.getString("name"),
-                                    db.getString("page")
-                            )
+                        new Role(
+                            db.getInt("id"),
+                            db.getString("name"),
+                            db.getString("page")
+                        )
                     );
                 }
             }
